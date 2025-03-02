@@ -1,0 +1,29 @@
+project:
+  type: website
+
+website:
+  title: "ISSS608-team4pj"
+  navbar:
+    right:
+      - href: index.qmd
+        text: "Team"
+      - href: introduction.qmd
+        text: "Introduction"
+      - href: aboutdata.qmd
+        text: "About Data"
+      - href: shintapp.qmd
+        text: "Shiny app"
+      - href: poster.qmd
+        text: "Poster"
+      - href: userguide.qmd
+        text: "User Guide"
+
+format:
+  html:
+    theme:
+      - zephyr
+    css: styles.css
+    toc: true
+
+editor: visual
+
