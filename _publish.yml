@@ -1,0 +1,4 @@
+- source: project
+  netlify:
+    - id: ccb99684-523f-4316-8029-8540a2b59d32
+      url: https://lustrous-valkyrie-f4eb42.netlify.app
