@@ -6,17 +6,13 @@ website:
   navbar:
     right:
       - href: index.qmd
-        text: "Team"
-      - href: introduction.qmd
-        text: "Introduction"
-      - href: aboutdata.qmd
-        text: "About Data"
-      - href: shintapp.qmd
-        text: "Shiny app"
-      - href: poster.qmd
-        text: "Poster"
-      - href: userguide.qmd
-        text: "User Guide"
+        text: "Home"
+      - href: "Proposal/proposal.qmd"
+        text: "Project Proposal"
+      - href: "EDA.qmd"
+        text: "EDA"
+     
+
 
 format:
   html:

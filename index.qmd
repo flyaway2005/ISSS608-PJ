@@ -1,5 +1,3 @@
 ---
-title: "Welcome to ISSS-608 team 4's Project Demo Site"
+title: "ISSS-608 team 4's Project"
 ---
-
-Test
