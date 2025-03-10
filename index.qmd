@@ -1,3 +1,11 @@
 ---
-title: "ISSS608-Team 4 Project Site"
+title: "Let's Track Public Dollars!"
+subtitle: "This is a project website of ISSS608. We're diving deep into Singapore's government procurement data to uncover insights about public spending patterns."
 ---
+
+:::{.column-page}
+Author: Chang Fang Yu, Cathy CHU Shan-hui
+:::
+
+
+
