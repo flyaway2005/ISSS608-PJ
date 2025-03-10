@@ -2,20 +2,17 @@ project:
   type: website
 
 website:
-  title: "SG Public Dollars"
+  title: "Lets’ Track Public Dollars!"
   navbar:
-    left:
-    - text: "Project Proposal"
-      href: Proposal/proposal.qmd
-    - text: "Product"
-      href: 
-      
     right:
       - href: index.qmd
         text: "Home"
-      - href: about.qmd
-        text: "Team"
+      - href: "Proposal/proposal.qmd"
+        text: "Project Proposal"
       
+     
+
+
 format:
   html:
     theme:
