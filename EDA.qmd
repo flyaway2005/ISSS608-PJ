@@ -8,6 +8,7 @@ execute:
   warning: false
   freeze: true
 ---
+
 ```{r}
 library(readr)
 ```
@@ -22,30 +23,36 @@ pacman::p_load(igraph, tidygraph, ggraph,
                tidyverse, graphlayouts)
 ```
 
-
 Import data:
+
 ```{r}
 GP <- read_csv("data/GovernmentProcurementviaGeBIZ.csv")
 ```
+
 ```{R}
 glimpse(GP)
 ```
+
 ```{r}
 str(GP)
 ```
+
 ```{R}
 sum(is.na(GP))
 ```
+
 ```{R}
 summary(GP)
 
 ```
+
 ```{r}
 colnames(GP)
 
 ```
 
 Data Cleaning
+
 ```{R}
 # drop NA
 GP_cleaned <- GP %>% drop_na()
@@ -73,7 +80,9 @@ ggplot(GP_summary, aes(x = reorder(agency, Total_Value), y = Total_Value)) +
   theme_minimal()
 
 ```
+
 Top 10 suppliers
+
 ```{r}
 GP %>%
   group_by(supplier_name) %>%
@@ -90,6 +99,7 @@ GP %>%
 
 
 ```
+
 ```{r}
 
 library(tidytext)
@@ -105,6 +115,7 @@ word_freq <- GP %>%
 wordcloud(words = word_freq$word, freq = word_freq$n, max.words = 100, colors = brewer.pal(8, "Dark2"))
 
 ```
+
 ```{r}
 # Calculate total procurement amount per supplier
 supplier_market_share <- GP %>%
@@ -131,6 +142,7 @@ supplier_market_share %>%
 
 
 ```
+
 ```{r}
 library(ggplot2)
 
@@ -155,6 +167,7 @@ ggplot(supplier_pie_data, aes(x = "", y = Total_Awarded_Amt, fill = supplier_nam
   labs(title = "Market Share of Top 10 Suppliers in Government Procurement")
 
 ```
+
 ```{r}
 # Ensure supplier_market_share is sorted and compute cumulative sum
 supplier_market_share <- supplier_market_share %>%
@@ -176,9 +189,8 @@ ggplot(supplier_market_share, aes(x = Supplier_Rank, y = Cumulative_Share)) +
 
 ```
 
-
-
 Distribution of Awarded Amount (Boxplot)
+
 ```{r}
 GP %>%
   ggplot(aes(y = awarded_amt)) +
@@ -189,7 +201,9 @@ GP %>%
   theme_minimal()
 
 ```
+
 Total Procurement Amount by Government Agencies
+
 ```{r}
 GP %>%
   group_by(agency) %>%
@@ -205,6 +219,3 @@ GP %>%
   theme_minimal()
 
 ```
-
-
-
