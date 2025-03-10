@@ -49,11 +49,13 @@ Through these visual analytics approaches, users will understand immediately: 
 Our solutions will empower citizens, businesses, and policymakers with the tool to understand government spending, and contracts without specialised technical knowledge. Ultimately we want to promote greater accountability by shedding light on procurement patterns, key suppliers, and competitive landscapes, as well as informed public resource allocation.
 
 ##   Data
+
 [GeBIZ](https://www.gebiz.gov.sg/) (Government Electronic Business Platform), containing 18,638 entries from 2019 to 2023.
 
 ```{r}
 library(readr)
 ```
+
 ```{r}
 pacman::p_load(ggrepel, patchwork, 
                ggthemes, hrbrthemes,
@@ -63,16 +65,16 @@ pacman::p_load(igraph, tidygraph, ggraph,
                visNetwork, lubridate, clock,
                tidyverse, graphlayouts)
 ```
+
 ```{r}
 
 GP <- read_csv("data/GovernmentProcurementviaGeBIZ.csv")
 ```
+
 ```{r}
 library(knitr)
 kable(head(GP))
 ```
-
-
 
 ## Methodology 
 
@@ -177,3 +179,5 @@ An interactive dashboard will track supplier competition, market share, and agen
 -   **Price and procurement cost analysis:** Examine contract price distributions across supplier clusters to detect unusually high or low procurement prices, providing insights for cost optimization. 
 
 ## **Prototype** 
+
+![](images/Network_1-01.png)
