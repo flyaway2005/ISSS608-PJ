@@ -9,8 +9,8 @@ website:
         text: "Home"
       - href: Proposal/proposal.qmd
         text: "Project Proposal"
-      
-     
+
+
 
 
 format:
