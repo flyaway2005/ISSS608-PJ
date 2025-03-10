@@ -1,4 +1,179 @@
 ---
 title: "Project Proposal"
 author: "Chang Fang Yu, Cathy CHU Shan-hui"
+date-modified: "last-modified"
+execute:
+  echo: False
+  eval: True
+  warning: false
+  freeze: true
 ---
+
+# Lets’ Track Public Dollars! Unveiling the G2B Network from GeBiz
+
+## Motivation
+
+Government procurement represents billions in public spending annually, directly impacting taxpayers and the business ecosystem. Despite initiatives like GeBIZ that ostensibly promote transparency, meaningful public oversight remains challenging. Our team's experience attempting to analyze this data revealed significant barriers to understanding: scattered information across thousands of entries, complex relationships between agencies and suppliers, and limited tools to identify patterns or anomalies in spending.
+
+## Problem statement
+
+While raw procurement data is technically "available," several critical issues prevent it from being truly accessible:
+
+1.  Information Overload: The volume and complexity of government tender data overwhelm ordinary citizens.
+
+2.  Limited Visualization: Current platforms present data in tabular formats without meaningful visual representations of relationships or trends.
+
+3.  Hidden Patterns: Important insights about procurement patterns, supplier dominance, and potential inefficiencies remain buried in spreadsheets.
+
+4.  Accessibility Barriers: Technical knowledge requirements effectively restrict who can meaningfully engage with and interpret public spending information.
+
+## Proposed solution 
+
+To bridge this gap, our project " Lets’ Track Public Dollars! Unveiling the G2B Network from GeBiz " aims to address these challenges by developing an intuitive Shiny dashboard that transforms complex procurement data into accessible visual insights.  
+
+The application will leverage: 
+
+-   Network analysis: Reveals relationship patterns between government agencies and suppliers, identifying key players, procurement communities, and the flow of public funds 
+-   Temporal visualisation: Tracks procurement trends over time, highlighting seasonal patterns, evolving supplier relationships, and changes in government spending priorities 
+-   Competitive intelligence: Maps market concentration, spending distributions, and supplier dominance across different government sectors, enabling analysis of procurement fairness and efficiency 
+-   Text analysis: Discovers common themes and requirements in tender descriptions through interactive word clouds, helping users understand what government agencies are purchasing 
+
+Through these visual analytics approaches, users will understand immediately: 
+
+-   How government spending flows & distribution between agencies and suppliers 
+-   Which suppliers dominate particular agency relationships 
+-   How procurement patterns evolve over fiscal periods 
+-   Where potential opportunities exist for new market entrants 
+-   Whether procurement appears appropriately distributed or concentrated 
+
+Our solutions will empower citizens, businesses, and policymakers with the tool to understand government spending, and contracts without specialised technical knowledge. Ultimately we want to promote greater accountability by shedding light on procurement patterns, key suppliers, and competitive landscapes, as well as informed public resource allocation.
+
+##   Data
+[GeBIZ](https://www.gebiz.gov.sg/) (Government Electronic Business Platform), containing 18,638 entries from 2019 to 2023.
+
+```{r}
+library(readr)
+```
+```{r}
+pacman::p_load(ggrepel, patchwork, 
+               ggthemes, hrbrthemes,
+               tidyverse, plotly, 
+               DT, GGally, parallelPlot, tidytext) 
+pacman::p_load(igraph, tidygraph, ggraph, 
+               visNetwork, lubridate, clock,
+               tidyverse, graphlayouts)
+```
+```{r}
+
+GP <- read_csv("data/GovernmentProcurementviaGeBIZ.csv")
+```
+```{r}
+library(knitr)
+kable(head(GP))
+```
+
+
+
+## Methodology 
+
+The project will employ a modular data-driven approach to uncover insights from government procurement data using interactive dashboards, natural language processing (NLP), and network analysis techniques. By integrating advanced visualization and machine learning methods, the system will provide a comprehensive, transparent, and engaging analytical tool for public procurement monitoring. The planning modules include the following: 
+
+### Module 1. Procurement Dashboard  
+
+#### Core functionality: 
+
+The Procurement Dashboard serves as an interactive data exploration module designed to empower users with real-time insights into procurement activities. By leveraging advanced data visualization techniques, filtering mechanisms, and anomaly detection, the dashboard provides a comprehensive, transparent, and dynamic interface for monitoring procurement trends. 
+
+#### Implement components: 
+
+1.  Custom filtering & interactive selection to explore procurement activity at various levels. 
+
+#### Specific insights: 
+
+-   **Real-time Procurement Trends:** Gain an overview of procurement spending, contract awards, and supplier distribution over time. 
+
+<!-- -->
+
+-   **Agency-Level Procurement Analysis:** Identify top-spending agencies and their procurement patterns. 
+
+<!-- -->
+
+-   **Supplier Market Presence:** Monitor key suppliers, their awarded contracts, and market concentration. 
+
+<!-- -->
+
+-   **High-Value & High-Frequency Contracts:** Detect contracts with significant financial impact or recurring transactions. 
+
+### Module 2. G2B Procurement Network Analysis  
+
+#### Core functionality: 
+
+A network graph visualization will be developed to illustrate the relationships between government agencies and suppliers based on procurement transactions.  
+
+#### Implement components: 
+
+1.  Interactive network visualisation (core) 
+2.  Filtering and control panel (core) 
+3.  Network metrics dashboard (core) 
+4.  Community detection 
+5.  Entity focus view 
+
+#### Specific insights: 
+
+-   **Agency-supplier collaboration:** which agencies work most frequently with specific suppliers 
+-   **Network centrality analysis:** Identify central nodes in procurement networks 
+-   **Community detection:** will reveal clusters of agencies and suppliers that frequently collaborate. 
+-   **Temporal network evolution:** will show how procurement relationships develop over time  
+-   **Pattern recognition:** will highlight recurring procurement transactions. 
+
+### Module 3. Procurement Language Insights 
+
+#### Core functionality: 
+
+A word cloud visualization will extract key phrases from tender descriptions, providing an interactive linguistic analysis of procurement trends and needs. 
+
+#### Implement components:
+
+1.  Comparison of agency-specific terminology to detect procurement priorities. 
+
+<!-- -->
+
+2.  Side-by-side word clouds to track language shifts across different procurement periods. 
+
+<!-- -->
+
+3.  LDA-based topic modeling to extract key procurement themes. 
+
+#### Specific insights: 
+
+-   **Agency-Specific Procurement Terminology:**  
+
+    Identify key terms used in procurement tender descriptions across different government agencies by LDA topic analysis. 
+
+-   **Procurement Demand Trends:** Word cloud comparisons across different years will reveal shifts in procurement focus. 
+
+### Module 4. Competitive Intelligence & Market Analysis 
+
+#### Core functionality: 
+
+An interactive dashboard will track supplier competition, market share, and agency spending. 
+
+#### Implement components:
+
+1.  Contract concentration metrics to evaluate reliance on specific suppliers. 
+
+<!-- -->
+
+2.  Temporal market analysis to track supplier entry/exit and market share shifts. 
+
+<!-- -->
+
+3.  Award value distribution analysis to highlight spending patterns and procurement diversity. 
+
+#### Specific insights: 
+
+-   **Supplier Market Segmentation and Dependency Analysis**: Utilize LDA topic modeling and K-means clustering to segment suppliers based on market behavior and procurement categories, enabling data-driven procurement strategies. Simultaneously, conduct supplier dependency analysis by calculating the market share of top suppliers in each procurement category to assess whether government procurement is overly reliant on specific suppliers, identifying potential risks. 
+
+-   **Price and procurement cost analysis:** Examine contract price distributions across supplier clusters to detect unusually high or low procurement prices, providing insights for cost optimization. 
+
+## **Prototype** 
