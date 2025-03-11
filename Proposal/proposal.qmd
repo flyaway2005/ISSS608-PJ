@@ -176,18 +176,23 @@ An interactive dashboard will track supplier competition, market share, and agen
 ::: panel-tabset
 ## Procurement Dashboard
 
+**Top Agencies & Suppliers**
 ![](images/Temp_1-01.png)
 
+**Procurement Trend by Supplier**
 ![](images/Temp_2-01.png)
 
+**Prosurement Trend by Agency**
 ![](images/Temp_3-02.png)
 
 ## Network Analysis
-
+**Network Visualisation**
 ![](images/Network_1-01.png)
 
+**Communities Detection**
 ![](images/Network_2-01.png)
 
+**Network Metrics**
 ![](images/Network_3-01.png)
 
 ## Procurement Language
