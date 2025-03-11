@@ -180,4 +180,14 @@ An interactive dashboard will track supplier competition, market share, and agen
 
 ## **Prototype** 
 
+![](images/Temp_1-01.png)
+
+![](images/Temp_2-01.png)
+
+![](images/Temp_3-02.png)
+
 ![](images/Network_1-01.png)
+
+![](images/Network_2-01.png)
+
+![](images/Network_3-01.png)
