@@ -125,8 +125,7 @@ A network graph visualization will be developed to illustrate the relationships 
 -   **Agency-supplier collaboration:** which agencies work most frequently with specific suppliers 
 -   **Network centrality analysis:** Identify central nodes in procurement networks 
 -   **Community detection:** will reveal clusters of agencies and suppliers that frequently collaborate. 
--   **Temporal network evolution:** will show how procurement relationships develop over time  
--   **Pattern recognition:** will highlight recurring procurement transactions. 
+
 
 ### Module 3. Procurement Language Insights 
 
@@ -137,13 +136,7 @@ A word cloud visualization will extract key phrases from tender descriptions, pr
 #### Implement components:
 
 1.  Comparison of agency-specific terminology to detect procurement priorities. 
-
-<!-- -->
-
 2.  Side-by-side word clouds to track language shifts across different procurement periods. 
-
-<!-- -->
-
 3.  LDA-based topic modeling to extract key procurement themes. 
 
 #### Specific insights: 
@@ -164,11 +157,11 @@ An interactive dashboard will track supplier competition, market share, and agen
 
 1.  Contract concentration metrics to evaluate reliance on specific suppliers. 
 
-<!-- -->
+
 
 2.  Temporal market analysis to track supplier entry/exit and market share shifts. 
 
-<!-- -->
+
 
 3.  Award value distribution analysis to highlight spending patterns and procurement diversity. 
 
@@ -180,14 +173,26 @@ An interactive dashboard will track supplier competition, market share, and agen
 
 ## **Prototype** 
 
+::: panel-tabset
+## Procurement Dashboard
+
 ![](images/Temp_1-01.png)
 
 ![](images/Temp_2-01.png)
 
 ![](images/Temp_3-02.png)
 
+## Network Analysis
+
 ![](images/Network_1-01.png)
 
 ![](images/Network_2-01.png)
 
 ![](images/Network_3-01.png)
+
+## Procurement Language
+
+## Market Analysis
+
+:::
+
