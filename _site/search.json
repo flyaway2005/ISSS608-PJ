@@ -114,7 +114,7 @@
   {
     "objectID": "meetings/meeting_notes_1.html",
     "href": "meetings/meeting_notes_1.html",
-    "title": "Meeting Minutes 2",
+    "title": "Meeting Minutes 1",
     "section": "",
     "text": "The meeting notes below document the 2nd discussion among group members.\n\nDate: 2pm, March 3, 2025\n\n\nAttendees: Cathy, Fangyu\n\n\nDiscussion\n1 Readiness of Github Collaboration and Netilify Page\n\nFangyu has initiated the Github repo and Netlify for the project.\n\n2 Survey Data Analysis Options\n\nCathy noted that PISA data offers multiple analytical perspectives.\n\nPISA data enables broader analytical exploration but requires more extensive data exploration and processing \nNetwork analysis also appears to be an interesting topic, but is new to this field. \nExpressed uncertainty about the viability of Nowcasting as a project direction.\n\n\n3 Data Complexity Considerations\n\nFangyu highlighted concerns regarding:  \n\nThe complexity of processing survey data, particularly due to encoding requirements \nWeather data’s suitability for forecasting applications \nPreference for selecting a topic with stronger business value implications \nPlans to consult with Professor regarding Open Government Data options  \n\n\n4 Text Analysis Approach\n\nFangyu proposed leveraging text analysis techniques specifically for Word Cloud visualizations of the procurement data. \n\nBoth Cathy and Fangyu decided to explore two alternative topics: \n\nGovernment Procurement \nNowcasting \n\nAction Items \n\nCathy will start developing a comprehensive storyboard for the Network analysis module. \nFangyu will begin text analysis implementation and create an initial prototype."
   },
