@@ -102,16 +102,20 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-meetings">    
         <li>
-    <a class="dropdown-item" href="../meetings/meeting_notes_1.qmd">
+    <a class="dropdown-item" href="../meetings/meeting_notes_1.html">
  <span class="dropdown-text">Meeting 1</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../meetings/meeting_notes_2.qmd">
+    <a class="dropdown-item" href="../meetings/meeting_notes_2.html">
  <span class="dropdown-text">Meeting 2</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../meetings/meeting_notes_3.html">
  <span class="dropdown-text">Meeting 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../meetings/meeting_notes_4.html">
+ <span class="dropdown-text">Meeting 4</span></a>
   </li>  
     </ul>
   </li>
@@ -131,7 +135,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#meeing-3" id="toc-meeing-3" class="nav-link active" data-scroll-target="#meeing-3">Meeing 3</a></li>
+  <li><a href="#meeting-3" id="toc-meeting-3" class="nav-link active" data-scroll-target="#meeting-3">Meeting 3</a></li>
   </ul>
 </nav>
     </div>
@@ -164,73 +168,40 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>The meeting notes below document the 3rd discussion among group members and consultation with Professor Kam.</p>
-<section id="meeing-3" class="level2">
-<h2 class="anchored" data-anchor-id="meeing-3">Meeing 3</h2>
-<section id="date-4pm-march-11-2025" class="level4">
-<h4 class="anchored" data-anchor-id="date-4pm-march-11-2025"><strong>Date: 4pm, March 11, 2025</strong></h4>
+<section id="meeting-3" class="level2">
+<h2 class="anchored" data-anchor-id="meeting-3">Meeting 3</h2>
+<section id="date-2pm-march-8-2025" class="level4">
+<h4 class="anchored" data-anchor-id="date-2pm-march-8-2025"><strong>Date: 2pm, March 8, 2025</strong></h4>
 </section>
-<section id="attendees-cathy-fangyu-prof.-kam" class="level4">
-<h4 class="anchored" data-anchor-id="attendees-cathy-fangyu-prof.-kam"><strong>Attendees:</strong> Cathy, Fangyu, Prof.&nbsp;Kam</h4>
+<section id="attendees-cathy-fangyu" class="level4">
+<h4 class="anchored" data-anchor-id="attendees-cathy-fangyu"><strong>Attendees:</strong> Cathy, Fangyu</h4>
 </section>
-<section id="discussion" class="level4">
-<h4 class="anchored" data-anchor-id="discussion"><strong>Discussion</strong></h4>
-<p><strong><em>1 Procurement Dashboard &amp; Visualization</em></strong></p>
+<section id="progress-updates" class="level4">
+<h4 class="anchored" data-anchor-id="progress-updates"><strong>Progress updates</strong></h4>
+<p><strong><em>1 Text Analysis Development</em></strong></p>
 <ul>
-<li>Cathy presented the proposal outline and storyboard for the Procurement dashboard and Network analysis.</li>
-<li><strong>Prof.&nbsp;Kam’s feedback</strong>
+<li><p>Fangyu has made progress on several fronts&nbsp;</p>
 <ul>
-<li>Implement user flexibility to select the top N number of agencies/suppliers when visualizing dashboard data.</li>
-<li>Create interactive bar charts where users can click on specific agencies/suppliers to trigger dynamic metrics tables with relevant information, rather than displaying static tables.</li>
-<li>Replace individual month selectors with calendar selectors or quarterly options (Q1, Q2, etc.) to better represent ordinal data and reveal seasonal patterns.</li>
-<li>Utilise Treemaps to visualize agency hierarchy by ministry, enabling better drill-down functionality. Add interactivity to display additional information, such as the top five suppliers for any selected agency.</li>
+<li>Developed a Shiny App prototype specifically for word cloud visualisation.</li>
+<li>Initiated text analysis of procurement tender descriptions.</li>
+<li>Conducted experimental LDA (Latent Dirichlet Allocation) analysis to explore text analysis possibilities with the procurement data.</li>
 </ul></li>
 </ul>
-<p><strong><em>2 Network Graph Visualization</em></strong></p>
+<p><strong><em>2 Interface Design Progress</em></strong>&nbsp;</p>
 <ul>
-<li>Cathy presented the three-tab design concept for the procurement network dashboards.</li>
-<li><strong>Prof.&nbsp;Kam’s feedback</strong>
+<li><p>Cathy has begun work on user interface design: &nbsp;</p>
 <ul>
-<li>Calculate node centrality metrics first to enable community construction. These centrality indices will provide critical analytical information for outcomes.</li>
-<li>Implement user selection of centrality measurement types, allowing the network graph to update based on the selected method.</li>
-<li>Integrate community detection/analysis within the initial “Visualisation” tab, followed by deeper analysis based on community findings.</li>
-<li><em>[Note: Cathy inquired if community detection could remain as a standalone tab. Prof.&nbsp;Kam recommended further exploration before making this decision.]</em></li>
+<li>Created initial sketch designs for the Network analysis module&nbsp;</li>
+<li>Developed preliminary layouts for the Overview dashboard&nbsp;</li>
+<li>Expressed uncertainty about whether the current design direction is logistically workable.&nbsp;</li>
 </ul></li>
 </ul>
-<p><strong><em>3 Text Analysis &amp; Topic Modeling</em></strong></p>
+<p><strong><em>Action Item</em></strong>&nbsp;</p>
 <ul>
-<li><p>Fangyu demonstrated the text analysis storyboard and current progress, including the LDA (Latent Dirichlet Allocation) topic modeling and clustering techniques used to identify key procurement themes.</p></li>
-<li><p><strong>Prof.&nbsp;Kam’s feedback</strong></p>
-<ul>
-<li><p>Emphasized the importance of interactive data refinement to continuously improve classification accuracy.</p></li>
-<li><p>Recommended training a model to label each tender type, referencing the book “Text Modeling with R” to establish a standardized categorization process.</p></li>
-<li><p>Suggested revised approaches for LDA modeling utilizing TF-IDF (Term Frequency-Inverse Document Frequency) metrics while maintaining the tidytext approach.</p></li>
-<li><p>Proposed re-ordering the tabs within the module: Learning Data &gt; Word Cloud &gt; Text Analysis &gt; LDA Text Modeling (since LDA itself is a clustering analysis for classification).</p></li>
-<li><p>Recommended restructuring the overall module flow: Begin with Text Analysis to derive tender classification results &gt; Incorporate these results into Network Analysis to generate more insightful visualizations.</p></li>
-</ul></li>
-</ul>
-<p><strong><em>4 Additional Notes (Text Analysis Techniques):</em></strong></p>
-<ul>
-<li><p><em>TF-IDF (Term Frequency-Inverse Document Frequency):</em> Identifies the most representative keywords to enhance topic modeling accuracy.</p></li>
-<li><p><em>Text Cleaning:</em> Ensures clean textual data (removing stop words, special characters, punctuation, etc.) for higher-quality analysis.</p></li>
-<li><p><em>LDA Refinement Process:</em> The LDA model should be iteratively refined to achieve the purest possible categorization, enhancing the clarity and accuracy of procurement descriptions.</p></li>
-</ul>
-<p><strong><em>Shiny App Development &amp; Integration</em></strong></p>
-<ul>
-<li>Team had questions about code compilation and implementing a sophisticated Shiny app interface similar to previous student work.</li>
-<li><strong>Prof Kam’s feedback</strong>
-<ul>
-<li>Team members should develop modules separately but eventually compile all code into a single Shiny web app file for publication on Shinyapps.io (one link only to be used on Netlify).</li>
-<li>Before code compilation, the team must agree on a consistent menu design across all modules to ensure consistent rendering and expected results.</li>
-</ul></li>
-</ul>
-<p><strong><em>5 Next steps</em></strong></p>
-<ul>
-<li><p>FangYu to continue refining the text classification module implementing Prof.&nbsp;Kam’s recommended approaches by the next milestone.</p></li>
-<li><p>Cathy to redesign the interactive procurement network visualization incorporating feedback on centrality metrics and community detection.</p></li>
-</ul>
-<!-- -->
-<ul>
-<li>Schedule another consultation with Prof.&nbsp;Kam at the next project milestone to review progress.</li>
+<li>Cathy will join the Github to begin development.&nbsp;</li>
+<li>Cathy will work on drafting a proposal for the procurement data module and further develop the Network Module story board.&nbsp;</li>
+<li>Fangyu will continue iterating on the Shiny App prototype and refine LDA analysis.&nbsp;</li>
+<li>Group will consult Prof.&nbsp;Kam to clear questions.&nbsp;</li>
 </ul>
 
 

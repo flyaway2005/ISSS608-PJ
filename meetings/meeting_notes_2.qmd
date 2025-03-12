@@ -19,13 +19,7 @@ The meeting notes below document the 2nd discussion among group members.
 ***1 Nowcasting Data Requirements***
 
 -   Fangyu consulted on Piazza about nowcasting data frequency requirements, noting that most government datasets only update quarterly or annually, with approximately five datasets updating monthly. 
-
-<!-- -->
-
--   *\[Prof. Kam clarified that best practices for nowcasting require monthly data updates.\]*
-
-<!-- -->
-
+-   *\[Prof. Kam clarified that best practices for nowcasting require monthly data updates.*
 -   Based on data availability constraints, Fangyu suggested Network analysis as a more feasible research direction. 
 
 ***2 Procurement Data Analysis Opportunities***
@@ -38,14 +32,11 @@ The meeting notes below document the 2nd discussion among group members.
 
 ***3 Text Analysis Approach***
 
--   Fangyu proposed leveraging text analysis techniques specifically for Word Cloud visualizations of the procurement data. 
+-   Fangyu proposed leveraging text analysis techniques specifically for Word Cloud visualisations of the procurement data. 
 
 **Team agreed with the proposals and will work on the following action items.** 
 
 ***4 Action Items*** 
 
 -   Cathy will start developing a comprehensive storyboard for the Network analysis module. 
-
-<!-- -->
-
 -   Fangyu will begin text analysis implementation and create an initial prototype. 

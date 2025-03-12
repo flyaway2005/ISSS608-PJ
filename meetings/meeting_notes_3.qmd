@@ -10,69 +10,33 @@ execute:
 
 The meeting notes below document the 3rd discussion among group members and consultation with Professor Kam.
 
-## Meeing 3
+## Meeting 3
 
-#### **Date: 4pm, March 11, 2025**
+#### **Date: 2pm, March 8, 2025**
 
-#### **Attendees:** Cathy, Fangyu, Prof. Kam
+#### **Attendees:** Cathy, Fangyu
 
-#### **Discussion**
+#### **Progress updates**
 
-***1 Procurement Dashboard & Visualization***
+***1 Text Analysis Development***
 
--   Cathy presented the proposal outline and storyboard for the Procurement dashboard and Network analysis.
--   **Prof. Kam's feedback**
-    -   Implement user flexibility to select the top N number of agencies/suppliers when visualizing dashboard data.
-    -   Create interactive bar charts where users can click on specific agencies/suppliers to trigger dynamic metrics tables with relevant information, rather than displaying static tables.
-    -   Replace individual month selectors with calendar selectors or quarterly options (Q1, Q2, etc.) to better represent ordinal data and reveal seasonal patterns.
-    -   Utilise Treemaps to visualize agency hierarchy by ministry, enabling better drill-down functionality. Add interactivity to display additional information, such as the top five suppliers for any selected agency.
+-   Fangyu has made progress on several fronts 
 
-***2 Network Graph Visualization***
+    -   Developed a Shiny App prototype specifically for word cloud visualisation.
+    -   Initiated text analysis of procurement tender descriptions.
+    -   Conducted experimental LDA (Latent Dirichlet Allocation) analysis to explore text analysis possibilities with the procurement data.
 
--   Cathy presented the three-tab design concept for the procurement network dashboards.
--   **Prof. Kam's feedback**
-    -   Calculate node centrality metrics first to enable community construction. These centrality indices will provide critical analytical information for outcomes.
-    -   Implement user selection of centrality measurement types, allowing the network graph to update based on the selected method.
-    -   Integrate community detection/analysis within the initial "Visualisation" tab, followed by deeper analysis based on community findings.
-    -   *\[Note: Cathy inquired if community detection could remain as a standalone tab. Prof. Kam recommended further exploration before making this decision.\]*
+***2 Interface Design Progress*** 
 
-***3 Text Analysis & Topic Modeling***
+-   Cathy has begun work on user interface design:  
 
--   Fangyu demonstrated the text analysis storyboard and current progress, including the LDA (Latent Dirichlet Allocation) topic modeling and clustering techniques used to identify key procurement themes.
+    -   Created initial sketch designs for the Network analysis module 
+    -   Developed preliminary layouts for the Overview dashboard 
+    -   Expressed uncertainty about whether the current design direction is logistically workable. 
 
--   **Prof. Kam's feedback**
+***Action Item*** 
 
-    -   Emphasized the importance of interactive data refinement to continuously improve classification accuracy.
-
-    -   Recommended training a model to label each tender type, referencing the book "Text Modeling with R" to establish a standardized categorization process.
-
-    -   Suggested revised approaches for LDA modeling utilizing TF-IDF (Term Frequency-Inverse Document Frequency) metrics while maintaining the tidytext approach.
-
-    -   Proposed re-ordering the tabs within the module: Learning Data \> Word Cloud \> Text Analysis \> LDA Text Modeling (since LDA itself is a clustering analysis for classification).
-
-    -   Recommended restructuring the overall module flow: Begin with Text Analysis to derive tender classification results \> Incorporate these results into Network Analysis to generate more insightful visualizations.
-
-***4 Additional Notes (Text Analysis Techniques):***
-
--   *TF-IDF (Term Frequency-Inverse Document Frequency):* Identifies the most representative keywords to enhance topic modeling accuracy.
-
--   *Text Cleaning:* Ensures clean textual data (removing stop words, special characters, punctuation, etc.) for higher-quality analysis.
-
--   *LDA Refinement Process:* The LDA model should be iteratively refined to achieve the purest possible categorization, enhancing the clarity and accuracy of procurement descriptions.
-
-***Shiny App Development & Integration***
-
--   Team had questions about code compilation and implementing a sophisticated Shiny app interface similar to previous student work.
--   **Prof Kam’s feedback**
-    -   Team members should develop modules separately but eventually compile all code into a single Shiny web app file for publication on Shinyapps.io (one link only to be used on Netlify).
-    -   Before code compilation, the team must agree on a consistent menu design across all modules to ensure consistent rendering and expected results.
-
-***5 Next steps***
-
--   FangYu to continue refining the text classification module implementing Prof. Kam's recommended approaches by the next milestone.
-
--   Cathy to redesign the interactive procurement network visualization incorporating feedback on centrality metrics and community detection.
-
-<!-- -->
-
--   Schedule another consultation with Prof. Kam at the next project milestone to review progress.
+-   Cathy will join the Github to begin development. 
+-   Cathy will work on drafting a proposal for the procurement data module and further develop the Network Module story board. 
+-   Fangyu will continue iterating on the Shiny App prototype and refine LDA analysis. 
+-   Group will consult Prof. Kam to clear questions. 

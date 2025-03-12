@@ -16,7 +16,11 @@ The meeting notes below document the 2nd discussion among group members.
 
 #### **Discussion**
 
-***1 Survey Data Analysis Options***
+***1 Readiness of Github Collaboration and Netilify Page***
+
+-   Fangyu has initiated the Github repo and Netlify for the project.
+
+***2 Survey Data Analysis Options***
 
 -   Cathy noted that PISA data offers multiple analytical perspectives.
 
@@ -24,7 +28,7 @@ The meeting notes below document the 2nd discussion among group members.
     -   Network analysis also appears to be an interesting topic, but is new to this field. 
     -   Expressed uncertainty about the viability of Nowcasting as a project direction.
 
-***2 Data Complexity Considerations***
+***3 Data Complexity Considerations***
 
 -   Fangyu highlighted concerns regarding:  
 
@@ -33,7 +37,7 @@ The meeting notes below document the 2nd discussion among group members.
     -   Preference for selecting a topic with stronger business value implications 
     -   Plans to consult with Professor regarding Open Government Data options  
 
-***3 Text Analysis Approach***
+***4 Text Analysis Approach***
 
 -   Fangyu proposed leveraging text analysis techniques specifically for Word Cloud visualizations of the procurement data. 
 
