@@ -17,6 +17,8 @@ website:
           href: meetings/meeting_notes_2.qmd
         - text: "Meeting 3"
           href: meetings/meeting_notes_3.qmd
+        - text: "Meeting 4"
+          href: meetings/meeting_notes_4.qmd
 
 
 format:
