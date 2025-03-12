@@ -115,14 +115,22 @@ The Procurement Dashboard is an interactive module providing real-time insights 
 
 #### Implement components: 
 
-*to update*
+-   **Time-Based Analysis** Interactive time series charts with customisable periods, complemented by calendar heat maps that highlight seasonal patterns and procurement cycles.
+
+-   **Agency Explorer** Dynamic visualisation of top agencies with comparison tools, featuring distribution views and timeline charts to track spending patterns across different government entities.
+
+-   **Supplier Analysis** Comprehensive supplier metrics dashboard showing concentration statistics and temporal activity patterns to identify key vendors and their engagement over time.
+
+-   **Tender Analysis** Tools for analysing tender value distribution by type, with capabilities to identify outliers and track frequency trends across the procurement landscape.
+
+-   **Interactive Controls** Unified control panel with filters for date ranges, agencies, suppliers, tender types and award amounts.
 
 #### Specific insights: 
 
--   **Real-time Procurement Trends** : Monitor spending, contract awards, and supplier distribution over time.
--   **Agency-Level Procurement Analysis** : Identify top-spending agencies and their procurement patterns.
+-   **Real-time Procurement Trends** : Visualisation of temporal spending patterns including month-over-month changes, year-over-year comparisons, and identification of peak procurement periods tied to budget cycles.
+-   **Agency-Level Procurement Analysis** : Identification of top spending agencies with their specialization patterns. Enable comparative analysis to spot unusual procurement behaviors and spending anomalies.
 -   **Supplier Market Presence** : Track key suppliers, awarded contracts, and market concentration.
--   **Market Share & Competitive Analysis** : Evaluate supplier dominance, competition, and procurement fairness across agencies.
+-   **Market Share & Competitive** : Evaluate supplier dominance, competition, and procurement fairness across agencies.
 
 ### Module 3. G2B Procurement Networks  
 
@@ -161,13 +169,15 @@ To update
 
 ## Network Analysis
 
-**Network visualisation** 
-![](images/Network_1-01.png)
+**Network visualisation** ![](images/Network_1-01.png)
 
-**Community detection** 
-![](images/Network_2-01.png)
+**Community detection** ![](images/Network_2-01.png)
 
-**Network metrics** 
+**Network metrics**
 
 ![](images/Network_3-01.png)
 :::
+
+## **Timeline**
+
+## ![](images/Screenshot 2025-03-13 at 1.12.19 AM.png){width="1000"} 
