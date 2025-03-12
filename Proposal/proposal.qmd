@@ -151,7 +151,8 @@ A network graph visualization will be developed to illustrate the relationships 
 
 ::: panel-tabset
 ## Tender Classification
-<to update>
+
+To update
 
 ## Procurement Dashboard
 
@@ -163,15 +164,13 @@ A network graph visualization will be developed to illustrate the relationships 
 
 ## Network Analysis
 
-**Networkk visualisation**
+**Network visualisation** 
 ![](images/Network_1-01.png)
 
-**Community detection**
+**Community detection** 
 ![](images/Network_2-01.png)
 
-**Network metrics**
+**Network metrics** 
+
 ![](images/Network_3-01.png)
-
-
-
 :::

@@ -118,7 +118,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#motivation" id="toc-motivation" class="nav-link" data-scroll-target="#motivation">Motivation</a></li>
   <li><a href="#problem-statement" id="toc-problem-statement" class="nav-link" data-scroll-target="#problem-statement">Problem statement</a></li>
   <li><a href="#proposed-solution" id="toc-proposed-solution" class="nav-link" data-scroll-target="#proposed-solution">Proposed solution&nbsp;</a></li>
-  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">&nbsp; Data</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a></li>
   <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology">Methodology&nbsp;</a>
   <ul class="collapse">
   <li><a href="#module-1.-machine-learning-based-tender-categorization" id="toc-module-1.-machine-learning-based-tender-categorization" class="nav-link" data-scroll-target="#module-1.-machine-learning-based-tender-categorization">Module 1. Machine Learning Based Tender Categorization</a></li>
@@ -185,12 +185,9 @@ ul.task-list li input[type="checkbox"] {
 <p>To bridge this gap, our project “Let’s Track Public Dollars! Unveiling the G2B Network from GeBiz” aims to address these challenges by developing an intuitive Shiny dashboard that transforms complex procurement data into accessible and insightful visualizations.</p>
 <p>The application will leverage:</p>
 <ul>
-<li><p><strong>Machine Learning-Based Tender Categorization</strong>: Uses text analysis to classify tenders, enabling grouped analysis by category to reveal agency procurement trends and supplier market dominance.</p></li>
-<li><p><strong>Procurement Dashboard:</strong> Visualizes procurement trends over time, revealing seasonal patterns, supplier shifts, and spending changes by tender type. It also analyzes market concentration and supplier dominance, highlighting procurement fairness and supplier competition within each category.</p></li>
-</ul>
-<!-- -->
-<ul>
-<li><strong>Network Analysis</strong>: Uncovers agency-supplier relationships, identifying key players and procurement clusters while allowing filtering by tender category.</li>
+<li><p><strong>Machine Learning-Based Tender Categorization</strong>: Uses text analysis to classify tenders via its description, enabling grouped analysis by category to reveal agency procurement trends and supplier market dominance.</p></li>
+<li><p><strong>Procurement Dashboard:</strong> Visualises procurement trends over time, revealing seasonal patterns, supplier shifts, and spending changes by tender type. It also analyzes market concentration and supplier dominance.</p></li>
+<li><p><strong>Network Analysis</strong>: Visualises agency-supplier relationships and identifies key players in procurement clusters. Features multiple filters by tender category, agencies, suppliers, and date ranges with highlights of top suppliers and agencies.</p></li>
 </ul>
 <p>Through these visual analytics approaches, users will understand immediately:&nbsp;</p>
 <ul>
@@ -203,7 +200,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Our solutions will empower citizens, businesses, and policymakers with the tool to understand government spending, and contracts without specialised technical knowledge. Ultimately we want to promote greater accountability by shedding light on procurement patterns, key suppliers, and competitive landscapes, as well as informed public resource allocation.</p>
 </section>
 <section id="data" class="level2">
-<h2 class="anchored" data-anchor-id="data">&nbsp; Data</h2>
+<h2 class="anchored" data-anchor-id="data">Data</h2>
 <p><a href="https://www.gebiz.gov.sg/">GeBIZ</a> (Government Electronic Business Platform), containing 18,638 entries from 2019 to 2023.</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -341,7 +338,6 @@ ul.task-list li input[type="checkbox"] {
 <li><strong>Real-time Procurement Trends</strong> : Monitor spending, contract awards, and supplier distribution over time.</li>
 <li><strong>Agency-Level Procurement Analysis</strong> : Identify top-spending agencies and their procurement patterns.</li>
 <li><strong>Supplier Market Presence</strong> : Track key suppliers, awarded contracts, and market concentration.</li>
-<li><strong>High-Value &amp; High-Frequency Contracts</strong> : Detect contracts with significant financial impact or recurring transactions.</li>
 <li><strong>Market Share &amp; Competitive Analysis</strong> : Evaluate supplier dominance, competition, and procurement fairness across agencies.</li>
 </ul>
 </section>
@@ -375,23 +371,21 @@ ul.task-list li input[type="checkbox"] {
 <section id="prototype" class="level2">
 <h2 class="anchored" data-anchor-id="prototype"><strong>Prototype</strong>&nbsp;</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Procurement Dashboard</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Network Analysis</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Procurement Language</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Market Analysis</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Tender Classification</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Procurement Dashboard</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Network Analysis</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>To update</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <p><img src="images/Temp_1-01.png" class="img-fluid"></p>
 <p><img src="images/Temp_2-01.png" class="img-fluid"></p>
 <p><img src="images/Temp_3-02.png" class="img-fluid"></p>
 </div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<p><img src="images/Network_1-01.png" class="img-fluid"></p>
-<p><img src="images/Network_2-01.png" class="img-fluid"></p>
-<p><img src="images/Network_3-01.png" class="img-fluid"></p>
-</div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
-
-</div>
-<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
-
+<p><strong>Network visualisation</strong> <img src="images/Network_1-01.png" class="img-fluid"></p>
+<p><strong>Community detection</strong> <img src="images/Network_2-01.png" class="img-fluid"></p>
+<p><strong>Network metrics</strong></p>
+<p><img src="images/Network_3-01.png" class="img-fluid"></p>
 </div>
 </div>
 </div>
