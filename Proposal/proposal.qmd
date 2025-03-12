@@ -33,13 +33,11 @@ To bridge this gap, our project "Let’s Track Public Dollars! Unveiling the G2B
 
 The application will leverage:
 
--   **Machine Learning-Based Tender Categorization**: Uses text analysis to classify tenders, enabling grouped analysis by category to reveal agency procurement trends and supplier market dominance.
+-   **Machine Learning-Based Tender Categorization**: Uses text analysis to classify tenders via its description, enabling grouped analysis by category to reveal agency procurement trends and supplier market dominance.
 
--   **Procurement Dashboard:** Visualizes procurement trends over time, revealing seasonal patterns, supplier shifts, and spending changes by tender type. It also analyzes market concentration and supplier dominance, highlighting procurement fairness and supplier competition within each category.
+-   **Procurement Dashboard:** Visualises procurement trends over time, revealing seasonal patterns, supplier shifts, and spending changes by tender type. It also analyzes market concentration and supplier dominance.
 
-<!-- -->
-
--   **Network Analysis**: Uncovers agency-supplier relationships, identifying key players and procurement clusters while allowing filtering by tender category.
+-   **Network Analysis**: Visualises agency-supplier relationships and identifies key players in procurement clusters. Features multiple filters by tender category, agencies, suppliers, and date ranges with highlights of top suppliers and agencies.
 
 Through these visual analytics approaches, users will understand immediately: 
 
@@ -51,7 +49,7 @@ Through these visual analytics approaches, users will understand immediately: 
 
 Our solutions will empower citizens, businesses, and policymakers with the tool to understand government spending, and contracts without specialised technical knowledge. Ultimately we want to promote greater accountability by shedding light on procurement patterns, key suppliers, and competitive landscapes, as well as informed public resource allocation.
 
-##   Data
+## Data
 
 [GeBIZ](https://www.gebiz.gov.sg/) (Government Electronic Business Platform), containing 18,638 entries from 2019 to 2023.
 
@@ -127,7 +125,6 @@ The Procurement Dashboard is an interactive module providing real-time insights 
 -   **Real-time Procurement Trends** : Monitor spending, contract awards, and supplier distribution over time.
 -   **Agency-Level Procurement Analysis** : Identify top-spending agencies and their procurement patterns.
 -   **Supplier Market Presence** : Track key suppliers, awarded contracts, and market concentration.
--   **High-Value & High-Frequency Contracts** : Detect contracts with significant financial impact or recurring transactions.
 -   **Market Share & Competitive Analysis** : Evaluate supplier dominance, competition, and procurement fairness across agencies.
 
 ### Module 3. G2B Procurement Network Analysis  
@@ -153,6 +150,9 @@ A network graph visualization will be developed to illustrate the relationships 
 ## **Prototype** 
 
 ::: panel-tabset
+## Tender Classification
+<to update>
+
 ## Procurement Dashboard
 
 ![](images/Temp_1-01.png)
@@ -163,13 +163,15 @@ A network graph visualization will be developed to illustrate the relationships 
 
 ## Network Analysis
 
+**Networkk visualisation**
 ![](images/Network_1-01.png)
 
+**Community detection**
 ![](images/Network_2-01.png)
 
+**Network metrics**
 ![](images/Network_3-01.png)
 
-## Procurement Language
 
-## Market Analysis
+
 :::
