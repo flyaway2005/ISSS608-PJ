@@ -81,7 +81,7 @@ kable(head(GP))
 
 The project will employ a modular data-driven approach to uncover insights from government procurement data using interactive dashboards, natural language processing (NLP), and network analysis techniques. By integrating advanced visualization and machine learning methods, the system will provide a comprehensive, transparent, and engaging analytical tool for public procurement monitoring. The planning modules include the following: 
 
-### Module 1. Machine Learning Based Tender Categorization
+### Module 1. Machine Learning Based Tender Classification
 
 #### Core functionality:
 
@@ -127,7 +127,7 @@ The Procurement Dashboard is an interactive module providing real-time insights 
 -   **Supplier Market Presence** : Track key suppliers, awarded contracts, and market concentration.
 -   **Market Share & Competitive Analysis** : Evaluate supplier dominance, competition, and procurement fairness across agencies.
 
-### Module 3. G2B Procurement Network Analysis  
+### Module 3. G2B Procurement Networks  
 
 #### Core functionality: 
 
