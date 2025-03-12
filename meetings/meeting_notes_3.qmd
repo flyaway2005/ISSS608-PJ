@@ -10,8 +10,6 @@ execute:
 
 The meeting notes below document the 3rd discussion among group members and consultation with Professor Kam.
 
-## Meeting 3
-
 #### **Date: 2pm, March 8, 2025**
 
 #### **Attendees:** Cathy, Fangyu

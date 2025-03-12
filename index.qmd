@@ -1,11 +1,25 @@
 ---
 title: "Let's Track Public Dollars!"
-subtitle: "This is a project website of ISSS608. We're diving deep into Singapore's government procurement data to uncover insights about public spending patterns."
+subtitle: "Unveiling the G2B Network from GeBiz"
 ---
 
-:::{.column-page}
-Author: Chang Fang Yu, Cathy CHU Shan-hui
-:::
+Are you curious about how Singapore government spends public funds across agencies, suppliers, and projects?
+
+You're at the right place! This interactive Shiny dashboard provides data-driven insights into government procurement patterns from 2019 to 2023, helping to enhance transparency, efficiency, and strategic decision-making in public spending.
+
+Through this dashboard, you can explore real-time procurement trends and spending patterns, analyse relationships between government agencies and suppliers, evaluate market competition and supplier diversity, and discover insights from procurement descriptions through text analysis.
+
+Start exploring by selecting a module from the menu on the left.
+![](images/sg_bg.png){fig-align="center"}
 
 
+## What You'll Discover
 
+Our analysis of procurement data reveals patterns across agencies, suppliers, and time periods that might otherwise remain hidden in complex datasets. Through this dashboard, you can:
+
+-   Track real-time procurement trends and spending patterns
+-   Identify key relationships between government agencies and suppliers
+-   Evaluate market competition and supplier diversity
+-   Uncover insights from procurement descriptions through text analysis
+
+*This website is created for Visual Analytics course project at Singapore Management University. *

@@ -48,9 +48,9 @@ ul, ol {
 }
 
 /* Image styling */
-img {
+#img {
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 0px 0px rgba(0,0,0,0.1);
     margin: 1em 0;
     max-width: 100%;
     height: auto;

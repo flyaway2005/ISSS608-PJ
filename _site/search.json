@@ -67,7 +67,7 @@
     "href": "index.html",
     "title": "Let’s Track Public Dollars!",
     "section": "",
-    "text": "Author: Chang Fang Yu, Cathy CHU Shan-hui"
+    "text": "Are you curious about how Singapore government spends public funds across agencies, suppliers, and projects?\nYou’re at the right place! This interactive Shiny dashboard provides data-driven insights into government procurement patterns from 2019 to 2023, helping to enhance transparency, efficiency, and strategic decision-making in public spending.\nThrough this dashboard, you can explore real-time procurement trends and spending patterns, analyse relationships between government agencies and suppliers, evaluate market competition and supplier diversity, and discover insights from procurement descriptions through text analysis.\nStart exploring by selecting a module from the menu on the left."
   },
   {
     "objectID": "EDA.html",
@@ -95,7 +95,7 @@
     "href": "meetings/meeting_notes_3.html",
     "title": "Meeting Minutes 3",
     "section": "",
-    "text": "The meeting notes below document the 3rd discussion among group members and consultation with Professor Kam."
+    "text": "The meeting notes below document the 3rd discussion among group members and consultation with Professor Kam.\n\nDate: 2pm, March 8, 2025\n\n\nAttendees: Cathy, Fangyu\n\n\nProgress updates\n1 Text Analysis Development\n\nFangyu has made progress on several fronts \n\nDeveloped a Shiny App prototype specifically for word cloud visualisation.\nInitiated text analysis of procurement tender descriptions.\nConducted experimental LDA (Latent Dirichlet Allocation) analysis to explore text analysis possibilities with the procurement data.\n\n\n2 Interface Design Progress \n\nCathy has begun work on user interface design:  \n\nCreated initial sketch designs for the Network analysis module \nDeveloped preliminary layouts for the Overview dashboard \nExpressed uncertainty about whether the current design direction is logistically workable. \n\n\nAction Item \n\nCathy will join the Github to begin development. \nCathy will work on drafting a proposal for the procurement data module and further develop the Network Module story board. \nFangyu will continue iterating on the Shiny App prototype and refine LDA analysis. \nGroup will consult Prof. Kam to clear questions."
   },
   {
     "objectID": "meetings/meeting_notes_3.html#meeting-3",
@@ -103,5 +103,12 @@
     "title": "Meeting Minutes 3",
     "section": "Meeting 3",
     "text": "Meeting 3\n\nDate: 2pm, March 8, 2025\n\n\nAttendees: Cathy, Fangyu\n\n\nProgress updates\n1 Text Analysis Development\n\nFangyu has made progress on several fronts \n\nDeveloped a Shiny App prototype specifically for word cloud visualisation.\nInitiated text analysis of procurement tender descriptions.\nConducted experimental LDA (Latent Dirichlet Allocation) analysis to explore text analysis possibilities with the procurement data.\n\n\n2 Interface Design Progress \n\nCathy has begun work on user interface design:  \n\nCreated initial sketch designs for the Network analysis module \nDeveloped preliminary layouts for the Overview dashboard \nExpressed uncertainty about whether the current design direction is logistically workable. \n\n\nAction Item \n\nCathy will join the Github to begin development. \nCathy will work on drafting a proposal for the procurement data module and further develop the Network Module story board. \nFangyu will continue iterating on the Shiny App prototype and refine LDA analysis. \nGroup will consult Prof. Kam to clear questions."
+  },
+  {
+    "objectID": "index.html#what-youll-discover",
+    "href": "index.html#what-youll-discover",
+    "title": "Let’s Track Public Dollars!",
+    "section": "What You’ll Discover",
+    "text": "What You’ll Discover\nOur analysis of procurement data reveals patterns across agencies, suppliers, and time periods that might otherwise remain hidden in complex datasets. Through this dashboard, you can:\n\nTrack real-time procurement trends and spending patterns\nIdentify key relationships between government agencies and suppliers\nEvaluate market competition and supplier diversity\nUncover insights from procurement descriptions through text analysis\n\nThis website is created for Visual Analytics course project at Singapore Management University."
   }
 ]
