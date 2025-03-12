@@ -39,7 +39,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-fb111ea82d72e5bd18f836ed95d90a79.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-299fde5381b5a602aab895950093955a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -121,10 +121,9 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">&nbsp; Data</a></li>
   <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology">Methodology&nbsp;</a>
   <ul class="collapse">
-  <li><a href="#module-1.-procurement-dashboard" id="toc-module-1.-procurement-dashboard" class="nav-link" data-scroll-target="#module-1.-procurement-dashboard">Module 1. Procurement Dashboard &nbsp;</a></li>
-  <li><a href="#module-2.-g2b-procurement-network-analysis" id="toc-module-2.-g2b-procurement-network-analysis" class="nav-link" data-scroll-target="#module-2.-g2b-procurement-network-analysis">Module 2. G2B Procurement Network Analysis &nbsp;</a></li>
-  <li><a href="#module-3.-procurement-language-insights" id="toc-module-3.-procurement-language-insights" class="nav-link" data-scroll-target="#module-3.-procurement-language-insights">Module 3. Procurement Language Insights&nbsp;</a></li>
-  <li><a href="#module-4.-competitive-intelligence-market-analysis" id="toc-module-4.-competitive-intelligence-market-analysis" class="nav-link" data-scroll-target="#module-4.-competitive-intelligence-market-analysis">Module 4. Competitive Intelligence &amp; Market Analysis&nbsp;</a></li>
+  <li><a href="#module-1.-machine-learning-based-tender-categorization" id="toc-module-1.-machine-learning-based-tender-categorization" class="nav-link" data-scroll-target="#module-1.-machine-learning-based-tender-categorization">Module 1. Machine Learning Based Tender Categorization</a></li>
+  <li><a href="#module-2.-procurement-dashboard" id="toc-module-2.-procurement-dashboard" class="nav-link" data-scroll-target="#module-2.-procurement-dashboard">Module 2. Procurement Dashboard &nbsp;</a></li>
+  <li><a href="#module-3.-g2b-procurement-network-analysis" id="toc-module-3.-g2b-procurement-network-analysis" class="nav-link" data-scroll-target="#module-3.-g2b-procurement-network-analysis">Module 3. G2B Procurement Network Analysis &nbsp;</a></li>
   </ul></li>
   <li><a href="#prototype" id="toc-prototype" class="nav-link" data-scroll-target="#prototype"><strong>Prototype</strong>&nbsp;</a></li>
   </ul></li>
@@ -154,7 +153,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">March 11, 2025</p>
+      <p class="date-modified">March 12, 2025</p>
     </div>
   </div>
     
@@ -183,13 +182,15 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="proposed-solution" class="level2">
 <h2 class="anchored" data-anchor-id="proposed-solution">Proposed solution&nbsp;</h2>
-<p>To bridge this gap, our project ” Lets’ Track Public Dollars! Unveiling the G2B Network from GeBiz ” aims to address these challenges by developing an intuitive Shiny dashboard that transforms complex procurement data into accessible visual insights. &nbsp;</p>
-<p>The application will leverage:&nbsp;</p>
+<p>To bridge this gap, our project “Let’s Track Public Dollars! Unveiling the G2B Network from GeBiz” aims to address these challenges by developing an intuitive Shiny dashboard that transforms complex procurement data into accessible and insightful visualizations.</p>
+<p>The application will leverage:</p>
 <ul>
-<li>Network analysis: Reveals relationship patterns between government agencies and suppliers, identifying key players, procurement communities, and the flow of public funds&nbsp;</li>
-<li>Temporal visualisation: Tracks procurement trends over time, highlighting seasonal patterns, evolving supplier relationships, and changes in government spending priorities&nbsp;</li>
-<li>Competitive intelligence: Maps market concentration, spending distributions, and supplier dominance across different government sectors, enabling analysis of procurement fairness and efficiency&nbsp;</li>
-<li>Text analysis: Discovers common themes and requirements in tender descriptions through interactive word clouds, helping users understand what government agencies are purchasing&nbsp;</li>
+<li><p><strong>Machine Learning-Based Tender Categorization</strong>: Uses text analysis to classify tenders, enabling grouped analysis by category to reveal agency procurement trends and supplier market dominance.</p></li>
+<li><p><strong>Procurement Dashboard:</strong> Visualizes procurement trends over time, revealing seasonal patterns, supplier shifts, and spending changes by tender type. It also analyzes market concentration and supplier dominance, highlighting procurement fairness and supplier competition within each category.</p></li>
+</ul>
+<!-- -->
+<ul>
+<li><strong>Network Analysis</strong>: Uncovers agency-supplier relationships, identifying key players and procurement clusters while allowing filtering by tender category.</li>
 </ul>
 <p>Through these visual analytics approaches, users will understand immediately:&nbsp;</p>
 <ul>
@@ -290,45 +291,69 @@ ul.task-list li input[type="checkbox"] {
 <section id="methodology" class="level2">
 <h2 class="anchored" data-anchor-id="methodology">Methodology&nbsp;</h2>
 <p>The project will employ a modular data-driven approach to uncover insights from government procurement data using interactive dashboards, natural language processing (NLP), and network analysis techniques. By integrating advanced visualization and machine learning methods, the system will provide a comprehensive, transparent, and engaging analytical tool for public procurement monitoring. The planning modules include the following:&nbsp;</p>
-<section id="module-1.-procurement-dashboard" class="level3">
-<h3 class="anchored" data-anchor-id="module-1.-procurement-dashboard">Module 1. Procurement Dashboard &nbsp;</h3>
+<section id="module-1.-machine-learning-based-tender-categorization" class="level3">
+<h3 class="anchored" data-anchor-id="module-1.-machine-learning-based-tender-categorization">Module 1. Machine Learning Based Tender Categorization</h3>
 <section id="core-functionality" class="level4">
-<h4 class="anchored" data-anchor-id="core-functionality">Core functionality:&nbsp;</h4>
-<p>The Procurement Dashboard serves as an interactive data exploration module designed to empower users with real-time insights into procurement activities. By leveraging advanced data visualization techniques, filtering mechanisms, and anomaly detection, the dashboard provides a comprehensive, transparent, and dynamic interface for monitoring procurement trends.&nbsp;</p>
+<h4 class="anchored" data-anchor-id="core-functionality">Core functionality:</h4>
+<p>This component aims to automatically categorize tenders by analyzing procurement descriptions using Natural Language Processing (NLP) and machine learning techniques. By implementing LDA topic modeling, TF-IDF-based text analysis, and a trained classification model, we can label tenders with meaningful categories. These labels will then be used for trend analysis, procurement pattern identification, and supplier-agency relationship insights.</p>
 </section>
 <section id="implement-components" class="level4">
-<h4 class="anchored" data-anchor-id="implement-components">Implement components:&nbsp;</h4>
-<ol type="1">
-<li>Custom filtering &amp; interactive selection to explore procurement activity at various levels.&nbsp;</li>
-</ol>
+<h4 class="anchored" data-anchor-id="implement-components">Implement Components:</h4>
+<p><strong>1. Data Preprocessing &amp; Text Cleaning</strong></p>
+<ul>
+<li><strong>Objective:</strong> Prepare tender descriptions for accurate text analysis and machine learning classification.</li>
+</ul>
+<p><strong>2. LDA Topic Modeling &amp; Tender Clustering</strong></p>
+<ul>
+<li><strong>Objective:</strong> Identify potential procurement categories based on tender descriptions.</li>
+</ul>
+<p><strong>3. Machine Learning Model Training &amp; Tender Labeling</strong></p>
+<ul>
+<li><strong>Objective:</strong> Train a supervised learning model to automatically label tenders based on discovered categories.</li>
+</ul>
 </section>
 <section id="specific-insights" class="level4">
-<h4 class="anchored" data-anchor-id="specific-insights">Specific insights:&nbsp;</h4>
+<h4 class="anchored" data-anchor-id="specific-insights"><strong>Specific Insights:</strong></h4>
 <ul>
-<li><strong>Real-time Procurement Trends:</strong> Gain an overview of procurement spending, contract awards, and supplier distribution over time.&nbsp;</li>
-</ul>
-<!-- -->
-<ul>
-<li><strong>Agency-Level Procurement Analysis:</strong> Identify top-spending agencies and their procurement patterns.&nbsp;</li>
-</ul>
-<!-- -->
-<ul>
-<li><strong>Supplier Market Presence:</strong> Monitor key suppliers, their awarded contracts, and market concentration.&nbsp;</li>
-</ul>
-<!-- -->
-<ul>
-<li><strong>High-Value &amp; High-Frequency Contracts:</strong> Detect contracts with significant financial impact or recurring transactions.&nbsp;</li>
+<li><p><strong>Identifies key procurement categories</strong>: based on tender descriptions.</p></li>
+<li><p><strong>Improves supplier-agency analysis</strong>: by grouping tenders based on category labels.</p></li>
 </ul>
 </section>
 </section>
-<section id="module-2.-g2b-procurement-network-analysis" class="level3">
-<h3 class="anchored" data-anchor-id="module-2.-g2b-procurement-network-analysis">Module 2. G2B Procurement Network Analysis &nbsp;</h3>
+<section id="module-2.-procurement-dashboard" class="level3">
+<h3 class="anchored" data-anchor-id="module-2.-procurement-dashboard">Module 2. Procurement Dashboard &nbsp;</h3>
 <section id="core-functionality-1" class="level4">
 <h4 class="anchored" data-anchor-id="core-functionality-1">Core functionality:&nbsp;</h4>
-<p>A network graph visualization will be developed to illustrate the relationships between government agencies and suppliers based on procurement transactions. &nbsp;</p>
+<p>The Procurement Dashboard is an interactive module providing real-time insights into procurement activities, supplier competition, and market dynamics. By leveraging advanced visualization, filtering, and anomaly detection, it offers a comprehensive and transparent view of procurement trends.</p>
 </section>
 <section id="implement-components-1" class="level4">
 <h4 class="anchored" data-anchor-id="implement-components-1">Implement components:&nbsp;</h4>
+<ol type="1">
+<li><strong>Custom filtering &amp; interactive selection</strong> to explore procurement activity at various levels.</li>
+<li><strong>Contract concentration metrics</strong> to assess agency reliance on specific suppliers.</li>
+<li><strong>Temporal market analysis</strong> to track supplier entry/exit and market share shifts.</li>
+<li><strong>Award value distribution analysis</strong> to highlight spending patterns and procurement diversity.</li>
+</ol>
+</section>
+<section id="specific-insights-1" class="level4">
+<h4 class="anchored" data-anchor-id="specific-insights-1">Specific insights:&nbsp;</h4>
+<ul>
+<li><strong>Real-time Procurement Trends</strong> : Monitor spending, contract awards, and supplier distribution over time.</li>
+<li><strong>Agency-Level Procurement Analysis</strong> : Identify top-spending agencies and their procurement patterns.</li>
+<li><strong>Supplier Market Presence</strong> : Track key suppliers, awarded contracts, and market concentration.</li>
+<li><strong>High-Value &amp; High-Frequency Contracts</strong> : Detect contracts with significant financial impact or recurring transactions.</li>
+<li><strong>Market Share &amp; Competitive Analysis</strong> : Evaluate supplier dominance, competition, and procurement fairness across agencies.</li>
+</ul>
+</section>
+</section>
+<section id="module-3.-g2b-procurement-network-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="module-3.-g2b-procurement-network-analysis">Module 3. G2B Procurement Network Analysis &nbsp;</h3>
+<section id="core-functionality-2" class="level4">
+<h4 class="anchored" data-anchor-id="core-functionality-2">Core functionality:&nbsp;</h4>
+<p>A network graph visualization will be developed to illustrate the relationships between government agencies and suppliers based on procurement transactions. &nbsp;</p>
+</section>
+<section id="implement-components-2" class="level4">
+<h4 class="anchored" data-anchor-id="implement-components-2">Implement components:&nbsp;</h4>
 <ol type="1">
 <li>Interactive network visualisation (core)&nbsp;</li>
 <li>Filtering and control panel (core)&nbsp;</li>
@@ -337,57 +362,12 @@ ul.task-list li input[type="checkbox"] {
 <li>Entity focus view&nbsp;</li>
 </ol>
 </section>
-<section id="specific-insights-1" class="level4">
-<h4 class="anchored" data-anchor-id="specific-insights-1">Specific insights:&nbsp;</h4>
+<section id="specific-insights-2" class="level4">
+<h4 class="anchored" data-anchor-id="specific-insights-2">Specific insights:&nbsp;</h4>
 <ul>
 <li><strong>Agency-supplier collaboration:</strong> which agencies work most frequently with specific suppliers&nbsp;</li>
 <li><strong>Network centrality analysis:</strong> Identify central nodes in procurement networks&nbsp;</li>
 <li><strong>Community detection:</strong> will reveal clusters of agencies and suppliers that frequently collaborate.&nbsp;</li>
-</ul>
-</section>
-</section>
-<section id="module-3.-procurement-language-insights" class="level3">
-<h3 class="anchored" data-anchor-id="module-3.-procurement-language-insights">Module 3. Procurement Language Insights&nbsp;</h3>
-<section id="core-functionality-2" class="level4">
-<h4 class="anchored" data-anchor-id="core-functionality-2">Core functionality:&nbsp;</h4>
-<p>A word cloud visualization will extract key phrases from tender descriptions, providing an interactive linguistic analysis of procurement trends and needs.&nbsp;</p>
-</section>
-<section id="implement-components-2" class="level4">
-<h4 class="anchored" data-anchor-id="implement-components-2">Implement components:</h4>
-<ol type="1">
-<li>Comparison of agency-specific terminology to detect procurement priorities.&nbsp;</li>
-<li>Side-by-side word clouds to track language shifts across different procurement periods.&nbsp;</li>
-<li>LDA-based topic modeling to extract key procurement themes.&nbsp;</li>
-</ol>
-</section>
-<section id="specific-insights-2" class="level4">
-<h4 class="anchored" data-anchor-id="specific-insights-2">Specific insights:&nbsp;</h4>
-<ul>
-<li><p><strong>Agency-Specific Procurement Terminology:</strong> &nbsp;</p>
-<p>Identify key terms used in procurement tender descriptions across different government agencies by LDA topic analysis.&nbsp;</p></li>
-<li><p><strong>Procurement Demand Trends:</strong> Word cloud comparisons across different years will reveal shifts in procurement focus.&nbsp;</p></li>
-</ul>
-</section>
-</section>
-<section id="module-4.-competitive-intelligence-market-analysis" class="level3">
-<h3 class="anchored" data-anchor-id="module-4.-competitive-intelligence-market-analysis">Module 4. Competitive Intelligence &amp; Market Analysis&nbsp;</h3>
-<section id="core-functionality-3" class="level4">
-<h4 class="anchored" data-anchor-id="core-functionality-3">Core functionality:&nbsp;</h4>
-<p>An interactive dashboard will track supplier competition, market share, and agency spending.&nbsp;</p>
-</section>
-<section id="implement-components-3" class="level4">
-<h4 class="anchored" data-anchor-id="implement-components-3">Implement components:</h4>
-<ol type="1">
-<li><p>Contract concentration metrics to evaluate reliance on specific suppliers.&nbsp;</p></li>
-<li><p>Temporal market analysis to track supplier entry/exit and market share shifts.&nbsp;</p></li>
-<li><p>Award value distribution analysis to highlight spending patterns and procurement diversity.&nbsp;</p></li>
-</ol>
-</section>
-<section id="specific-insights-3" class="level4">
-<h4 class="anchored" data-anchor-id="specific-insights-3">Specific insights:&nbsp;</h4>
-<ul>
-<li><p><strong>Supplier Market Segmentation and Dependency Analysis</strong>: Utilize LDA topic modeling and K-means clustering to segment suppliers based on market behavior and procurement categories, enabling data-driven procurement strategies. Simultaneously, conduct supplier dependency analysis by calculating the market share of top suppliers in each procurement category to assess whether government procurement is overly reliant on specific suppliers, identifying potential risks.&nbsp;</p></li>
-<li><p><strong>Price and procurement cost analysis:</strong> Examine contract price distributions across supplier clusters to detect unusually high or low procurement prices, providing insights for cost optimization.&nbsp;</p></li>
 </ul>
 </section>
 </section>
@@ -398,14 +378,14 @@ ul.task-list li input[type="checkbox"] {
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Procurement Dashboard</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Network Analysis</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Procurement Language</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Market Analysis</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<p><strong>Top Agencies &amp; Suppliers</strong> <img src="images/Temp_1-01.png" class="img-fluid"></p>
-<p><strong>Procurement Trend by Supplier</strong> <img src="images/Temp_2-01.png" class="img-fluid"></p>
-<p><strong>Prosurement Trend by Agency</strong> <img src="images/Temp_3-02.png" class="img-fluid"></p>
+<p><img src="images/Temp_1-01.png" class="img-fluid"></p>
+<p><img src="images/Temp_2-01.png" class="img-fluid"></p>
+<p><img src="images/Temp_3-02.png" class="img-fluid"></p>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<p><strong>Network Visualisation</strong> <img src="images/Network_1-01.png" class="img-fluid"></p>
-<p><strong>Communities Detection</strong> <img src="images/Network_2-01.png" class="img-fluid"></p>
-<p><strong>Network Metrics</strong> <img src="images/Network_3-01.png" class="img-fluid"></p>
+<p><img src="images/Network_1-01.png" class="img-fluid"></p>
+<p><img src="images/Network_2-01.png" class="img-fluid"></p>
+<p><img src="images/Network_3-01.png" class="img-fluid"></p>
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 
