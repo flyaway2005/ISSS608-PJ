@@ -115,10 +115,7 @@ The Procurement Dashboard is an interactive module providing real-time insights 
 
 #### Implement components: 
 
-1.  **Custom filtering & interactive selection** to explore procurement activity at various levels.
-2.  **Contract concentration metrics** to assess agency reliance on specific suppliers.
-3.  **Temporal market analysis** to track supplier entry/exit and market share shifts.
-4.  **Award value distribution analysis** to highlight spending patterns and procurement diversity.
+*to update*
 
 #### Specific insights: 
 
