@@ -1,0 +1,62 @@
+---
+title: "Data Pre-processing"
+author: "Chang Fang Yu, Cathy CHU Shan-hui"
+date-modified: "last-modified"
+execute:
+  echo: False
+  eval: True
+  warning: false
+  freeze: true
+---
+```{r}
+library(readr)
+```
+```{r}
+pacman::p_load(ggrepel, patchwork, 
+               ggthemes, hrbrthemes,
+               tidyverse, plotly, 
+               DT, GGally, parallelPlot, tidytext) 
+pacman::p_load(igraph, tidygraph, ggraph, 
+               visNetwork, lubridate, clock,
+               tidyverse, graphlayouts)
+```
+```{R}
+GP <- read_csv("data/GovernmentProcurementviaGeBIZ.csv")
+EN <- read_csv("data/SGentities.csv")
+```
+::: panel-tabset
+### GP(GovernmentProcurementviaGeBIZ.csv")
+```{R}
+library(knitr)
+
+kable(head(GP))
+
+```
+### EN(SGentities.csv)
+```{r}
+kable(head(EN))
+```
+:::
+
+#### SG Government Engities Data set (EN)
+This R script processes a dataset (EN) containing government agency names, where abbreviations are enclosed in parentheses ( ). The goal is to extract these abbreviations into a new column (ABBREVIATION) while keeping a clean version of the agency names (NAME_CLEAN).
+
+
+
+```{r}
+# 讀取 CSV 檔案（假設資料已經讀入變數 EN）
+library(dplyr)
+library(stringr)
+
+# 使用正則表達式提取括號內的縮寫
+EN <- EN %>%
+  mutate(ABBREVIATION = str_extract(NAME, "\\(([^)]+)\\)"),  # 提取括號內的內容
+         NAME_CLEAN = str_replace(NAME, " \\([^)]*\\)", "")) # 移除括號及其內容，保留完整名稱
+
+# 移除括號，讓縮寫只保留字母
+EN$ABBREVIATION <- str_replace_all(EN$ABBREVIATION, "[()]", "")
+
+# 顯示前幾行確認結果
+head(EN)
+
+```

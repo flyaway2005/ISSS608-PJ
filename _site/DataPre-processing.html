@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Chang Fang Yu, Cathy CHU Shan-hui">
 
-<title>Let’s Track Public Dollars! – Lets’ Track Public Dollars!</title>
+<title>Data Pre-processing – Lets’ Track Public Dollars!</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -89,7 +90,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="./index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
@@ -130,30 +131,35 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#what-youll-discover" id="toc-what-youll-discover" class="nav-link active" data-scroll-target="#what-youll-discover">What You’ll Discover</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Let’s Track Public Dollars!</h1>
-<p class="subtitle lead">Unveiling the G2B Network from GeBiz</p>
+<h1 class="title">Data Pre-processing</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Chang Fang Yu, Cathy CHU Shan-hui </p>
+          </div>
+  </div>
     
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">March 15, 2025</p>
+    </div>
+  </div>
     
   </div>
   
@@ -162,20 +168,163 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Are you curious about how Singapore government spends public funds across agencies, suppliers, and projects?</p>
-<p>You’re at the right place! This interactive Shiny dashboard provides data-driven insights into government procurement patterns from 2019 to 2023, helping to enhance transparency, efficiency, and strategic decision-making in public spending.</p>
-<p>Through this dashboard, you can explore real-time procurement trends and spending patterns, analyse relationships between government agencies and suppliers, evaluate market competition and supplier diversity, and discover insights from procurement descriptions through text analysis.</p>
-<p>Start exploring by selecting a module from the menu on the left. <img src="images/sg_bg.png" class="img-fluid quarto-figure quarto-figure-center"></p>
-<section id="what-youll-discover" class="level2">
-<h2 class="anchored" data-anchor-id="what-youll-discover">What You’ll Discover</h2>
-<p>Our analysis of procurement data reveals patterns across agencies, suppliers, and time periods that might otherwise remain hidden in complex datasets. Through this dashboard, you can:</p>
-<ul>
-<li>Track real-time procurement trends and spending patterns</li>
-<li>Identify key relationships between government agencies and suppliers</li>
-<li>Evaluate market competition and supplier diversity</li>
-<li>Uncover insights from procurement descriptions through text analysis</li>
-</ul>
-<p><em>This website is created for Visual Analytics course project at Singapore Management University. </em></p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">GP(GovernmentProcurementviaGeBIZ.csv”)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">EN(SGentities.csv)</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 57%">
+<col style="width: 12%">
+<col style="width: 3%">
+<col style="width: 6%">
+<col style="width: 11%">
+<col style="width: 3%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">tender_no</th>
+<th style="text-align: left;">tender_description</th>
+<th style="text-align: left;">agency</th>
+<th style="text-align: left;">award_date</th>
+<th style="text-align: left;">tender_detail_status</th>
+<th style="text-align: left;">supplier_name</th>
+<th style="text-align: right;">awarded_amt</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ACR000ETT18300010</td>
+<td style="text-align: left;">SUPPLY, DESIGN, DEVELOPMENT, CUSTOMIZATION, DELIVERY, INSTALLATION, TESTING, COMMISSIONING AND MAINTENANCE OF A VARIABLE CAPITAL COMPANIES (VCC) SYSTEM FOR ACCOUNTING AND CORPORATE REGULARTORY AUTHORITY</td>
+<td style="text-align: left;">Accounting And Corporate Regulatory Authority</td>
+<td style="text-align: left;">11/6/2019</td>
+<td style="text-align: left;">Awarded to Suppliers</td>
+<td style="text-align: left;">AZAAS PTE. LTD.</td>
+<td style="text-align: right;">2305880</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ACR000ETT18300011</td>
+<td style="text-align: left;">APPLICATION ENHANCEMENT, CUSTOMISATION, MIGRATION, DELIVERY, INSTALLATION, TESTING AND COMMISSIONING OF THE FULLY OPERATIONAL BIZFINx 2.0 APPLICATION SYSTEM WITH AN OPTION FOR MAINTENANCE</td>
+<td style="text-align: left;">Accounting And Corporate Regulatory Authority</td>
+<td style="text-align: left;">10/5/2019</td>
+<td style="text-align: left;">Awarded to No Suppliers</td>
+<td style="text-align: left;">Unknown</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ACR000ETT19300001</td>
+<td style="text-align: left;">PROVISION OF CONSULTANCY SERVICES FOR STRATEGIC BUSINESS PROCESSES RE-ENGINEERING (SBPR) AND ACRA’S IT INFRASTRUCTURE</td>
+<td style="text-align: left;">Accounting And Corporate Regulatory Authority</td>
+<td style="text-align: left;">30/4/2019</td>
+<td style="text-align: left;">Awarded to Suppliers</td>
+<td style="text-align: left;">ACCENTURE SG SERVICES PTE. LTD.</td>
+<td style="text-align: right;">2035000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ACR000ETT19300002</td>
+<td style="text-align: left;">SUPPLY, DELIVERY, DESIGN, CUSTOMISATION, INSTALLATION, CONFIGURATION, TESTING, COMMISSIONING OF A FULLY OPERATIONAL BIZFILE+ WITH AN OPTION FOR MAINTENANCE</td>
+<td style="text-align: left;">Accounting And Corporate Regulatory Authority</td>
+<td style="text-align: left;">29/8/2019</td>
+<td style="text-align: left;">Awarded to Suppliers</td>
+<td style="text-align: left;">TECH MAHINDRA LIMITED (SINGAPORE BRANCH)</td>
+<td style="text-align: right;">30700374</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ACR000ETT19300003</td>
+<td style="text-align: left;">PROVISION OF MEDIA MONITORING SERVICES FOR A PERIOD OF TWO YEARS WITH OPTION TO EXTEND FOR UP TO ONE YEAR</td>
+<td style="text-align: left;">Accounting And Corporate Regulatory Authority</td>
+<td style="text-align: left;">6/8/2019</td>
+<td style="text-align: left;">Awarded to Suppliers</td>
+<td style="text-align: left;">INSIGHTMATRIX</td>
+<td style="text-align: right;">178800</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ACR000ETT19300004</td>
+<td style="text-align: left;">INVITATION TO TENDER FOR THE PROVISION OF CALL CENTRE SERVICES FOR ACCOUNTING AND CORPORATE REGULATORY AUTHORITY FOR A PERIOD OF 3 YEARS WITH OPTION OF UP TO 2 EXTENSIONS OF 2 YEARS EACH</td>
+<td style="text-align: left;">Accounting And Corporate Regulatory Authority</td>
+<td style="text-align: left;">5/11/2019</td>
+<td style="text-align: left;">Awarded to Suppliers</td>
+<td style="text-align: left;">TDCX (SG) PTE. LTD.</td>
+<td style="text-align: right;">8566831</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 77%">
+<col style="width: 12%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">NAME</th>
+<th style="text-align: left;">CATEGORY</th>
+<th style="text-align: left;">SUBCAT</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">MINISTRY OF CULTURE, COMMUNITY AND YOUTH (MCCY)</td>
+<td style="text-align: left;">MINISTRY</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MINISTRY OF DEFENCE (MINDEF)</td>
+<td style="text-align: left;">MINISTRY</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MINISTRY OF DIGITAL DEVELOPMENT AND INFORMATION (MDDI)</td>
+<td style="text-align: left;">MINISTRY</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MINISTRY OF EDUCATION (MOE)</td>
+<td style="text-align: left;">MINISTRY</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MINISTRY OF FINANCE (MOF)</td>
+<td style="text-align: left;">MINISTRY</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MINISTRY OF FOREIGN AFFAIRS (MFA)</td>
+<td style="text-align: left;">MINISTRY</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<section id="sg-government-engities-data-set-en" class="level4">
+<h4 class="anchored" data-anchor-id="sg-government-engities-data-set-en">SG Government Engities Data set (EN)</h4>
+<p>This R script processes a dataset (EN) containing government agency names, where abbreviations are enclosed in parentheses ( ). The goal is to extract these abbreviations into a new column (ABBREVIATION) while keeping a clean version of the agency names (NAME_CLEAN).</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  NAME                                   CATEGORY SUBCAT ABBREVIATION NAME_CLEAN
+  &lt;chr&gt;                                  &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;        &lt;chr&gt;     
+1 MINISTRY OF CULTURE, COMMUNITY AND YO… MINISTRY &lt;NA&gt;   MCCY         MINISTRY …
+2 MINISTRY OF DEFENCE (MINDEF)           MINISTRY &lt;NA&gt;   MINDEF       MINISTRY …
+3 MINISTRY OF DIGITAL DEVELOPMENT AND I… MINISTRY &lt;NA&gt;   MDDI         MINISTRY …
+4 MINISTRY OF EDUCATION (MOE)            MINISTRY &lt;NA&gt;   MOE          MINISTRY …
+5 MINISTRY OF FINANCE (MOF)              MINISTRY &lt;NA&gt;   MOF          MINISTRY …
+6 MINISTRY OF FOREIGN AFFAIRS (MFA)      MINISTRY &lt;NA&gt;   MFA          MINISTRY …</code></pre>
+</div>
+</div>
 
 
 </section>
