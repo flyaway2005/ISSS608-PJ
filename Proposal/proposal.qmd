@@ -83,6 +83,8 @@ The project will employ a modular data-driven approach to uncover insights from 
 
 ### Module 1. Machine Learning Based Tender Classification
 
+#### Module Owner: Chang Fang Yu
+
 #### Core functionality:
 
 This component aims to automatically categorize tenders by analyzing procurement descriptions using Natural Language Processing (NLP) and machine learning techniques. By implementing LDA topic modeling, TF-IDF-based text analysis, and a trained classification model, we can label tenders with meaningful categories. These labels will then be used for trend analysis, procurement pattern identification, and supplier-agency relationship insights.
@@ -117,11 +119,19 @@ The Procurement Dashboard is an interactive module providing real-time insights 
 
 -   **Time-Based Analysis** Interactive time series charts with customisable periods, complemented by calendar heat maps that highlight seasonal patterns and procurement cycles.
 
+    **Component Owner: Cathy CHU Shan-hui**
+
 -   **Agency Explorer** Dynamic visualisation of top agencies with comparison tools, featuring distribution views and timeline charts to track spending patterns across different government entities.
+
+    **Component Owner: Cathy CHU Shan-hui**
 
 -   **Supplier Analysis** Comprehensive supplier metrics dashboard showing concentration statistics and temporal activity patterns to identify key vendors and their engagement over time.
 
+    **Component Owner: Cathy CHU Shan-hui**
+
 -   **Tender Analysis** Tools for analysing tender value distribution by type, with capabilities to identify outliers and track frequency trends across the procurement landscape.
+
+    **Component Owner: Chang Fang Yu**
 
 -   **Interactive Controls** Unified control panel with filters for date ranges, agencies, suppliers, tender types and award amounts.
 
@@ -133,6 +143,8 @@ The Procurement Dashboard is an interactive module providing real-time insights 
 -   **Market Share & Competitive** : Evaluate supplier dominance, competition, and procurement fairness across agencies.
 
 ### Module 3. G2B Procurement Networks  
+
+#### Module Owner: **Cathy CHU Shan-hui**
 
 #### Core functionality: 
 
