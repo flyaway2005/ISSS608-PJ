@@ -1,0 +1,311 @@
+---
+title: "Module 1. Tender Classification"
+author: "Chang Fang Yu"
+date-modified: "last-modified"
+execute:
+  echo: False
+  eval: True
+  warning: false
+  freeze: true
+---
+```{r}
+
+library(tidyverse)
+library(tidytext)
+library(topicmodels)
+library(tm)
+library(ggplot2)
+library(wordcloud)
+library(reshape2)
+library(widyr)
+library(DT)  # 互動表格
+library(RColorBrewer)
+```
+
+```{r}
+
+library(tidyverse)
+library(tidytext)
+library(topicmodels)
+library(ggplot2)
+library(cluster)
+library(reshape2)
+```
+
+
+
+```{r}
+# 讀取 Cleaned_GP 數據
+Cleaned_GP <- read_csv("data/GovernmentProcurementviaGeBIZ.csv")
+
+# 擴充 Stopwords
+extra_stopwords <- c("please", "refer", "another", "one", "two", "three", "framework", "edition", "related", "whole", "period", "government", "entities", "various", "including","requirement", "provide", "supply", "service", "procurement", "year", "option", "term", "extend", "agreement")
+custom_stopwords <- c("singapore", "services", "tender", "provision", "works", "contract", "supply", "invitation", "appointment", "board", "national", "years", "delivery")
+all_stopwords <- c(stopwords("en"), custom_stopwords, extra_stopwords)
+
+# 文本清理
+Cleaned_GP <- Cleaned_GP %>%
+  mutate(
+    tender_clean = tender_description %>%
+      tolower() %>%
+      removePunctuation() %>%
+      removeNumbers() %>%
+      stripWhitespace() %>%
+      removeWords(all_stopwords)
+  )
+
+# 訓練 LDA 模型 (7 類)
+dtm <- Cleaned_GP %>%
+  unnest_tokens(word, tender_clean) %>%
+  count(tender_no, word) %>%
+  cast_dtm(document = tender_no, term = word, value = n)
+
+lda_model <- LDA(dtm, k = 7, control = list(seed = 1234))
+
+lda_assignments <- tidy(lda_model, matrix = "gamma")
+
+# LDA 分類對應到政府採購類別
+Cleaned_GP <- Cleaned_GP %>%
+  left_join(lda_assignments %>% group_by(document) %>% top_n(1, gamma),
+            by = c("tender_no" = "document")) %>%
+  mutate(
+    LDA_Category = case_when(
+      topic == 1 ~ "General Procurement - Goods",
+      topic == 2 ~ "General Procurement - Services",
+      topic == 3 ~ "Engineering Procurement - Goods",
+      topic == 4 ~ "Engineering Procurement - Services",
+      topic == 5 ~ "Engineering Procurement - EPC",
+      topic == 6 ~ "PPP Procurement - DBO",
+      topic == 7 ~ "PPP Procurement - DBFO",
+      TRUE ~ "Unclassified"
+    )
+  )
+
+# 計算 TF-IDF，按 LDA_Category 分組，但保留 tender_no
+word_tf_idf <- Cleaned_GP %>%
+  unnest_tokens(word, tender_clean) %>%
+  count(LDA_Category, tender_no, word) %>%
+  bind_tf_idf(word, LDA_Category, n) %>%
+  filter(tf_idf > quantile(tf_idf, 0.25) & tf_idf < quantile(tf_idf, 0.95))
+
+# 以互動表格顯示 TF-IDF，提供篩選 tender_no
+datatable(word_tf_idf %>% arrange(desc(tf_idf)), 
+          options = list(pageLength = 10), rownames = FALSE)
+
+
+
+# 產生 Wordcloud，按 LDA_Category 分組並允許 tender_no 篩選
+word_tf_idf %>%
+  group_by(LDA_Category, tender_no) %>%
+  top_n(30, tf_idf) %>%
+  ungroup() %>%
+  with(wordcloud(word, tf_idf, max.words = 20, random.order = FALSE, colors = brewer.pal(8, "Dark2")))
+
+
+
+word_tf_idf %>%
+  group_by(LDA_Category) %>%
+  top_n(10, tf_idf) %>%  # 降低顯示的詞數，避免擁擠
+  ungroup() %>%
+  ggplot(aes(x = reorder_within(word, tf_idf, LDA_Category), 
+             y = tf_idf, fill = LDA_Category)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~LDA_Category, scales = "free", ncol = 2) +  # 調整 facet 排列方式
+  coord_flip() +
+  scale_x_reordered() +  # 讓每個 facet 的詞彙順序獨立
+  theme_minimal() +  # 使用簡潔風格減少干擾
+  theme(
+    axis.text.y = element_text(size = 10),  # 縮小 Y 軸標籤字體
+    strip.text = element_text(size = 14, face = "bold"),  # 加大 facet 標籤字體
+    panel.spacing = unit(2, "lines")  # 增加 facet 之間的距離
+  ) +
+  labs(title = "Top TF-IDF Words by LDA Category", 
+       x = "Word", y = "TF-IDF Score")
+
+
+
+# 視覺化: LDA 主題關鍵詞
+lda_top_terms <- lda_topics %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%  # 限制最多 8 個詞
+  ungroup() %>%
+  mutate(term = reorder_within(term, beta, topic))
+
+ggplot(lda_top_terms, aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free", ncol = 2) +  # 增加 ncol=2，使 facet 分成兩列
+  coord_flip() +
+  scale_x_reordered() +
+  theme_minimal() +  # 使用簡潔的主題，減少視覺干擾
+  theme(
+    axis.text.y = element_text(size = 9),  # 調小 Y 軸標籤字體
+    strip.text = element_text(size = 12, face = "bold"),  # 主題標籤加大
+    panel.spacing = unit(1, "lines")  # 增加 panel 之間的間距
+  ) +
+  labs(title = "Top Terms in LDA Topics", x = "Term", y = "Beta")
+
+
+# 視覺化: LDA 類別分布
+Cleaned_GP %>%
+  count(LDA_Category) %>%
+  ggplot(aes(x = reorder(LDA_Category, n), y = n, fill = LDA_Category)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "LDA Category Distribution", x = "Category", y = "Count")
+
+# 輸出標籤結果
+write_csv(Cleaned_GP, "Labeled_Tenders.csv")
+
+
+```
+
+
+```{r}
+library(tidyverse)
+library(tidytext)
+library(topicmodels)
+library(ggplot2)
+library(cluster)
+library(reshape2)
+```
+
+## Load Data
+
+```{r}
+# 讀取文本數據
+Cleaned_GP <- read_csv("data/GovernmentProcurementviaGeBIZ.csv")
+
+# 清理文本
+stopwords_custom <- c("please", "refer", "another", "one", "two", "three", "framework", "edition", "related", "whole", "period", "government", "entities", "various", "including",
+"requirement", "provide", "supply", "service", "procurement", "year", "option", "extend", "agreement", "singapore", "Singapore","one", "two", "three")
+
+Cleaned_GP <- Cleaned_GP %>%
+  mutate(
+    tender_clean = tender_description %>%
+      tolower() %>%
+      removePunctuation() %>%
+      removeNumbers() %>%
+      stripWhitespace() %>%
+      removeWords(stopwords("en")) %>%
+      removeWords(stopwords_custom)
+  )
+```
+
+
+## LDA Topic Modeling
+```{r}
+dtm <- Cleaned_GP %>%
+  unnest_tokens(word, tender_clean) %>%
+  count(tender_no, word) %>%
+  cast_dtm(document = tender_no, term = word, value = n)
+
+lda_model <- LDA(dtm, k = 20, control = list(seed = 1234))
+lda_results <- tidy(lda_model, matrix = "beta")
+```
+
+## Document-Topic Probability Matrix
+```{r}
+doc_topic_matrix <- tidy(lda_model, matrix = "gamma") %>%
+  spread(topic, gamma)
+```
+
+## K-means Clustering on Document-Topic Distributions
+```{r}
+k_clusters <- 6
+set.seed(1234)
+kmeans_result <- kmeans(doc_topic_matrix[,-1], centers = k_clusters)
+doc_topic_matrix$cluster <- factor(kmeans_result$cluster)
+```
+
+```{r}
+head(doc_topic_matrix)
+dim(doc_topic_matrix)  # 查看行數與列數
+
+```
+```{r}
+library(reshape2)
+
+doc_topic_melted <- melt(doc_topic_matrix, 
+                          id.vars = c("document", "cluster"), 
+                          variable.name = "Topic", 
+                          value.name = "Probability")
+
+# 檢查生成的數據
+head(doc_topic_melted)
+dim(doc_topic_melted)  # 查看數據是否有效
+
+```
+
+## Visualizing Topic Probabilities for Clusters
+```{r}
+library(ggplot2)
+
+ggplot(doc_topic_melted, aes(x = Topic, y = Probability, group = document, color = cluster)) +
+  geom_line(alpha = 0.2, size = 0.4)  +
+  geom_smooth(aes(group = cluster), method = "loess", se = FALSE, size = 1, color = "black") +
+  facet_wrap(~ cluster, scales = "free_y", nrow = 2) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10)
+  ) +
+  labs(title = "stLDA-C Topic Distributions by Cluster", x = "Topic", y = "Probability")
+
+```
+
+
+
+```{r}
+top_terms <- tidy(lda_model, matrix = "beta") %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  arrange(topic, desc(beta))
+print(top_terms)
+
+```
+
+```{r}
+library(ggplot2)
+library(plotly)
+
+# 確保 Topic 和 topic 類型一致
+doc_topic_melted <- doc_topic_melted %>%
+  mutate(Topic = as.character(Topic))  # 轉換為字符型態
+
+topic_keywords <- topic_keywords %>%
+  mutate(topic = as.character(topic))  # 轉換為字符型態
+
+# 重新執行 left_join()
+doc_topic_melted <- doc_topic_melted %>%
+  left_join(topic_keywords, by = c("Topic" = "topic"))
+
+# 檢查是否成功合併
+head(doc_topic_melted)
+
+
+# 繪製 ggplot2 圖表，並加入 hovertext
+p <- ggplot(doc_topic_melted, aes(
+    x = Topic, 
+    y = Probability, 
+    group = document, 
+    color = cluster,
+    text = paste("Topic:", Topic, "<br>Top Keywords:", keywords)
+  )) +
+  geom_line(alpha = 0.2, size = 0.4) +
+  geom_smooth(aes(group = cluster), method = "loess", se = FALSE, size = 1, color = "black") +
+  facet_wrap(~ cluster, scales = "free_y", nrow = 2) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10)
+  ) +
+  labs(title = "stLDA-C Topic Distributions by Cluster", x = "Topic", y = "Probability")
+
+# 轉換為 Plotly 互動式圖表
+ggplotly(p, tooltip = "text")
+
+```
+
+
+##end of LDA cluster
+

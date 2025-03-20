@@ -54,6 +54,101 @@ kable(head(EN))
 This R script processes a dataset (EN) containing government agency names, where abbreviations are enclosed in parentheses ( ). The goal is to extract these abbreviations into a new column (ABBREVIATION) while keeping a clean version of the agency names (NAME_CLEAN).
 
 ```{r}
+library(tidyverse)
+library(stringr)
+
+# 读取数据
+GP <- read_csv("data/GovernmentProcurementviaGeBIZ.csv")
+EN <- read_csv("data/SGentities.csv")
+
+# Step 1: 检查列名是否正确，避免 `select()` 时报错
+print("GP表的列名:")
+print(colnames(GP))
+
+print("EN表的列名:")
+print(colnames(EN))
+
+# Step 2: 统一列名，去掉可能的空格或特殊字符
+colnames(GP) <- str_trim(colnames(GP))
+colnames(EN) <- str_trim(colnames(EN))
+
+# Step 3: 标准化 `agency` 和 `NAME`（转换为小写、去掉特殊字符和多余空格）
+standardize_name <- function(name) {
+  name %>%
+    str_to_lower() %>%    # 轉小寫
+    str_trim() %>%        # 去除首尾空格
+    str_replace_all("[^a-z0-9 ]", " ") %>%  # 移除特殊字符並轉換為空格
+    str_squish()          # 合併多餘空格
+}
+
+GP <- GP %>% mutate(agency_std = standardize_name(agency))
+EN <- EN %>% mutate(NAME_std = standardize_name(NAME))
+
+# Step 4: 确保 `SUBCAT` 为空时使用 `CATEGORY`
+EN <- EN %>%
+  mutate(subcat_filled = ifelse(is.na(SUBCAT) | SUBCAT == "", CATEGORY, SUBCAT))
+
+# Step 5: 进行匹配
+merged_data <- GP %>%
+  left_join(EN, by = c("agency_std" = "NAME_std")) %>%
+  select(all_of(intersect(colnames(GP), c("tender_no", "tender_description", "agency", "award_date", "tender_detail_status", "awarded_amt"))), subcat_filled)
+
+# Step 6: 找出未匹配的机构
+unmatched_agencies <- GP %>%
+  filter(!agency_std %in% EN$NAME_std) %>%
+  select(agency) %>%
+  distinct()
+
+# 显示部分结果
+print("匹配后的数据:")
+print(head(merged_data))
+
+print("未匹配的机构:")
+print(unmatched_agencies)
+
+# 保存结果
+write_csv(merged_data, "data/processed_GovernmentProcurement.csv")
+write_csv(unmatched_agencies, "data/unmatched_agencies.csv")
+
+```
+
+```{r}
+matched_agencies <- intersect(GP$agency_std, EN$NAME_std)
+print("成功匹配的机构:")
+print(matched_agencies)
+
+print("未匹配的机构:")
+print(setdiff(GP$agency_std, EN$NAME_std))
+
+
+```
+```{r}
+install.packages("stringdist")
+
+```
+
+
+```{r}
+library(stringdist)
+
+# 找出未匹配的機構
+unmatched_GP <- GP %>%
+  filter(!agency_std %in% EN$NAME_std) %>%
+  select(agency, agency_std) %>%
+  distinct()
+
+# 嘗試模糊匹配
+matches <- stringdist_join(unmatched_GP, EN, by = c("agency_std" = "NAME_std"), method = "jw", max_dist = 0.2)
+
+# 檢查匹配結果
+print(matches)
+
+```
+
+```{}
+```
+
+```{r}
 EN <- EN %>%
   add_row(NAME = "Jurong Town Corporation", CATEGORY = "STATUTORY_BOARDS", SUBCAT = "Urban Planning") %>%
   add_row(NAME = "Assumption Pathway School", CATEGORY = "EDUCATION", SUBCAT = "Specialised Schools") %>%
@@ -123,6 +218,14 @@ print(paste("SUBCAT missing in SGentities after filling:", sum(is.na(EN$SUBCAT))
 write_csv(GP, "Cleaned_Tenders.csv")
 write_csv(EN, "Processed_SGentities.csv")
 
+```
+
+```{r}
+matches %>% count(agency_clean) %>% filter(n > 1)
+
+```
+
+```         
 ```
 
 ```{r}
@@ -208,4 +311,8 @@ Result Table
 
 ```{R}
 kable(head(Cleaned_GP))
+```
+
+```{r}
+write_csv(Cleaned_GP, "Cleaned_GP.csv")
 ```
