@@ -214,15 +214,17 @@ server <- function(input, output, session) {
     })
     
     output$tfidf_plot <- renderPlot({
-      data <- filtered_data() %>% slice_head(n = input$num_words)
+      data <- filtered_data() %>%
+        filter(tf_idf > 0) %>%  # ✅ 確保 TF-IDF 不是 0
+        slice_head(n = input$num_words)
       
       ggplot(data, aes(x = reorder(word, tf_idf), y = tf_idf, fill = LDA_Category)) +
         geom_col(show.legend = FALSE) +
         coord_flip() +
         theme_minimal() +
-        labs(title = "Top TF-IDF Words", x = "Word", y = "TF-IDF Score") +
-        scale_y_continuous(expand = expansion(mult = c(0, 0.05)))  # 避免負數顯示
+        labs(title = "Top TF-IDF Words", x = "Word", y = "TF-IDF Score")
     })
+    
     
   })
 }

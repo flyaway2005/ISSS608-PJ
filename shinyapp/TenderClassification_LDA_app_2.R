@@ -66,7 +66,9 @@ ui <- dashboardPage(
                       tabPanel("LDA Distribution", plotOutput("lda_category_plot")),
                       tabPanel("TF-IDF Table", DTOutput("tfidf_table")),
                       tabPanel("Wordcloud", plotOutput("wordcloud")),
-                      tabPanel("TF-IDF Bar Plot", plotOutput("tfidf_plot"))
+                      
+                      tabPanel("TF-IDF Bar Plot", plotlyOutput("tfidf_plot")),
+                      
                     )
                   )
                 )
@@ -213,17 +215,31 @@ server <- function(input, output, session) {
       with(data, wordcloud(word, tf_idf, max.words = input$num_words, random.order = FALSE, colors = color_palette))
     })
     
-    output$tfidf_plot <- renderPlot({
-      data <- filtered_data() %>% slice_head(n = input$num_words)
+    output$tfidf_plot <- renderPlotly({
+      req(filtered_data())  
       
-      ggplot(data, aes(x = reorder(word, tf_idf), y = tf_idf, fill = LDA_Category)) +
+      data <- filtered_data() %>%
+        filter(tf_idf > 0) %>%  
+        slice_head(n = input$num_words)
+      
+      if (nrow(data) == 0) {
+        return(plotly::plot_ly() %>% layout(title = "No TF-IDF Data Available"))
+      }
+      
+      p <- ggplot(data, aes(x = reorder(word, tf_idf), y = tf_idf, fill = LDA_Category, text = paste0(
+        "Word: ", word, "<br>",
+        "TF-IDF: ", round(tf_idf, 6), "<br>",
+        "Category: ", LDA_Category
+      ))) +
         geom_col(show.legend = FALSE) +
         coord_flip() +
         theme_minimal() +
-        labs(title = "Top TF-IDF Words", x = "Word", y = "TF-IDF Score") +
-        scale_y_continuous(expand = expansion(mult = c(0, 0.05)))  # 避免負數顯示
+        labs(title = "Top TF-IDF Words", x = "Word", y = "TF-IDF Score")
+      
+      ggplotly(p, tooltip = "text") %>%
+        layout(hoverlabel = list(bgcolor = "lightblue"),showlegend = FALSE)
+         
     })
-    
   })
 }
 
