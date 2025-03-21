@@ -1,0 +1,252 @@
+---
+title: "Data Preprocessing"
+author: "Chang Fang Yu"
+date-modified: "last-modified"
+execute:
+  echo: True
+  eval: True
+  warning: false
+  freeze: true
+---
+
+```{r}
+library(readr)
+```
+
+```{r}
+pacman::p_load(ggrepel, patchwork, 
+               ggthemes, hrbrthemes,
+               tidyverse, plotly, 
+               DT, GGally, parallelPlot, tidytext) 
+pacman::p_load(igraph, tidygraph, ggraph, 
+               visNetwork, lubridate, clock,
+               tidyverse, graphlayouts)
+```
+
+Import data:
+
+```{r}
+GP <- read_csv("data/GovernmentProcurementviaGeBIZ.csv")
+```
+
+```{R}
+glimpse(GP)
+```
+
+```{R}
+sum(is.na(GP))
+```
+
+```{R}
+summary(GP)
+
+```
+
+```{r}
+colnames(GP)
+
+```
+
+```{r}
+# 檢查 tender_detail_status 欄位的所有不同值
+distinct_statuses <- GP %>%
+  distinct(tender_detail_status) %>%
+  pull(tender_detail_status)
+
+# 印出所有不同的 tender_detail_status
+print(distinct_statuses)
+
+```
+### Data Cleaning
+```{r}
+
+#排除無效標案"Adwarded to no suppliers"
+# 計算清理前後的標案數量
+before_count <- nrow(GP)
+Cleaned_GP <- GP %>%
+  filter(tender_detail_status %in% c("Awarded to Suppliers", "Awarded by Items", "Award by interface record"))
+after_count <- nrow(Cleaned_GP)
+
+# Display results
+print(paste("Original number of tenders:", before_count))
+print(paste("Number of tenders after cleaning:", after_count))
+
+```
+
+```{r}
+# 將清理後的數據存成 CSV
+write_csv(Cleaned_GP, "data/Cleaned_GP.csv")
+
+# 確保文件正確保存，讀取前幾筆資料查看
+Cleaned_GP_check <- read_csv("data/Cleaned_GP.csv")
+
+# 顯示前幾筆資料確認是否正確
+head(Cleaned_GP_check)
+```
+
+
+```{R}
+
+library(tidyverse)
+
+# 讀取已清理的數據
+Cleaned_GP <- read_csv("data/Cleaned_GP.csv")
+
+# 1️⃣ **轉換 `tender_description` 為小寫**
+Cleaned_GP <- Cleaned_GP %>%
+  mutate(tender_description = tolower(tender_description))
+
+# 2️⃣ **檢查相同 `tender_no` 是否有不同的 `tender_description`**
+tender_variations <- Cleaned_GP %>%
+  group_by(tender_no) %>%
+  summarise(n_unique_desc = n_distinct(tender_description), .groups = "drop") %>%
+  filter(n_unique_desc > 1)  # 只保留 `tender_no` 對應多個 `tender_description` 的情況
+
+# 3️⃣ **列出這些 `tender_no` 的詳細內容**
+tender_detail_variations <- Cleaned_GP %>%
+  filter(tender_no %in% tender_variations$tender_no) %>%
+  arrange(tender_no)
+
+# 4️⃣ **存成 CSV 以便檢查**
+write_csv(tender_detail_variations, "data/tender_description_variations.csv")
+
+# 顯示結果
+print(paste("發現", nrow(tender_variations), "個 `tender_no` 具有不同的 `tender_description`"))
+head(tender_detail_variations)
+
+```
+
+```{r}
+library(tidyverse)
+library(stringr)
+
+# 讀取清理後的數據
+Cleaned_GP <- read_csv("data/cleaned_GP.csv")
+
+# 1️⃣ **清除多餘空格與特殊字元**
+Cleaned_GP <- Cleaned_GP %>%
+  mutate(
+    tender_description = tolower(tender_description),   # 轉小寫
+    tender_description = str_squish(tender_description), # 清除多餘空格
+    tender_description = str_replace_all(tender_description, "[[:punct:]]", ""), # 移除標點符號
+    tender_description = str_replace_all(tender_description, "[^[:alnum:]\\s]", "") # 移除非字母數字字符
+  )
+
+# 2️⃣ **檢查清理後的 `tender_description` 是否仍有不同變異**
+tender_variation_check <- Cleaned_GP %>%
+  group_by(tender_no) %>%
+  summarise(unique_desc = unique(tender_description), .groups = "drop") %>%
+  filter(length(unique_desc) > 1)
+
+# 3️⃣ **存成新的 CSV**
+write_csv(Cleaned_GP, "data/Cleaned_GP_cleaned.csv")
+
+# 4️⃣ **確認清理後的數據**
+print(nrow(tender_variation_check))  
+
+```
+
+```{r}
+library(tidyverse)
+
+# 讀取已清理的數據
+Cleaned_GP <- read_csv("data/Cleaned_GP_cleaned.csv")
+
+# 1️⃣ **檢查 `tender_description` 是否有重複**
+duplicate_descriptions <- Cleaned_GP %>%
+  group_by(tender_description) %>%
+  summarise(n_tenders = n(), unique_tenders = n_distinct(tender_no), .groups = "drop") %>%
+  filter(n_tenders > 1)  # 只保留重複出現的 `tender_description`
+
+# 2️⃣ **顯示重複的 `tender_description`**
+print(paste("發現", nrow(duplicate_descriptions), "個重複的 `tender_description`"))
+head(duplicate_descriptions)
+
+# 3️⃣ **找出詳細的 `tender_no` 與 `tender_description` 關聯**
+detailed_duplicates <- Cleaned_GP %>%
+  filter(tender_description %in% duplicate_descriptions$tender_description) %>%
+  arrange(tender_description, tender_no)
+
+# 4️⃣ **存成 CSV 以便檢查**
+write_csv(detailed_duplicates, "data/tender_description_duplicates.csv")
+
+# 5️⃣ **顯示部分重複的 `tender_description` 記錄**
+head(detailed_duplicates)
+
+```
+
+In this step, we identified that the dataset contains an excessive number of duplicate `tender_no` and `tender_description` records, differing only in supplier and awarded amount. This occurs because a single tender may be awarded to multiple suppliers for different portions of the contract.
+
+However, for LDA (Latent Dirichlet Allocation) analysis, we are only concerned with `tender_description`. The presence of duplicated records could distort word weight distribution in the topic modeling process. Therefore, before conducting LDA, we decided to clean the dataset by keeping only the first occurrence of each unique `tender_no` and `tender_description`, removing redundant supplier records. This cleaned dataset is saved as `Cleaned_GP_LDA`.
+
+After LDA analysis, where each tender is assigned a topic label, we merge these labels back into the original dataset (`Cleaned_GP`)—which was already cleaned of `"Awarded to No Suppliers"` records. This merging is performed using a left join on `tender_no` and `tender_description`, ensuring that the correct LDA label is assigned to each original tender record. The resulting dataset is called `Label_tenderClean`, which preserves supplier and awarded amount information while incorporating LDA topic labels.
+
+### **📂 Final Outputs**
+
+#### **`Cleaned_GP_LDA.csv`**
+
+-   A dataset cleaned for LDA analysis, keeping only the first occurrence of each `tender_no` and `tender_description`.
+
+-   This ensures that duplicate descriptions do not bias the LDA model and that each tender description is analyzed uniquely.
+
+#### **`Label_tenderClean.csv`**
+
+-   A dataset combining the original cleaned tenders (`Cleaned_GP`) with their LDA-assigned topic labels.
+
+-   The LDA labels are merged back using a left join on `tender_no` and `tender_description`, ensuring consistency.
+
+-   This dataset is used for network analysis and tender market analysis, enabling further exploration of supplier relationships and market trends across different tender categories.
+
+```{r}
+library(tidyverse)
+
+# 讀取已清理的數據
+CGC <- read_csv("data/Cleaned_GP_cleaned.csv")
+
+# ✅ **去除 `tender_no` 和 `tender_description` 重複的數據**
+Cleaned_GP_LDA <- CGC %>%
+  distinct(tender_no, tender_description, .keep_all = TRUE)  # 只保留第一筆記錄
+
+# 存成新的 CSV
+write_csv(Cleaned_GP_LDA, "data/Cleaned_GP_LDA.csv")
+
+# 確認結果
+print(nrow(Cleaned_GP))       # 原始數據行數
+print(nrow(Cleaned_GP_LDA))   # 清理後的數據行數
+
+```
+
+```{r}
+#再檢查一下是否還有重複的"tender_no"+"tender_description"
+library(tidyverse)
+
+# 讀取已清理的數據
+Cleaned_GP_LDA <- read_csv("data/Cleaned_GP_LDA.csv")
+
+# 1️⃣ **檢查 `tender_no` + `tender_description` 是否仍有重複**
+duplicate_check <- Cleaned_GP_LDA %>%
+  group_by(tender_no, tender_description) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  filter(count > 1)  # 只保留有重複的記錄
+
+# 2️⃣ **顯示檢查結果**
+if (nrow(duplicate_check) == 0) {
+  print("✅ No duplicate tender_no + tender_description found. The data cleaning is correct!")
+} else {
+  print(paste("⚠️ Found", nrow(duplicate_check), "duplicate records. Check the data again!"))
+  head(duplicate_check)  # 顯示前幾筆重複的記錄
+}
+
+# 3️⃣ **確認數據行數是否正確**
+print(paste("Original dataset rows:", 17855))  # 你的 Cleaned_GP 行數
+print(paste("After cleaning, remaining rows:", nrow(Cleaned_GP_LDA)))  # 你的 Cleaned_GP_LDA 行數
+
+```
+
+```{r}
+head(Cleaned_GP_LDA)
+```
+```{r}
+sum(is.na(Cleaned_GP_LDA))
+```
+

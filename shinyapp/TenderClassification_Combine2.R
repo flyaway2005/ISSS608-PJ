@@ -11,8 +11,9 @@ library(DT)
 library(wordcloud)
 library(shinyjs)
 
-# **📌 讀取 Cleaned_GP 數據**
-Cleaned_GP <- read_csv("data/GovernmentProcurementviaGeBIZ.csv")
+
+# **📌 讀取 Cleaned_GP_LDA 數據**
+Cleaned_GP_LDA <- read_csv("data/Cleaned_GP_LDA.csv")
 
 # **📌 預設 Stopwords**
 default_stopwords <- c(stopwords("en"), "please", "refer", "another", "one", "two", "three", 
@@ -40,7 +41,7 @@ ui <- dashboardPage(
                 sidebarLayout(
                   sidebarPanel(
                     selectInput("sample_size", "Choose Data Sample:", 
-                                choices = c("1000" = 1000, "5000" = 5000, "10000" = 10000, "All" = nrow(Cleaned_GP)),
+                                choices = c("1000" = 1000, "5000" = 5000, "10000" = 10000, "All" = nrow(Cleaned_GP_LDA)),
                                 selected = 1000),  
                     actionButton("load_data", "Load Data")
                   ),
@@ -61,8 +62,7 @@ ui <- dashboardPage(
                     sliderInput("num_words", "Number of Words:", min = 5, max = 20, value = 10),
                     selectInput("lda_category", "Select LDA Category:", choices = NULL, selected = "All"),
                     actionButton("reload_lda", "Reload")  # ✅ 新增 Reload 按鈕
-                  )
-                  ,
+                  ),
                   mainPanel(
                     tabsetPanel(
                       tabPanel("LDA Distribution", plotlyOutput("lda_category_plot")),
@@ -74,7 +74,6 @@ ui <- dashboardPage(
                 )
               )
       ),
-      
       # **📌 LDA Clustering (Unsupervised)**
       tabItem(tabName = "unsupervised",
               fluidPage(
@@ -95,8 +94,6 @@ ui <- dashboardPage(
                 )
               )
       )
-      
-      
     )
   )
 )
@@ -109,7 +106,7 @@ server <- function(input, output, session) {
   observe({
     sample_size <- 1000
     set.seed(1234)
-    sample_data <- Cleaned_GP %>% sample_n(sample_size)
+    sample_data <- Cleaned_GP_LDA %>% sample_n(sample_size)
     
     sample_data <- sample_data %>%
       mutate(
@@ -132,7 +129,7 @@ server <- function(input, output, session) {
   observeEvent(input$load_data, {
     sample_size <- as.numeric(input$sample_size)
     set.seed(1234)
-    sample_data <- Cleaned_GP %>% sample_n(sample_size)
+    sample_data <- Cleaned_GP_LDA %>% sample_n(sample_size)
     
     sample_data <- sample_data %>%
       mutate(
@@ -185,6 +182,9 @@ server <- function(input, output, session) {
           TRUE ~ "Unclassified"
         )
       )
+    # ✅ 寫入帶有 LDA 標籤的資料集
+    #dir.create("output", showWarnings = FALSE)  # 確保資料夾存在
+    #write_csv(sample_data, "output/tender_lda_labeled.csv")
     
     updateSelectInput(session, "lda_category", choices = c("All", unique(sample_data$LDA_Category)))
     
@@ -334,6 +334,17 @@ server <- function(input, output, session) {
     
     output$cluster_plot <- renderPlotly({
       ggplotly(p_all, tooltip = "text")
+    })
+    
+    ###檢查
+    observeEvent(input$run_unsupervised, {
+      req(selected_data())  
+      
+      print("Checking selected_data()...")
+      print(head(selected_data()))  # 檢查前幾行數據
+      
+      print("Checking tender_clean column...")
+      print(sum(nchar(selected_data()$tender_clean) == 0))  # 計算 tender_clean 是否有空值
     })
     
     # **📌 繪製單一 Cluster**

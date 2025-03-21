@@ -8,6 +8,7 @@ execute:
   warning: false
   freeze: true
 ---
+
 ```{r}
 
 library(tidyverse)
@@ -30,6 +31,15 @@ library(topicmodels)
 library(ggplot2)
 library(cluster)
 library(reshape2)
+
+```
+
+
+```{r}
+
+
+
+
 ```
 
 
@@ -157,8 +167,8 @@ Cleaned_GP %>%
 write_csv(Cleaned_GP, "Labeled_Tenders.csv")
 
 
-```
 
+```
 
 ```{r}
 library(tidyverse)
@@ -191,8 +201,8 @@ Cleaned_GP <- Cleaned_GP %>%
   )
 ```
 
-
 ## LDA Topic Modeling
+
 ```{r}
 dtm <- Cleaned_GP %>%
   unnest_tokens(word, tender_clean) %>%
@@ -204,12 +214,14 @@ lda_results <- tidy(lda_model, matrix = "beta")
 ```
 
 ## Document-Topic Probability Matrix
+
 ```{r}
 doc_topic_matrix <- tidy(lda_model, matrix = "gamma") %>%
   spread(topic, gamma)
 ```
 
 ## K-means Clustering on Document-Topic Distributions
+
 ```{r}
 k_clusters <- 6
 set.seed(1234)
@@ -222,6 +234,7 @@ head(doc_topic_matrix)
 dim(doc_topic_matrix)  # 查看行數與列數
 
 ```
+
 ```{r}
 library(reshape2)
 
@@ -237,6 +250,7 @@ dim(doc_topic_melted)  # 查看數據是否有效
 ```
 
 ## Visualizing Topic Probabilities for Clusters
+
 ```{r}
 library(ggplot2)
 
@@ -252,8 +266,6 @@ ggplot(doc_topic_melted, aes(x = Topic, y = Probability, group = document, color
   labs(title = "stLDA-C Topic Distributions by Cluster", x = "Topic", y = "Probability")
 
 ```
-
-
 
 ```{r}
 top_terms <- tidy(lda_model, matrix = "beta") %>%
@@ -306,6 +318,4 @@ ggplotly(p, tooltip = "text")
 
 ```
 
-
 ##end of LDA cluster
-
