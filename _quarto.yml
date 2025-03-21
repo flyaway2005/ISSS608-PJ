@@ -9,6 +9,8 @@ website:
         text: "Home"
       - href: Proposal/proposal.qmd
         text: "Proposal"
+      - herf: Data_Preprocessing.qmd
+        text: "Data Preprocessing"
       - text: "Meetings"
         menu:
         - text: "Meeting 1"
