@@ -1,0 +1,44 @@
+title Data Preprocessing Flow for LDA Topic Modeling
+
+participant "Raw Data" as RD
+participant "Initial Processing" as IP
+participant "Text Processing" as TP
+participant "Duplicate Analysis" as DA
+participant "LDA Input Dataset" as FD
+
+note over RD: GovernmentProcurementviaGeBIZ.csv\n(Raw procurement data)
+RD->IP: Import raw data
+
+group Data Cleaning Process
+    IP->IP: Filter invalid tenders
+    IP->IP: Remove "Awarded to no suppliers"
+    IP->IP: Save initial cleaned data
+end
+
+IP->TP: Pass cleaned data for text preprocessing
+
+group Text Processing for LDA
+    TP->TP: Convert to lowercase
+    TP->TP: Remove extra spaces
+    TP->TP: Remove punctuation
+    TP->TP: Remove special characters
+    TP->TP: Standardize text format
+end
+
+TP->DA: Pass standardized text data
+
+group Duplicate Analysis for LDA
+    DA->DA: Identify duplicate descriptions
+    DA->DA: Check tender variations
+    DA->DA: Analyze tender-description pairs\n(Ensure unique entries for LDA)
+end
+
+DA->FD: Process final dataset for LDA
+
+group LDA Dataset Preparation
+    FD->FD: Keep first occurrence of each\ntender_no + description pair
+    FD->FD: Validate no duplicates
+    FD->FD: Generate Cleaned_GP_LDA.csv\n(Ready for topic modeling)
+end
+
+note over FD: Final cleaned dataset\noptimized for LDA topic modeling 
