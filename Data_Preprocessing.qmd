@@ -9,13 +9,11 @@ execute:
   freeze: true
 ---
 
-# Data Preprocessing
-
 ## Overview
 
 This document details the data preprocessing steps for analyzing Singapore's government procurement data. The process includes data cleaning, text normalization, and preparation for subsequent analyses such as LDA topic modeling and network analysis.
 
-## Data Processing Steps
+## Data Preprocessing Steps
 
 ### 1. Data Import and Initial Setup
 
