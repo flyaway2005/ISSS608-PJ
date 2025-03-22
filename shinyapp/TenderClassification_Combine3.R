@@ -1,3 +1,4 @@
+
 library(shiny)
 library(shinydashboard)
 library(tidyverse)
@@ -10,6 +11,10 @@ library(reshape2)
 library(DT)
 library(wordcloud)
 library(shinyjs)
+library(text2vec)
+library(tm)
+library(tidytext)
+
 
 
 # **📌 讀取 Cleaned_GP_LDA 數據**
@@ -183,8 +188,8 @@ server <- function(input, output, session) {
         )
       )
     # ✅ 寫入帶有 LDA 標籤的資料集
-    #dir.create("output", showWarnings = FALSE)  # 確保資料夾存在
-    #write_csv(sample_data, "output/tender_lda_labeled.csv")
+    dir.create("output", showWarnings = FALSE)  # 確保資料夾存在
+    write_csv(sample_data, "output/tender_lda_labeled_all.csv")
     
     updateSelectInput(session, "lda_category", choices = c("All", unique(sample_data$LDA_Category)))
     

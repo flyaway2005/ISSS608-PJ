@@ -9,8 +9,10 @@ website:
         text: "Home"
       - href: Proposal/proposal.qmd
         text: "Proposal"
-      - href: Data_Preprocessing.qmd
-        text: "Data Preprocessing"
+      - text: "Data Preprocessing"
+        menu:
+        - text: "For LDA"
+          href: Data_Preprocessing/Data_Preprocessing_LDA.qmd
       - text: "Meetings"
         menu:
         - text: "Meeting 1"
