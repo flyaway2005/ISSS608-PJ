@@ -33,7 +33,7 @@ To bridge this gap, our project "Let’s Track Public Dollars! Unveiling the G2B
 
 The application will leverage:
 
--   **Machine Learning-Based Tender Categorization**: Uses text analysis to classify tenders via its description, enabling grouped analysis by category to reveal agency procurement trends and supplier market dominance.
+-   **Machine Learning-Based Tender Categorization**: Uses text analysis to classify tenders via its description, enabling grouped analysis by supervised category to reveal agency procurement trends and supplier market dominance.
 
 -   **Procurement Dashboard:** Visualises procurement trends over time, revealing seasonal patterns, supplier shifts, and spending changes by tender type. It also analyzes market concentration and supplier dominance.
 
@@ -69,7 +69,7 @@ pacman::p_load(igraph, tidygraph, ggraph,
 
 ```{r}
 
-GP <- read_csv("data/GovernmentProcurementviaGeBIZ.csv")
+GP <- read_csv("C:/Users/irisc/SynologyDrive/Documents/flyaway2005/ISSS608-team4pj/data/GovernmentProcurementviaGeBIZ.csv")
 ```
 
 ```{r}
@@ -79,35 +79,97 @@ kable(head(GP))
 
 ## Methodology 
 
-The project will employ a modular data-driven approach to uncover insights from government procurement data using interactive dashboards, natural language processing (NLP), and network analysis techniques. By integrating advanced visualization and machine learning methods, the system will provide a comprehensive, transparent, and engaging analytical tool for public procurement monitoring. The planning modules include the following: 
+The project will employ a modular data-driven approach to uncover insights from government procurement data using interactive dashboards, topic modeling, and network analysis techniques. By integrating advanced visualization and machine learning methods, the system will provide a comprehensive, transparent, and engaging analytical tool for public procurement monitoring. The planning modules include the following: 
 
 ### Module 1. Machine Learning Based Tender Classification
 
 #### Module Owner: Chang Fang Yu
 
-#### Core functionality:
+#### **Core Functionality**
 
-This component aims to automatically categorize tenders by analyzing procurement descriptions using Natural Language Processing (NLP) and machine learning techniques. By implementing LDA topic modeling, TF-IDF-based text analysis, and a trained classification model, we can label tenders with meaningful categories. These labels will then be used for trend analysis, procurement pattern identification, and supplier-agency relationship insights.
+This module adopts a complete **Latent Dirichlet Allocation (LDA) text modeling** approach to automatically categorize government tenders based on procurement descriptions. It comprises two key submodules:
 
-#### Implement Components:
+1.  **LDA Supervised Classification**, which uses predefined procurement categories to train the model and label tenders accordingly
 
-**1. Data Preprocessing & Text Cleaning**
+2.  **LDA Clustering (Unsupervised)**, which allows users to explore underlying topic structures without category supervision.
 
--   **Objective:** Prepare tender descriptions for accurate text analysis and machine learning classification.
+Users can control the **sample size** (e.g., 1,000, 5,000, 10,000, or all) from a pre-cleaned dataset (`Cleaned_GP_LDA.csv`) and then conduct analysis accordingly. This flexibility allows scalable experimentation and ensures robust and interpretable insights from both supervised and unsupervised LDA.
 
-**2. LDA Topic Modeling & Tender Clustering**
+### **Implemented Components**
 
--   **Objective:** Identify potential procurement categories based on tender descriptions.
+#### 1. **Data Selection & Sampling**
 
-**3. Machine Learning Model Training & Tender Labeling**
+-   Users begin by selecting a sample size from the full cleaned tender dataset.
 
--   **Objective:** Train a supervised learning model to automatically label tenders based on discovered categories.
+-   The app draws random samples from `Cleaned_GP_LDA.csv`, which has undergone preprocessing (punctuation removal, case normalization, stopword removal).
 
-#### **Specific Insights:**
+-   This step ensures consistency and readiness for text modeling.
 
--   **Identifies key procurement categories**: based on tender descriptions.
+#### 2. **LDA Supervised Classification**
 
--   **Improves supplier-agency analysis**: by grouping tenders based on category labels.
+**Objective**: Train an LDA model using 7 predefined procurement categories, then assign one category to each tender.
+
+**Workflow**:
+
+-   An LDA model is trained with a fixed number of topics (`k = 7`) using pre-annotated labels.
+
+-   Each tender is assigned to a category based on the most probable topic.
+
+-   The labeled dataset is exported (`tender_lda_labeled_all.csv`) for downstream analysis.
+
+**User Controls & Visualizations**:
+
+-   **Word count selector**: Choose the number of top words to display per category.
+
+-   **LDA Category Filter**: Focus on one or all categories.
+
+-   **LDA Distribution Chart**: View the number of tenders per category
+
+-   **TF-IDF Table**: Examine top words by TF-IDF per category.
+
+-   **Wordcloud**: Visualize dominant words per category.
+
+-   **TF-IDF Bar Chart**: Explore the top terms and their TF-IDF scores in a bar plot.
+
+**Key Benefits**:
+
+-   Enables consistent labeling of tenders using domain-specific procurement logic.
+
+-   Provides clear visual patterns for each procurement category.
+
+#### 3. **LDA Clustering (Unsupervised)**
+
+**Objective**: Explore latent structures in tender descriptions without using predefined labels.
+
+**Workflow**:
+
+-   The user specifies the number of clusters `k` and a fixed topic number (`k = 10`) for the LDA model.
+
+-   After modeling, a **k-means algorithm** is applied to cluster the tender-topic matrix.
+
+-   Each cluster reveals a pattern of topic distribution and representative keywords.
+
+**Visual Outputs**:
+
+-   **All Cluster View**: Visualize how tenders are grouped by topic across different clusters.
+
+-   **Single Cluster View**: Drill into a specific cluster to analyze its topic weight and top words.
+
+-   **TF-IDF Insights**: For each topic, the top 5 words with the highest beta values are displayed.
+
+**Key Benefits**:
+
+-   Facilitates discovery of procurement themes not captured by predefined categories.
+
+-   Highlights hidden textual patterns in tenders using a data-driven approach.
+
+### **Insights and Value**
+
+-   **Text Pattern Discovery**: Identify linguistic and thematic patterns in tender descriptions using both guided and unguided modeling.
+
+-   **Flexible Exploration**: Support user-defined sampling, keyword visualization, and model configuration.
+
+-   **Supports Strategic Analysis**: Enables users to better understand procurement trends, supplier profiles, and category distributions.
 
 ### Module 2. Procurement Dashboard  
 
