@@ -34,8 +34,18 @@ network_community_ui <- function(id) {
       # Announcement section
       
       column(12, 
-             h3("Test Network"),
-             verbatimTextOutput(NS(id, "test_network"))),
+             h3("Instructions"),
+             div(id = NS(id, "instructions"),
+                 p("Use the control panel on the left side to select date range, agencies, suppliers, etc. to control data selection."),
+                 p("Community Network Overview gives you an overview of the communities based on the data you selected."),
+                 tags$ul(
+                   tags$li(strong("Step 1:"), " Select procurement profile"),
+                   tags$li(strong("Step 2:"), " Choose community clustering & layout methods. Click on", strong("Update Visualisation"), "button to update."),
+                   tags$li(strong("Step 3:"), " View results on ", em("Community Network Overview"), "tab.", "When clicking on a node, all connected nodes will be highlighted."),
+                   tags$li(strong("Step 4:"), " When clicking on a node, the connected nodes will be highlighted. Learn the community cluster information on the tootip."),
+                   tags$li(strong("Step 5:"), " Choose a community from the drop-down list to see the focus view on ", em("Community Explorer"), "tab"),
+                 )
+             )),
       #------------      
       # Left sidebar with controls
       column(width = 3,
@@ -1029,10 +1039,10 @@ network_community_server <- function(id, dataset) {
                                            springConstant = 0.08),
                    stabilization = list(iterations = 100)) %>%
         visGroups(groupname = "Agency", 
-                  color = list(background = "#E195AB", border = "#C71585"),
+                  color = list(background = "#39B5E0", border = "#E3F6FF"),
                   shape = "diamond") %>%
         visGroups(groupname = "Supplier", 
-                  color = list(background = "#95E1AB", border = "#15C758"),
+                  color = list(background = "#E4003A", border = "#E195AB"),
                   shape = "dot") %>%
         visNodes(scaling = list(min = 10, max = 30),
                  font = list(size = 12),
