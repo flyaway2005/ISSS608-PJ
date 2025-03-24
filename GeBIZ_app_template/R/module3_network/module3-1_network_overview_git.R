@@ -295,10 +295,10 @@ network_analysis_ui <- function(id) {
           title = "Ego Network",
           tabPanel(
             title = "Ego Network",
-            # Replace the current layout with this:
+            # First row: Ego Network Visualization
             fluidRow(
               column(
-                width = 12,  # Full width for the network visualization
+                width = 12,  
                 box(
                   title = "Ego Network",
                   width = NULL,
@@ -307,18 +307,43 @@ network_analysis_ui <- function(id) {
                 )
               )
             ),
+            # Second row: Key Metrics
             fluidRow(
               column(
-                width = 12,  # Full width for the metrics
+                width = 12, 
                 box(
                   title = "Ego Network Metrics",
                   width = NULL,
                   solidHeader = TRUE,
+                  status = "info",
                   verbatimTextOutput(ns("ego_metrics"))
                 )
               )
             ),
-            # Add a message when no node is selected
+            # Third row: Detailed tables
+            fluidRow(
+              column(
+                width = 12,
+                # Tabbed box for detailed ego metrics
+                tabBox(
+                  title = "Ego Network Details",
+                  width = NULL,
+                  tabPanel(
+                    title = "Ego Agencies",
+                    DTOutput(ns("ego_agency_table"))
+                  ),
+                  tabPanel(
+                    title = "Ego Suppliers",
+                    DTOutput(ns("ego_supplier_table"))
+                  ),
+                  tabPanel(
+                    title = "Connections",
+                    DTOutput(ns("ego_connection_table"))
+                  )
+                )
+              )
+            ),
+            # When no node is selected
             uiOutput(ns("no_node_selected_message"))
           ))
       ))
@@ -916,6 +941,7 @@ network_analysis_server <- function(id) {
           id = name,
           label = name,
           color = ifelse(type == "supplier", "red", "blue"),
+          shape = ifelse(type == "supplier", "dot", "diamond"),
           title = paste0(
             "<strong>", name, "</strong><br>",
             "Type: ", type, "<br>",
@@ -1203,12 +1229,18 @@ network_analysis_server <- function(id) {
           is_focal = (id == selected_node),
           # Enhanced styling for better visualization
           color = case_when(
-            is_focal ~ "#00FF00",  # Bright green for focal node
-            id %in% connected_from ~ "#FF9999",  # Light red for suppliers
-            id %in% connected_to ~ "#9999FF",    # Light blue for agencies
+            is_focal ~ "#F3c623",  # Bright green for focal node
+            type == "supplier" ~ "#E4003A", 
+            type == "agency" ~ "#A6CDC6",    
             TRUE ~ color  # Keep original color otherwise
+          ),
+          shape = case_when(
+            is_focal ~ "star",     # Star shape for the focal node
+            type == "supplier" ~ "dot",  
+            type == "agency" ~ "diamond",       
+            TRUE ~ "dot"          
           )
-        )
+        )          
         
       # Add safety check for empty results
       if(nrow(ego_nodes) == 0 || nrow(ego_edges) == 0) {
@@ -1373,14 +1405,14 @@ network_analysis_server <- function(id) {
         visEdges(
           arrows = "to",
           color = list(
-            color = "#888888",
+            color = "#D3D3D3",
             highlight = "#FF0000"
           ),
-          smooth = FALSE  # Straight lines for clarity
+          smooth = TRUE
         ) %>%
         visNodes(
           shape = "dot",
-          shadow = TRUE  
+          shadow = FALSE  
         ) %>%
         visOptions(
           highlightNearest = list(enabled = TRUE, degree = 1, hover = TRUE),
@@ -1388,7 +1420,14 @@ network_analysis_server <- function(id) {
         ) %>%
         visPhysics(
           solver = "forceAtlas2Based",
-          stabilization = TRUE
+          stabilization = list(enabled = TRUE,
+                               iterations = if(input$performance_mode) 100 else 1000
+                               ) 
+        ) %>%
+        visInteraction(
+          navigationButtons = TRUE,
+          dragNodes = TRUE,
+          zoomView = TRUE
         ) %>%
         visLayout(randomSeed = 123)  # Consistent layout
     })
@@ -1436,7 +1475,155 @@ network_analysis_server <- function(id) {
       # Print the metrics in a nice format
       print(metrics_df, row.names = FALSE)
     })
+
+#----
+    # Ego Network Agency Table
+#----
     
+    output$ego_agency_table <- renderDT({
+      ego_data <- ego_network_data()
+      req(ego_data)
+      req(nrow(ego_data$nodes) > 0)
+      
+      # Get selected node info
+      selected_node <- input$selected_node
+      selected_type <- ego_data$nodes$type[ego_data$nodes$id == selected_node]
+      
+      # Always include the focal agency
+      if (selected_type == "agency") {
+        connected_agencies <- ego_data$nodes %>%
+          filter(type == "agency")  # Include all agencies, including the selected one
+        
+        connected_agencies <- connected_agencies %>%
+          mutate(is_focal = (id == selected_node))
+      } else {
+        # If selected node is a supplier, show all connected agencies
+        connected_agencies <- ego_data$nodes %>%
+          filter(type == "agency")
+        
+        # Since none of the agencies are the focal node
+        connected_agencies$is_focal <- FALSE
+      }
+      
+      if (nrow(connected_agencies) == 0) {
+        return(datatable(
+          data.frame(Message = "No connected agencies found"),
+          options = list(dom = 't')
+        ))
+      }
+      
+      # Format agency data
+      connected_agencies <- connected_agencies %>%
+        select(id, total_contracts, total_award_amount) %>%
+        arrange(desc(total_award_amount))
+      
+      # Format currency
+      connected_agencies$total_award_amount <- paste0("$", format(connected_agencies$total_award_amount, big.mark = ",", scientific = FALSE))
+      
+      colnames(connected_agencies) <- c("Agency Name", "Total Contracts", "Total Award Amount")
+      
+      # datatable
+      datatable(
+        connected_agencies,
+        options = list(
+          pageLength = 5,
+          lengthMenu = c(5, 10, 15),
+          scrollX = TRUE
+        )
+      )
+    })
+    
+    # Ego Network Supplier Table
+    output$ego_supplier_table <- renderDT({
+      ego_data <- ego_network_data()
+      req(ego_data)
+      req(nrow(ego_data$nodes) > 0)
+      
+      selected_node <- input$selected_node
+      selected_type <- ego_data$nodes$type[ego_data$nodes$id == selected_node]
+      
+      # Always include the focal supplier
+      if (selected_type == "supplier") {
+        # If selected node is a supplier, it should be included in the supplier table
+        connected_suppliers <- ego_data$nodes %>%
+          filter(type == "supplier")  # Include all suppliers, including the selected one
+        
+        # Mark the focal supplier for highlighting
+        connected_suppliers <- connected_suppliers %>%
+          mutate(is_focal = (id == selected_node))
+      } else {
+        # If selected node is an agency, show all connected suppliers
+        connected_suppliers <- ego_data$nodes %>%
+          filter(type == "supplier")
+        
+        # Since none of the suppliers are the focal node
+        connected_suppliers$is_focal <- FALSE
+      }
+      
+      # If there are no connected suppliers, return empty table with message
+      if (nrow(connected_suppliers) == 0) {
+        return(datatable(
+          data.frame(Message = "No connected suppliers found"),
+          options = list(dom = 't')
+        ))
+      }
+      
+      connected_suppliers <- connected_suppliers %>%
+        select(id, total_contracts, total_award_amount) %>%
+        arrange(desc(total_award_amount))
+      
+      connected_suppliers$total_award_amount <- paste0("$", format(connected_suppliers$total_award_amount, big.mark = ",", scientific = FALSE))
+      
+      colnames(connected_suppliers) <- c("Supplier Name", "Total Contracts", "Total Award Amount")
+      
+      datatable(
+        connected_suppliers,
+        options = list(
+          pageLength = 5,
+          lengthMenu = c(5, 10, 15),
+          scrollX = TRUE
+        )
+      )
+    })
+    
+    # Ego Network Connections Table 
+    output$ego_connection_table <- renderDT({
+      ego_data <- ego_network_data()
+      req(ego_data)
+      req(nrow(ego_data$edges) > 0)
+      
+      connections <- ego_data$edges
+      
+      # Check if tender_cat exists
+      if ("tender_cat" %in% names(connections)) {
+        # Select relevant columns including tender category
+        connections <- connections %>%
+          select(from, to, tender_cat, total_contracts, total_award_amount) %>%
+          arrange(desc(total_award_amount))
+      } else {
+        # Select relevant columns without tender category
+        connections <- connections %>%
+          select(from, to, total_contracts, total_award_amount) %>%
+          arrange(desc(total_award_amount))
+        
+        # placeholder column
+        connections$tender_cat <- "Not available"
+      }
+
+      connections$total_award_amount <- paste0("$", format(connections$total_award_amount, big.mark = ",", scientific = FALSE))
+      
+      colnames(connections) <- c("From", "To", "Tender Category", "Contract Count", "Award Amount")
+
+      datatable(
+        connections,
+        options = list(
+          pageLength = 5,
+          lengthMenu = c(5, 10, 15),
+          scrollX = TRUE
+        )
+      )
+    })
+        
     output$no_node_selected_message <- renderUI({
       if(is.null(input$selected_node)) {
         div(
@@ -1448,7 +1635,7 @@ network_analysis_server <- function(id) {
         return(NULL)  # Return nothing if a node is selected
       }
     })
-  })
+})
 }
 
 # UI
