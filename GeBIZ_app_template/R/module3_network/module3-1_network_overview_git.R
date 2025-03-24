@@ -5,6 +5,7 @@ library(dplyr)
 library(visNetwork)
 library(igraph)
 library(scales)
+library(DT)
 
 # Load preprocessed network data
 network_data <- readRDS("data/m3_processed_network_data.rds")
@@ -238,8 +239,55 @@ network_analysis_ui <- function(id) {
           # Tab 1: Main Network Visualization
           tabPanel(
             title = "Network Overview",
-        # Network visualization
-        visNetworkOutput(ns("network_plot"), height = "600px")
+            # Main Network Visualization - Full Width
+            fluidRow(
+              column(
+                width = 12,
+                box(
+                  title = "Network Visualization",
+                  width = NULL,
+                  solidHeader = TRUE,
+                  status = "primary",
+                  visNetworkOutput(ns("network_plot"), height = "600px")
+                )
+              )
+            ),
+            # Network Summary - Full Width
+            fluidRow(
+              column(
+                width = 12,
+                box(
+                  title = "Network Summary",
+                  width = NULL,
+                  solidHeader = TRUE,
+                  status = "info",
+                  verbatimTextOutput(ns("network_summary"))
+                )
+              )
+            ),
+            # Network Details Tables - Full Width
+            fluidRow(
+              column(
+                width = 12,
+                # Tabbed box for detailed metrics
+                tabBox(
+                  title = "Network Details",
+                  width = NULL,
+                  tabPanel(
+                    title = "Agencies",
+                    DTOutput(ns("agency_table"))
+                  ),
+                  tabPanel(
+                    title = "Suppliers",
+                    DTOutput(ns("supplier_table"))
+                  ),
+                  tabPanel(
+                    title = "Top Contracts",
+                    DTOutput(ns("contract_table"))
+                  )
+                )
+              )
+            )
           ),
         
         # Tab 2: Ego-centric
@@ -616,6 +664,12 @@ network_analysis_server <- function(id) {
         })
       }
     }, ignoreInit = TRUE)
+    
+    #Observe the node click on main network
+    observeEvent(input$switch_to_ego, {
+      updateTabsetPanel(session, "network_tabs", selected = "Ego Network")
+    }, ignoreInit = TRUE)
+    
     # observe({
     #   # When manual min input changes, update slider
     #   if (!is.null(input$min_award_manual)) {
@@ -1047,8 +1101,9 @@ network_analysis_server <- function(id) {
         ) %>%
         visEvents(
           selectNode = sprintf("function(nodes) { 
-Shiny.setInputValue('%s', nodes.nodes[0]);
-}", session$ns("selected_node"))
+    Shiny.setInputValue('%s', nodes.nodes[0]);
+    Shiny.setInputValue('%s', 'Ego Network', {priority: 'event'});
+  }", session$ns("selected_node"), session$ns("switch_to_ego"))
         )
     })
 #-------------
@@ -1166,7 +1221,133 @@ Shiny.setInputValue('%s', nodes.nodes[0]);
       return(list(nodes = ego_nodes, edges = ego_edges))
     })
     
+#----
+# Network metrics tables (tab 1)
+#----    
     
+    # Network Summary Statistics
+    output$network_summary <- renderPrint({
+      # Make sure we have data
+      data <- filtered_data()
+      req(data)
+      req(nrow(data$nodes) > 0)
+      
+      # Calculate key statistics
+      num_agencies <- sum(data$nodes$type == "agency")
+      num_suppliers <- sum(data$nodes$type == "supplier") 
+      total_contracts <- sum(data$edges$total_contracts)
+      total_award_amount <- sum(data$edges$total_award_amount)
+      
+      # Create summary data frame
+      summary_df <- data.frame(
+        Metric = c(
+          "Total Nodes",
+          "Agencies",
+          "Suppliers",
+          "Total Connections",
+          "Total Contracts",
+          "Total Award Amount"
+        ),
+        Value = c(
+          nrow(data$nodes),
+          num_agencies,
+          num_suppliers,
+          nrow(data$edges),
+          total_contracts,
+          paste0("$", format(total_award_amount, big.mark = ",", scientific = FALSE))
+        )
+      )
+      
+      # Print the summary
+      print(summary_df, row.names = FALSE)
+    })
+    
+    # Agency Table
+    output$agency_table <- renderDT({
+      data <- filtered_data()
+      req(data)
+      
+      # Filter for agencies 
+      agencies <- data$nodes %>%
+        filter(type == "agency") %>%
+        select(name, total_contracts, total_award_amount) %>%
+        arrange(desc(total_award_amount))
+      
+      # Format for display
+      agencies$total_award_amount <- paste0("$", format(agencies$total_award_amount, big.mark = ",", scientific = FALSE))
+      
+      # Rename columns 
+      colnames(agencies) <- c("Agency Name", "Total Contracts", "Total Award Amount")
+      
+      # Return the data table with options
+      datatable(
+        agencies,
+        options = list(
+          pageLength = 10,
+          lengthMenu = c(5, 10, 15, 20),
+          scrollX = TRUE
+        )
+      )
+    })
+    
+    # Supplier Table
+    output$supplier_table <- renderDT({
+      data <- filtered_data()
+      req(data)
+      
+      # Filter for suppliers 
+      suppliers <- data$nodes %>%
+        filter(type == "supplier") %>%
+        select(name, total_contracts, total_award_amount) %>%
+        arrange(desc(total_award_amount))
+      
+      suppliers$total_award_amount <- paste0("$", format(suppliers$total_award_amount, big.mark = ",", scientific = FALSE))
+      
+      colnames(suppliers) <- c("Supplier Name", "Total Contracts", "Total Award Amount")
+      
+      datatable(
+        suppliers,
+        options = list(
+          pageLength = 10,
+          lengthMenu = c(5, 10, 15, 20),
+          scrollX = TRUE
+        )
+      )
+    })
+    
+    # Top Contracts Table
+    output$contract_table <- renderDT({
+      data <- filtered_data()
+      req(data)
+      
+      # Check if tender_cat column exists in the edges data
+      if ("tender_cat" %in% names(data$edges)) {
+        top_contracts <- data$edges %>%
+          select(agency, supplier_name, tender_cat, total_contracts, total_award_amount) %>%
+          arrange(desc(total_award_amount))
+      } else {
+        # Fallback if tender_cat doesn't exist
+        top_contracts <- data$edges %>%
+          select(agency, supplier_name, total_contracts, total_award_amount) %>%
+          arrange(desc(total_award_amount))
+        # Add column for tender category
+        top_contracts$tender_cat <- "Not available"
+      }
+      
+      top_contracts$total_award_amount <- paste0("$", format(top_contracts$total_award_amount, big.mark = ",", scientific = FALSE))
+      
+      # Rename columns for better presentation
+      colnames(top_contracts) <- c("Agency", "Supplier", "Tender Category", "Contract Count", "Award Amount")
+      
+      datatable(
+        top_contracts,
+        options = list(
+          pageLength = 10,
+          lengthMenu = c(5, 10, 15, 20),
+          scrollX = TRUE
+        )
+      )
+    })   
     #-----------------
     # Ego visual output
     #-----------------
