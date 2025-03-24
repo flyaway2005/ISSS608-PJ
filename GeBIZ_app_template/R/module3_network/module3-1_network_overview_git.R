@@ -245,33 +245,37 @@ network_analysis_ui <- function(id) {
         # Tab 2: Ego-centric
         tabPanel(
           title = "Ego Network",
-          fluidRow(
-            column(
-              width = 8,
-              box(
-                title = "Ego Network",
-                width = NULL,
-                solidHeader = TRUE,
-                visNetworkOutput(ns("ego_network_plot"), height = "500px")
+          tabPanel(
+            title = "Ego Network",
+            # Replace the current layout with this:
+            fluidRow(
+              column(
+                width = 12,  # Full width for the network visualization
+                box(
+                  title = "Ego Network",
+                  width = NULL,
+                  solidHeader = TRUE,
+                  visNetworkOutput(ns("ego_network_plot"), height = "500px")
+                )
               )
             ),
-            column(
-              width = 4,
-              box(
-                title = "Ego Network Metrics",
-                width = NULL,
-                solidHeader = TRUE,
-                verbatimTextOutput(ns("ego_metrics"))
+            fluidRow(
+              column(
+                width = 12,  # Full width for the metrics
+                box(
+                  title = "Ego Network Metrics",
+                  width = NULL,
+                  solidHeader = TRUE,
+                  verbatimTextOutput(ns("ego_metrics"))
+                )
               )
-            )
-          )
-        ),
-        # Add a message when no node is selected
-        uiOutput(ns("no_node_selected_message"))
-        ))
-      )
+            ),
+            # Add a message when no node is selected
+            uiOutput(ns("no_node_selected_message"))
+          ))
+      ))
     )
-}
+    )}
 #--------------------------------
 # Network Analysis Server Module
 #--------------------------------
