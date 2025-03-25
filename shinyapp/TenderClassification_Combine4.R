@@ -14,6 +14,8 @@ library(shinyjs)
 library(text2vec)
 library(tm)
 library(tidytext)
+library(lubridate)
+
 
 
 
@@ -33,8 +35,9 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Data Selection", tabName = "data_selection", icon = icon("database")),
-      menuItem("LDA Supervised Learning", tabName = "supervised", icon = icon("brain")),
-      menuItem("LDA Clustering", tabName = "unsupervised", icon = icon("chart-line"))  # ✅ 新增 Unsupervised 分頁
+      menuItem("LDA Supervised Classification", tabName = "supervised", icon = icon("brain")),
+      menuItem("LDA Clustering", tabName = "unsupervised", icon = icon("chart-line")),
+      menuItem("Tender Analysis", tabName = "tender_analysis", icon = icon("chart-bar"))
     )
   ),
   dashboardBody(
@@ -60,7 +63,7 @@ ui <- dashboardPage(
       # **📌 LDA 監督學習**
       tabItem(tabName = "supervised",
               fluidPage(
-                titlePanel("LDA Supervised Learning"),
+                titlePanel("LDA Supervised Classification"),
                 sidebarLayout(
                   sidebarPanel(
                     actionButton("run_supervised", "Run LDA Analysis"),
@@ -98,7 +101,28 @@ ui <- dashboardPage(
                   )
                 )
               )
+      ),
+      # 在 dashboardBody 加入新 tabItem：
+      tabItem(tabName = "tender_analysis",
+              fluidPage(
+                titlePanel("Tender Analysis"),
+                sidebarLayout(
+                  sidebarPanel(
+                    selectInput("analysis_category", "Select LDA Category:", choices = NULL),
+                    sliderInput("value_range", "Tender Value Range:", min = 0, max = 10000000, value = c(0, 5000000)),
+                    checkboxInput("show_outliers", "Show Outliers", value = TRUE)
+                  ),
+                  mainPanel(
+                    tabsetPanel(
+                      tabPanel("Value Distribution", plotlyOutput("value_boxplot")),
+                      tabPanel("Summary Table", DTOutput("summary_table")),
+                      tabPanel("Category Trend (if date available)", plotlyOutput("trend_plot"))
+                    )
+                  )
+                )
+              )
       )
+      
     )
   )
 )
@@ -380,9 +404,100 @@ server <- function(input, output, session) {
         })
       }
     })
+    # === Tender Analysis Dataset Loading ===
+    # === Tender Analysis 使用 lda_results ===
+    observe({
+      req(lda_results)
+      
+      df <- lda_results
+      
+      # 初始化 Category 選單
+      if ("LDA_Category" %in% names(df)) {
+        updateSelectInput(session, "analysis_category",
+                          choices = c("All", unique(df$LDA_Category)),
+                          selected = "All")
+      }
+      output$debug_colnames <- renderPrint({
+        colnames(lda_results)
+      })
+      
+      # 反應式篩選資料
+      filtered_analysis_data <- reactive({
+        data <- df
+        if (input$analysis_category != "All") {
+          data <- data %>% filter(LDA_Category == input$analysis_category)
+        }
+        if ("tender_value" %in% names(data)) {
+          data <- data %>% filter(tender_value >= input$value_range[1],
+                                  tender_value <= input$value_range[2])
+        }
+        data
+      })
+      
+      # 📊 Value Distribution 圖
+      output$value_boxplot <- renderPlotly({
+        data <- filtered_analysis_data()
+        req(nrow(data) > 0)
+        
+        p <- ggplot(data, aes(x = LDA_Category, y = tender_value, fill = LDA_Category)) +
+          geom_boxplot(outlier.shape = ifelse(input$show_outliers, 16, NA)) +
+          theme_minimal() +
+          labs(title = "Tender Value Distribution by Category",
+               x = "LDA Category", y = "Tender Value")
+        
+        ggplotly(p)
+      })
+      
+      # 📋 Summary Table
+      output$summary_table <- renderDT({
+        data <- filtered_analysis_data()
+        req(nrow(data) > 0)
+        
+        data %>%
+          group_by(LDA_Category) %>%
+          summarise(
+            Count = n(),
+            Total_Value = sum(tender_value, na.rm = TRUE),
+            Mean_Value = mean(tender_value, na.rm = TRUE),
+            .groups = "drop"
+          ) %>%
+          datatable(options = list(pageLength = 10))
+      })
+      
+      # 📈 時間趨勢圖（如果有日期欄位）
+      output$trend_plot <- renderPlotly({
+        data <- filtered_analysis_data()
+        
+        if ("tender_date" %in% names(data)) {
+          # 處理日期欄位（轉為 Date → floor to month）
+          data <- data %>%
+            mutate(
+              tender_date = as.Date(tender_date),  # 若原本是 character
+              tender_month = floor_date(tender_date, unit = "month")
+            )
+          
+          # 月別加總
+          monthly_summary <- data %>%
+            group_by(tender_month, LDA_Category) %>%
+            summarise(count = n(), .groups = "drop")
+          
+          # 繪圖
+          p <- ggplot(monthly_summary, aes(x = tender_month, y = count, color = LDA_Category)) +
+            geom_line(size = 1) +
+            labs(title = "Monthly Tender Count by Category",
+                 x = "Month", y = "Number of Tenders") +
+            theme_minimal()
+          
+          ggplotly(p)
+        } else {
+          plotly_empty()
+        }
+      })
+      
+    })
+    
   })
-  
- }
+}
 
 
 shinyApp(ui, server)
