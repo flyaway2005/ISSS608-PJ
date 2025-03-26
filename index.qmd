@@ -9,9 +9,7 @@ You're at the right place! This interactive Shiny dashboard provides data-driven
 
 Through this dashboard, you can explore real-time procurement trends and spending patterns, analyse relationships between government agencies and suppliers, evaluate market competition and supplier diversity, and discover insights from procurement descriptions through text analysis.
 
-Start exploring by selecting a module from the menu on the left.
-![](images/sg_bg.png){fig-align="center"}
-
+Start exploring by selecting a module from the menu on the left. ![](images/sg_bg.png){fig-align="center"}
 
 ## What You'll Discover
 
@@ -22,4 +20,4 @@ Our analysis of procurement data reveals patterns across agencies, suppliers, an
 -   Evaluate market competition and supplier diversity
 -   Uncover insights from procurement descriptions through text analysis
 
-*This website is created for Visual Analytics course project at Singapore Management University. *
+*This website is created for Visual Analytics course project at Singapore Management University.*
