@@ -15,7 +15,7 @@ library(shinyjs)
 
 # Load preprocessed network-community data
 
-community_data_global <- read_csv("/Users/cathyc/Documents/cathyschu/VAA_project/test_learning/data/network_community_data.csv")
+community_data_global <- read_csv("data/network_community_data.csv")
 #--------
 # Debug
 
@@ -185,7 +185,7 @@ network_community_server <- function(id, dataset) {
   moduleServer(id, function(input, output, session) {
     cat("Starting moduleServer function\n")
     
-    cat("Executing line [167]\n")
+    cat("Executing line [188]\n")
     
     # Initialise reactive values
     rv <- reactiveValues(
@@ -193,7 +193,7 @@ network_community_server <- function(id, dataset) {
       communities = NULL
     )
     
-    cat("Executing line [175]\n")
+    cat("Executing line [196]\n")
     
     # For the update button
     observeEvent(input$some_trigger, {
@@ -246,7 +246,7 @@ network_community_server <- function(id, dataset) {
         cat("ERROR in debug observer:", e$message, "\n")
       })
       
-      cat("Executing line [228]\n")      
+      cat("Executing line [249]\n")      
       #------------------------------------
       req(dataset)
       
@@ -319,7 +319,7 @@ network_community_server <- function(id, dataset) {
       }
     }, ignoreInit = TRUE)
 #-----    
-    cat("Executing line [291]\n")
+    cat("Executing line [322]\n")
     
     create_filtered_graph <- eventReactive(input$update_viz, {
       req(dataset)
@@ -339,7 +339,7 @@ network_community_server <- function(id, dataset) {
       #------
       # Print filtered data dimensions
       cat("Filtered data dimensions:", nrow(filtered_data), "rows x", ncol(filtered_data), "columns\n")
-      cat("Executing line [300]\n")      
+      cat("Executing line [342]\n")      
       #-----
       
       # Apply filters 
@@ -615,7 +615,7 @@ network_community_server <- function(id, dataset) {
       #   }
       # }
       
-      cat("Executing line [517]\n")     
+      cat("Executing line [618]\n")     
       
       
       # Calculate centrality measure based on user selection
@@ -812,7 +812,7 @@ network_community_server <- function(id, dataset) {
       return(network)
     })
     
-    cat("Executing line [676]\n") 
+    cat("Executing line [815]\n") 
     
     # Render metrics cards
     output$community_metrics <- renderUI({
@@ -844,7 +844,7 @@ network_community_server <- function(id, dataset) {
       
       between_density <- edge_density(igraph_obj) - within_density
       
-      cat("Executing line [708]\n")
+      cat("Executing line [847]\n")
       
       # Create UI cards
       fluidRow(
@@ -866,7 +866,7 @@ network_community_server <- function(id, dataset) {
         )
       )
     })
-    cat("Executing line [821]\n")
+    cat("Executing line [869]\n")
     
     # Render community structure bar chart
     output$community_barchart <- renderPlot({

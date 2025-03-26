@@ -15,9 +15,11 @@ source("global.R")
 # add more source (modules here)
 #-----------------------------------------------------
 # Source module file
-source("R/module3_network/module3_v2data_v1.R")
-source("R/module2_temporal/module2_overview.R")
-source("R/module3_network/module3_community.R")
+
+source("R/module2_tempo/module2_overview_git.R")
+source("R/module2_tempo/module2_agency_git.R")
+source("R/module3_network/module3-1_network_overview_git.R")
+source("R/module3_network/module3-2_community_git.R")
 
 
 #-----------------------------------------------------
@@ -35,15 +37,15 @@ ui <- dashboardPage(
       menuItem("Introduction", tabName = "introduction", icon = icon("file")),
       menuItem("Procurement Analyser", tabName = "dashboard", icon = icon("table"),
                menuSubItem("Supervised Learning", tabName = "supervised_learning"),
-               menuSubItem("Unsupervised Learning", tabName = "unsupervised_learning"))),
-      menuItem("Temporal Analysis", tabName = "temo_analysis", icon = icon("dashboard"),
-               menuSubItem("overview", tabName = "overview"),
+               menuSubItem("Unsupervised Learning", tabName = "unsupervised_learning")),
+      menuItem("Budget Flow", tabName = "temo_analysis", icon = icon("dashboard"),
+               menuSubItem("Time Series", tabName = "time_series"),
                menuSubItem("Agency Explorer", tabName = "agency_analysis"),
                menuSubItem("Supplier Markets", tabName = "supplier_analysis")),
       menuItem("Network Insights", tabName = "network_insights", icon = icon("project-diagram"),
                menuSubItem("Network Overview", tabName = "network"),
                menuSubItem("Community Detection", tabName = "community"))
-    ),
+    )),
   
   dashboardBody(
     # Custom CSS
@@ -230,16 +232,17 @@ ui <- dashboardPage(
       ),
 
 #------------------------------
-# Module 2-1 Overview
+# Module 2-1 Overview 
+# need to update width of plot
 #------------------------------ 
-tabItem(tabName = "overview",
-        h2("Procurement Trends"),
-        time_series_ui("temporalOverview")
+tabItem(tabName = "time_series",
+#        h2("Procurement Trends"),
+        time_series_ui("timeSeries")
 ),
 
       
 #------------------------------
-# Module 2-2 Agency analysis
+# Module 2-2 Agency analysis (pending update)
 #------------------------------    
       tabItem(tabName = "agency_analysis",
               # Flexbox container for layout
@@ -312,7 +315,8 @@ tabItem(tabName = "overview",
 
     tabItem(tabName = "community",
             network_community_ui("community_module")
-            ),
+    ),
+
 
 #-------------------
 # Introduction tab
@@ -331,8 +335,10 @@ tabItem(tabName = "introduction",
 server <- function(input, output, session) {
 
   # Load time series data
-  ts_overview_data <- read.csv("/Users/cathyc/Documents/cathyschu/VAA_project/test_learning/data/GeBiz_add_y_m.csv")
+  ts_overview_data <- read.csv("data/GeBiz_add_y_m.csv")
 #  ts_overview_data$award_date <- as.Date(ts_overview_data$award_date)
+  community_data_global <- read_csv("data/network_community_data.csv")
+  network_data <- readRDS("data/m3_processed_network_data.rds")
   
   # Reactive value for plot data
   plot_data <- reactive({
@@ -355,11 +361,12 @@ server <- function(input, output, session) {
     p
   })
   
-  # Initialize time series module server
-  time_series_server("temporalOverview", ts_overview_data)
+  # Initialise time series module server
+  time_series_server("timeSeries", ts_overview_data)
   
-  # Initialize network module server
-  network_analysis_server("network_module")
+  # Initialise network module server
+  network_analysis_server("network_module", network_data)
+  network_community_server("community_module", community_data_global)
   
   # Statistics for valueBoxes
   output$mean_value <- renderText({
