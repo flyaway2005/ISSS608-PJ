@@ -1588,6 +1588,48 @@ ui <- dashboardPage(
     )
   ),
   dashboardBody(
+    tags$style(HTML("
+        /* Main content area - increase max-width */
+        .content-wrapper {
+          max-width: 100% !important;
+        }
+        
+        /* Make the main container fluid */
+        .container-fluid {
+          width: 95% !important;
+          max-width: 2000px !important;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        
+        /* Ensure boxes use full width */
+        .box {
+          width: 100% !important;
+        }
+        
+        /* Make tab content full width */
+        .tab-content, .tab-pane {
+          width: 100% !important;
+        }
+        
+        /* DataTables width fix */
+        .dataTables_wrapper {
+          width: 100% !important;
+        }
+        
+        /* Ensure network visualizations use full width */
+        .vis-network {
+          width: 100% !important;
+        }
+      ")),
+  tabItems(
+    tabItem(tabName = "network",
+            fluidRow(
+              column(width = 12, network_analysis_ui("network_module"))
+            )
+    )
+  ),
+    
     tabItems(
       tabItem(tabName = "network",
               box(width = 12, network_analysis_ui("network_module"))

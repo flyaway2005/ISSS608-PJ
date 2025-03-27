@@ -37,6 +37,7 @@ ui <- dashboardPage(
       menuItem("Introduction", tabName = "introduction", icon = icon("file")),
       menuItem("Procurement Analyser", tabName = "dashboard", icon = icon("table"),
                menuSubItem("Supervised Learning", tabName = "supervised_learning"),
+               
                menuSubItem("Unsupervised Learning", tabName = "unsupervised_learning")),
       menuItem("Budget Flow", tabName = "temo_analysis", icon = icon("dashboard"),
                menuSubItem("Time Series", tabName = "time_series"),
@@ -48,94 +49,98 @@ ui <- dashboardPage(
     )),
   
   dashboardBody(
-    # Custom CSS
+    # Apply CSS from global.R
     tags$head(
-      tags$style("
-        /* Header background color */
-        .skin-blue .main-header .navbar {
-          background-color: #B7CADB;
-        }
-        
-        /* Logo background color */
-        .skin-blue .main-header .logo {
-          background-color: #A7BDCD;
-        }
-        
-        /* Logo hover color */
-        .skin-blue .main-header .logo:hover {
-          background-color: #97ADBD;
-        }
-        
-        /* Sidebar background color */
-        .skin-blue .left-side, .skin-blue .main-sidebar, .skin-blue .wrapper {
-          background-color: #FDF6EC;
-        }
-        
-        /* Sidebar text color */
-        .skin-blue .sidebar a {
-          color: #444;
-        }
-        
-        /* Sidebar width */
-        .main-sidebar {
-          width: 228px;
-        }
-        
-        /* Content wrapper adjustment */
-        .content-wrapper, .right-side {
-          margin-left: 200px;
-        }
-        
-        /* Active sidebar item */
-        .skin-blue .sidebar-menu > li.active > a,
-        .skin-blue .sidebar-menu > li:hover > a {
-          color: #000;
-          background: #F7E3C1;
-          border-left-color: #B7CADB;
-        }
-        
-        /* Box borders */
-        .box.box-primary {
-          border-top-color: #B7CADB;
-        }
-        
-        /* Button colors */
-        .btn-primary {
-          background-color: #B7CADB;
-          border-color: #A7BDCD;
-        }
-        
-        .btn-primary:hover {
-          background-color: #A7BDCD;
-        }
-        
-        /* Control panel styling */
-        .control-panel {
-          background-color: #F8F8F8;
-          border-right: 1px solid #ddd;
-          padding: 15px;
-          margin-bottom: 15px;
-        }
-        
-        /* Main layout with flexbox */
-        .tab-content {
-          display: flex;
-          flex-direction: row;
-        }
-        
-        /* Control panel width */
-        .control-section {
-          width: 250px;
-          flex-shrink: 0;
-        }
-        
-        /* Content section */
-        .content-section {
-          flex-grow: 1;
-          padding-left: 15px;
-        }
-      ")
+      tags$style(app_theme$css)
     ),
+    # Custom CSS
+    # tags$head(
+    #   tags$style("
+    #     /* Header background color */
+    #     .skin-blue .main-header .navbar {
+    #       background-color: #B7CADB;
+    #     }
+    #     
+    #     /* Logo background color */
+    #     .skin-blue .main-header .logo {
+    #       background-color: #A7BDCD;
+    #     }
+    #     
+    #     /* Logo hover color */
+    #     .skin-blue .main-header .logo:hover {
+    #       background-color: #97ADBD;
+    #     }
+    #     
+    #     /* Sidebar background color */
+    #     .skin-blue .left-side, .skin-blue .main-sidebar, .skin-blue .wrapper {
+    #       background-color: #FDF6EC;
+    #     }
+    #     
+    #     /* Sidebar text color */
+    #     .skin-blue .sidebar a {
+    #       color: #444;
+    #     }
+    #     
+    #     /* Sidebar width */
+    #     .main-sidebar {
+    #       width: 208px;
+    #     }
+    #     
+    #     /* Content wrapper adjustment */
+    #     .content-wrapper, .right-side {
+    #       margin-left: 200px;
+    #     }
+    #     
+    #     /* Active sidebar item */
+    #     .skin-blue .sidebar-menu > li.active > a,
+    #     .skin-blue .sidebar-menu > li:hover > a {
+    #       color: #000;
+    #       background: #F7E3C1;
+    #       border-left-color: #B7CADB;
+    #     }
+    #     
+    #     /* Box borders */
+    #     .box.box-primary {
+    #       border-top-color: #B7CADB;
+    #     }
+    #     
+    #     /* Button colors */
+    #     .btn-primary {
+    #       background-color: #B7CADB;
+    #       border-color: #A7BDCD;
+    #     }
+    #     
+    #     .btn-primary:hover {
+    #       background-color: #A7BDCD;
+    #     }
+    #     
+    #     /* Control panel styling */
+    #     .control-panel {
+    #       background-color: #F8F8F8;
+    #       border-right: 1px solid #ddd;
+    #       padding: 15px;
+    #       margin-bottom: 15px;
+    #     }
+    #     
+    #     /* Main layout with flexbox */
+    #     .tab-content {
+    #       display: flex;
+    #       flex-direction: row;
+    #     }
+    #     
+    #     /* Control panel width */
+    #     .control-section {
+    #       width: 250px;
+    #       flex-shrink: 0;
+    #     }
+    #     
+    #     /* Content section */
+    #     .content-section {
+    #       flex-grow: 1;
+    #       padding-left: 15px;
+    #     }
+    #   ")
+    # ),
     
 #-----------------------------------------------------
 # All tab items
