@@ -335,8 +335,8 @@ tabItem(tabName = "introduction",
 server <- function(input, output, session) {
 
   # Load time series data
-  ts_overview_data <- read.csv("data/GeBiz_add_y_m.csv")
-#  ts_overview_data$award_date <- as.Date(ts_overview_data$award_date)
+  ts_overview_data <- read_csv("data/GeBiz_add_y_m.csv")
+  # Load network data
   community_data_global <- read_csv("data/network_community_data.csv")
   network_data <- readRDS("data/m3_processed_network_data.rds")
   

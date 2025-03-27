@@ -212,18 +212,18 @@ network_community_server <- function(id, dataset) {
       
       # Check if dataset exists and is a function
       if (!is.function(dataset)) {
-        cat("ERROR: dataset is not a function\n")
+        cat("ERROR: dataset is NULL\n")
         return()
       }
       
       # Try to execute the dataset function
       tryCatch({
-        data <- dataset()
+        data <- dataset
         cat("DEBUG: Dataset function executed successfully\n")
         
         # Check if data is NULL or empty
         if (is.null(data) || nrow(data) == 0) {
-          cat("ERROR: dataset() returned NULL or empty data frame\n")
+          cat("ERROR: dataset returned NULL or empty data frame\n")
           return()
         }
         
@@ -250,10 +250,10 @@ network_community_server <- function(id, dataset) {
       #------------------------------------
       req(dataset)
       
-      agency_type_choices <- c("All" = "All", unique(dataset()$agency_type))
-      agency_choices <- c("All" = "All", unique(dataset()$agency))
-      supplier_choices <- c("All" = "All", unique(dataset()$supplier_name))
-      tender_type_choices <- c("All" = "All", unique(dataset()$tender_type))      
+      agency_type_choices <- c("All" = "All", unique(dataset$agency_type))
+      agency_choices <- c("All" = "All", unique(dataset$agency))
+      supplier_choices <- c("All" = "All", unique(dataset$supplier_name))
+      tender_type_choices <- c("All" = "All", unique(dataset$tender_type))      
       
       updateSelectInput(session, "agency_type", 
                         choices = agency_type_choices,
@@ -282,10 +282,10 @@ network_community_server <- function(id, dataset) {
       
       # Filter agencies based on agency_type selection
       filtered_agencies <- if (is.null(input$agency_type) || "All" %in% input$agency_type) {
-        c("All" = "All", unique(dataset()$agency))
+        c("All" = "All", unique(dataset$agency))
       } else {
         c("All" = "All", 
-          filter(dataset(), agency_type %in% input$agency_type) %>%
+          filter(dataset, agency_type %in% input$agency_type) %>%
             pull(agency) %>%
             unique())
       }
@@ -326,7 +326,7 @@ network_community_server <- function(id, dataset) {
       cat("Creating filtered graph...\n") 
       
       # TEMPORARY: Skip filtering for debugging
-      filtered_data <- dataset()
+      filtered_data <- dataset
       
       cat("Using all data with dimensions:", nrow(filtered_data), "rows x", ncol(filtered_data), "columns\n")
       
@@ -1188,28 +1188,16 @@ network_community_server <- function(id, dataset) {
 ui <- network_community_ui("community_module")
 
 server <- function(input, output, session) {
-  community_data_reactive <- reactive({
-    community_data_global %>%
-      mutate(
-        award_date = as.Date(award_date),
-        awarded_amt = as.numeric(awarded_amt)
-      ) %>%
-      rename(tender_type = tender_cat)
-  })
+  # Process the data once, not as a reactive
+  community_data_processed <- community_data_global %>%
+    mutate(
+      award_date = as.Date(award_date),
+      awarded_amt = as.numeric(awarded_amt)
+    ) %>%
+    rename(tender_type = tender_cat)
   
-  #--------
-  # Validation output
-  #--------
-  output$debug_data <- renderPrint({
-    cat("Data dimensions:", nrow(community_data_reactive()), "rows x", 
-        ncol(community_data_reactive()), "columns\n")
-    cat("Sample data:\n")
-    print(head(community_data_reactive()))
-  })
-  
-  network_community_server("community_module", community_data_reactive)
+  network_community_server("community_module", community_data_processed)
 }
-
 
 # Run the application 
 shinyApp(ui = ui, server = server)

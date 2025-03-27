@@ -8,48 +8,7 @@ library(scales)
 library(DT)
 
 # Load preprocessed network data
-network_data <- readRDS("data/m3_processed_network_data.rds")
-
-#--------
-# Debug
-print("agency_types structure:")
-print(str(network_data$agency_types))
-if (is.data.frame(network_data$agency_types)) {
-  print("agency_types columns:")
-  print(names(network_data$agency_types))
-  print("First few rows:")
-  print(head(network_data$agency_types))
-}
-#--------
-
-# Prepare yearly_edges outside of UI function
-if(is.null(network_data$yearly_edges)) {
-  # Check if time_info contains year data
-  if(!is.null(network_data$time_info) && "award_year" %in% names(network_data$time_info)) {
-    # Join time_info with edges to create yearly_edges
-    network_data$yearly_edges <- network_data$edges %>%
-      left_join(network_data$time_info, by = c("agency", "supplier_name"))
-    
-    print(paste("Created yearly_edges with", nrow(network_data$yearly_edges), "rows"))
-    
-    # Ensure award_year is character type for consistent comparison
-    network_data$yearly_edges$award_year <- as.character(network_data$yearly_edges$award_year)
-    
-  } else if("award_year" %in% names(network_data$edges)) {
-    # If edges already has year information, just use that
-    network_data$yearly_edges <- network_data$edges
-    
-    # Ensure award_year is character type
-    network_data$yearly_edges$award_year <- as.character(network_data$yearly_edges$award_year)
-    
-    print("Created yearly_edges directly from edges")
-  } else {
-    # Check what's in time_info for debugging
-    print("Could not create yearly_edges automatically")
-    print("Structure of time_info:")
-    print(str(network_data$time_info))
-  }
-}
+#network_data <- readRDS("data/m3_processed_network_data.rds")
 
 
 #-----------------------------
@@ -177,27 +136,6 @@ network_analysis_ui <- function(id) {
           )
         ),    
         
-        # # Min max award amount
-        # sliderInput(ns("award_amount_range"), 
-        #             label = NULL,
-        #             min = 0, 
-        #             max = 1500000000,  
-        #             value = c(100000, 1000000),
-        #             step = 50000),
-        # column(6,
-        #        numericInput(ns("min_award_amount"), "Min",
-        #                     value = 100000,
-        #                     min = 0,
-        #                     max = 1000000,
-        #                     step = 20000)
-        # ),
-        # column(6,
-        #        numericInput(ns("max_award_amount"), "Max",
-        #                     value = 1000000,  # Default value of 1 million
-        #                     min = 0,
-        #                     max = 1500000000,  
-        #                     step = 1000000)
-        # ),
         
         # Maximum edges to plot
         sliderInput(ns("max_edges"), "Maximum Edges to Plot",
@@ -352,8 +290,20 @@ network_analysis_ui <- function(id) {
 #--------------------------------
 # Network Analysis Server Module
 #--------------------------------
-network_analysis_server <- function(id) {
+network_analysis_server <- function(id, data = NULL) {
   moduleServer(id, function(input, output, session) {
+    # Create a reactive to store the data
+    network_data <- reactive({
+      if (is.null(data)) {
+        # Load data from file as fallback
+        readRDS("data/m3_processed_network_data.rds")
+      } else if (is.reactive(data)) {
+        # Use the passed data parameter
+        data()
+      } else{
+        data
+      }
+    })
     
     #debug
     selected_node_tracker <- reactiveVal(NULL)
@@ -363,24 +313,30 @@ network_analysis_server <- function(id) {
     
     # Create a reactive value to store filtered agencies
     filtered_agencies <- reactiveVal(NULL)
-    
-    #debug
-    # Add this debug code at the beginning of your network_analysis_server function
-    print("Network data summary:")
-    print(paste("Nodes:", nrow(network_data$nodes)))
-    print(paste("Edges:", nrow(network_data$edges)))
-    print("Node columns:")
-    print(names(network_data$nodes))
-    print("Edge columns:")
-    print(names(network_data$edges))
+
+#-----
+# Debug    
+    observe({
+      # Ensure network_data() is available
+      req(network_data())
+      
+      # Debug output
+      print("Network data summary:")
+      print(paste("Nodes:", nrow(network_data()$nodes)))
+      print(paste("Edges:", nrow(network_data()$edges)))
+      print("Node columns:")
+      print(names(network_data()$nodes))
+      print("Edge columns:")
+      print(names(network_data()$edges))
+    })
     
     
     # Populate month selection
     observe({
       # Check if months data is available
-      if (!is.null(network_data$months)) {
+      if (!is.null(network_data()$months)) {
         # Get the years data for year selectors
-        years <- sort(unique(network_data$months$year))
+        years <- sort(unique(network_data()$months$year))
         
         # Update the year selectors
         updateSelectInput(session, "start_year", 
@@ -414,11 +370,11 @@ network_analysis_server <- function(id) {
         print("WARNING: No months data available for filtering")
         
         # Try to create a fallback
-        if (!is.null(network_data$time_info) && 
-            !is.null(network_data$time_info$award_year)) {
+        if (!is.null(network_data()$time_info) && 
+            !is.null(network_data()$time_info$award_year)) {
           
           print("Using time_info as fallback")
-          years <- sort(unique(network_data$time_info$award_year))
+          years <- sort(unique(network_data()$time_info$award_year))
           
           updateSelectInput(session, "start_year", 
                             choices = years,
@@ -447,26 +403,26 @@ network_analysis_server <- function(id) {
     # Populate agency type choices
     observe({
       # Check if agency_types component exists
-      if (!is.null(network_data$agency_types)) {
+      if (!is.null(network_data()$agency_types)) {
         # Check what structure agency_types has and extract type values accordingly
-        if (is.data.frame(network_data$agency_types)) {
+        if (is.data.frame(network_data()$agency_types)) {
           # If it's a data frame with agency-type mapping
           print("agency_types is a data frame")
           
           # Assuming the second column contains the type data
-          if (ncol(network_data$agency_types) >= 2) {
-            agency_types <- c("All", unique(network_data$agency_types[[2]]))
+          if (ncol(network_data()$agency_types) >= 2) {
+            agency_types <- c("All", unique(network_data()$agency_types[[2]]))
           } else {
             agency_types <- c("All", "No agency types found")
           }
-        } else if (is.list(network_data$agency_types)) {
+        } else if (is.list(network_data()$agency_types)) {
           # If it's a simple list of types
           print("agency_types is a list")
-          agency_types <- c("All", unique(unlist(network_data$agency_types)))
-        } else if (is.vector(network_data$agency_types)) {
+          agency_types <- c("All", unique(unlist(network_data()$agency_types)))
+        } else if (is.vector(network_data()$agency_types)) {
           # If it's a vector of types
           print("agency_types is a vector")
-          agency_types <- c("All", unique(network_data$agency_types))
+          agency_types <- c("All", unique(network_data()$agency_types))
         } else {
           # Fallback
           print("agency_types has unknown structure")
@@ -503,14 +459,13 @@ network_analysis_server <- function(id) {
     # Observe agency type filter changes and update the filtered agencies list
 #----------------------------------------------------------------      
     observeEvent(input$agency_type_filter, {
-      # Print debug information
-      print("======= AGENCY TYPE FILTER DEBUGGING =======")
+      # Debug
       print("Selected agency types:")
       print(input$agency_type_filter)
       
       # Default to all agencies if "All" is selected or nothing is selected
       if("All" %in% input$agency_type_filter || length(input$agency_type_filter) == 0) {
-        agencies <- unique(network_data$edges$agency)
+        agencies <- unique(network_data()$edges$agency)
         print(paste("No filter applied. Total agencies:", length(agencies)))
       } else {
         # Since agency_types is a vector according to console, let's try to find the agencies
@@ -518,27 +473,27 @@ network_analysis_server <- function(id) {
         print("Looking for agencies with the selected types...")
         
         # Check if there's a mapping in the nodes dataframe
-        if ("agency_type" %in% names(network_data$nodes)) {
+        if ("agency_type" %in% names(network_data()$nodes)) {
           # Filter nodes by agency type
-          filtered_nodes <- network_data$nodes %>%
+          filtered_nodes <- network_data()$nodes %>%
             filter(tolower(agency_type) %in% tolower(input$agency_type_filter))
           
           agencies <- filtered_nodes$name[filtered_nodes$type == "agency"]
           print(paste("Found", length(agencies), "agencies of selected types in nodes data"))
         }
         # Check if there's a mapping in the edges dataframe
-        else if ("agency_type" %in% names(network_data$edges)) {
+        else if ("agency_type" %in% names(network_data()$edges)) {
           # Filter edges by agency type
-          filtered_edges <- network_data$edges %>%
+          filtered_edges <- network_data()$edges %>%
             filter(tolower(agency_type) %in% tolower(input$agency_type_filter))
           
           agencies <- unique(filtered_edges$agency)
           print(paste("Found", length(agencies), "agencies of selected types in edges data"))
         }
         # If there's a specific mapping dataframe we're not aware of
-        else if (exists("agency_type_mapping", where = network_data)) {
+        else if ("agency_type_mapping" %in% names(network_data())) {
           # Use the mapping if it exists
-          filtered_agencies <- network_data$agency_type_mapping %>%
+          filtered_agencies <- network_data()$agency_type_mapping %>%
             filter(tolower(agency_type) %in% tolower(input$agency_type_filter))
           
           agencies <- filtered_agencies$agency
@@ -549,12 +504,12 @@ network_analysis_server <- function(id) {
           # Check all dataframes in network_data for agency_type column
           mapping_found <- FALSE
           
-          for (name in names(network_data)) {
-            if (is.data.frame(network_data[[name]]) && 
-                "agency" %in% names(network_data[[name]]) && 
-                "agency_type" %in% names(network_data[[name]])) {
+          for (name in names(network_data())) {
+            if (is.data.frame(network_data()[[name]]) && 
+                "agency" %in% names(network_data()[[name]]) && 
+                "agency_type" %in% names(network_data()[[name]])) {
               
-              filtered_df <- network_data[[name]] %>%
+              filtered_df <- network_data()[[name]] %>%
                 filter(tolower(agency_type) %in% tolower(input$agency_type_filter))
               
               agencies <- unique(filtered_df$agency)
@@ -568,14 +523,14 @@ network_analysis_server <- function(id) {
             # If we can't find a mapping, show all agencies
             print("WARNING: Could not find any mapping between agency types and agencies")
             print("Showing all agencies instead")
-            agencies <- unique(network_data$edges$agency)
+            agencies <- unique(network_data()$edges$agency)
           }
         }
       }
       
       # Ensure we have agency list
       if (!exists("agencies") || length(agencies) == 0) {
-        agencies <- unique(network_data$edges$agency)
+        agencies <- unique(network_data()$edges$agency)
         print("Using all agencies as fallback")
       }
       
@@ -603,7 +558,7 @@ network_analysis_server <- function(id) {
       updateSelectizeInput(
         session, 
         "supplier_filter", 
-        choices = c("All", unique(network_data$edges$supplier_name)),
+        choices = c("All", unique(network_data()$edges$supplier_name)),
         selected = c("All"),
         server = TRUE
       )
@@ -612,8 +567,8 @@ network_analysis_server <- function(id) {
         
     # Populate tender category choices
     observe({
-      if ("tender_cat" %in% names(network_data$edges)) {
-        all_categories <- network_data$edges$tender_cat
+      if ("tender_cat" %in% names(network_data()$edges)) {
+        all_categories <- network_data()$edges$tender_cat
         # Split concatenated categories and extract unique values
         unique_categories <- unique(unlist(strsplit(all_categories, ", ")))
         unique_categories <- unique_categories[!is.na(unique_categories) & unique_categories != ""]
@@ -695,49 +650,13 @@ network_analysis_server <- function(id) {
       updateTabsetPanel(session, "network_tabs", selected = "Ego Network")
     }, ignoreInit = TRUE)
     
-    # observe({
-    #   # When manual min input changes, update slider
-    #   if (!is.null(input$min_award_manual)) {
-    #     current_range <- input$award_amount_range
-    #     if (input$min_award_manual != current_range[1]) {
-    #       # Ensure min doesn't exceed max
-    #       new_min <- min(input$min_award_manual, current_range[2])
-    #       updateSliderInput(session, "award_amount_range", 
-    #                         value = c(new_min, current_range[2]))
-    #     }
-    #   }
-    # })
-    # 
-    # observe({
-    #   # When manual max input changes, update slider
-    #   if (!is.null(input$max_award_manual)) {
-    #     current_range <- input$award_amount_range
-    #     if (input$max_award_manual != current_range[2]) {
-    #       # Ensure max isn't less than min
-    #       new_max <- max(input$max_award_manual, current_range[1])
-    #       updateSliderInput(session, "award_amount_range", 
-    #                         value = c(current_range[1], new_max))
-    #     }
-    #   }
-    # })
-    # 
-    # observe({
-    #   # When slider changes, update manual inputs
-    #   min_val <- input$award_amount_range[1]
-    #   max_val <- input$award_amount_range[2]
-    #   
-    #   updateNumericInput(session, "min_award_manual", value = min_val)
-    #   updateNumericInput(session, "max_award_manual", value = max_val)
-    # })    
-    
-    
     
     #--------
     # Reactive filtered data
     #---------
     filtered_data <- eventReactive(input$update_network, {
-      nodes <- network_data$nodes
-      edges <- network_data$edges
+      nodes <- network_data()$nodes
+      edges <- network_data()$edges
       
       # Month-based date range filtering
       if (!is.null(input$start_year) && !is.null(input$start_month) && 
@@ -747,75 +666,97 @@ network_analysis_server <- function(id) {
         print(paste("Start:", input$start_year, "Month:", input$start_month))
         print(paste("End:", input$end_year, "Month:", input$end_month))
         
-        if (!is.null(network_data$monthly_edges)) {
+        if (!is.null(network_data()$monthly_edges)) {
           print("monthly_edges data exists")
           
-          # Calculate start and end month indices
-          start_idx <- as.numeric(input$start_year) * 12 + as.numeric(input$start_month)
-          end_idx <- as.numeric(input$end_year) * 12 + as.numeric(input$end_month)
+          # Ensure inputs are numeric
+          start_year <- as.numeric(input$start_year)
+          start_month <- as.numeric(input$start_month)
+          end_year <- as.numeric(input$end_year)
+          end_month <- as.numeric(input$end_month)
           
-          print(paste("Start index:", start_idx, "End index:", end_idx))
-          
-          # Ensure start isn't after end
-          if (start_idx > end_idx) {
-            temp <- start_idx
-            start_idx <- end_idx
-            end_idx <- temp
-            print("Swapped start and end indices to ensure proper order")
-          }
-          
-          # Filter monthly edges
-          filtered_monthly_edges <- network_data$monthly_edges %>%
-            filter(month_index >= start_idx & month_index <= end_idx)
-          
-          print(paste("After filtering, monthly_edges has", nrow(filtered_monthly_edges), "rows"))
-          
-          if (nrow(filtered_monthly_edges) > 0) {
-            # Aggregate edges for the filtered period
-            monthly_filtered <- filtered_monthly_edges %>%
-              group_by(agency, supplier_name) %>%
-              summarize(
-                total_contracts = sum(total_contracts),
-                total_award_amount = sum(total_award_amount),
-                .groups = "drop"
-              )
+          # Validate inputs before calculating indices
+          if (!is.na(start_year) && !is.na(start_month) && 
+              !is.na(end_year) && !is.na(end_month)) {
             
-            print(paste("After aggregation, we have", nrow(monthly_filtered), "edges"))
+            # Calculate start and end month indices
+            start_idx <- start_year * 12 + start_month
+            end_idx <- end_year * 12 + end_month
             
-            # Filter the edges based on the monthly data
-            edges_filtered <- tryCatch({
-              edges %>%
-                semi_join(monthly_filtered, by = c("agency", "supplier_name"))
-            }, error = function(e) {
-              print(paste("Error in semi_join:", e$message))
-              return(edges)  # Return original if error
-            })
+            print(paste("Start index:", start_idx, "End index:", end_idx))
             
-            if (nrow(edges_filtered) > 0) {
-              print(paste("After semi_join, edges has", nrow(edges_filtered), "rows"))
-              edges <- edges_filtered
+            # Ensure start isn't after end
+            if (start_idx > end_idx) {
+              temp <- start_idx
+              start_idx <- end_idx
+              end_idx <- temp
+              print("Swapped start and end indices to ensure proper order")
+            }
+            
+            # Check if month_index column exists in monthly_edges
+            if ("month_index" %in% names(network_data()$monthly_edges)) {
+              # Filter monthly edges
+              filtered_monthly_edges <- network_data()$monthly_edges %>%
+                filter(month_index >= start_idx & month_index <= end_idx)
+              
+              print(paste("After filtering, monthly_edges has", nrow(filtered_monthly_edges), "rows"))
+              
+              if (nrow(filtered_monthly_edges) > 0) {
+                # Verify that total_contracts and total_award_amount columns exist
+                if (all(c("total_contracts", "total_award_amount") %in% names(filtered_monthly_edges))) {
+                  # Aggregate edges for the filtered period
+                  monthly_filtered <- filtered_monthly_edges %>%
+                    group_by(agency, supplier_name) %>%
+                    summarize(
+                      total_contracts = sum(total_contracts, na.rm = TRUE),
+                      total_award_amount = sum(total_award_amount, na.rm = TRUE),
+                      .groups = "drop"
+                    )
+                  
+                  print(paste("After aggregation, we have", nrow(monthly_filtered), "edges"))
+                  
+                  # Filter the edges based on the monthly data
+                  edges_filtered <- tryCatch({
+                    edges %>%
+                      semi_join(monthly_filtered, by = c("agency", "supplier_name"))
+                  }, error = function(e) {
+                    print(paste("Error in semi_join:", e$message))
+                    return(edges)  # Return original if error
+                  })
+                  
+                  if (nrow(edges_filtered) > 0) {
+                    print(paste("After semi_join, edges has", nrow(edges_filtered), "rows"))
+                    edges <- edges_filtered
+                  } else {
+                    print("No edges found after semi_join")
+                  }
+                } else {
+                  print("Missing required columns in monthly_edges data")
+                }
+              } else {
+                print("No monthly edges found in the selected date range")
+              }
             } else {
-              print("No edges found after semi_join")
+              print("month_index column missing in monthly_edges")
             }
           } else {
-            print("No monthly edges found in the selected date range")
+            print("Invalid date inputs detected")
           }
         } else {
           print("monthly_edges data is missing")
         }
-        print("==== END DATE RANGE FILTER DEBUGGING ====")
       }
 
       # Agency Type direct filtering
       if(!("All" %in% input$agency_type_filter) && length(input$agency_type_filter) > 0) {
         # Use the agency_types data frame to filter the edges
-        if (!is.null(network_data$agency_types) && is.data.frame(network_data$agency_types)) {
+        if (!is.null(network_data()$agency_types) && is.data.frame(network_data()$agency_types)) {
           # Assuming first column is agency name and second is type
-          agency_col <- names(network_data$agency_types)[1]
-          type_col <- names(network_data$agency_types)[2]
+          agency_col <- names(network_data()$agency_types)[1]
+          type_col <- names(network_data()$agency_types)[2]
           
           # Get agencies of the selected types - use proper data frame filtering
-          agencies_filtered <- network_data$agency_types %>%
+          agencies_filtered <- network_data()$agency_types %>%
             filter(.data[[type_col]] %in% input$agency_type_filter)
           
           agencies_of_type <- agencies_filtered[[agency_col]]
