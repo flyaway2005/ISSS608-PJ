@@ -22,7 +22,7 @@ network_analysis_ui <- function(id) {
     sidebarLayout(
       # Left sidebar for controls
       sidebarPanel(
-        h3("Control Panel"),
+        h4("Control Panel"),
         
         #---------------------------------------------
         # 1. UI MODIFICATIONS - Replace the year filter with this
@@ -106,12 +106,11 @@ network_analysis_ui <- function(id) {
         # Award amount range with improved layout
         div(
           style = "margin-bottom: 25px;",
-          h5("Award Amount Range"),
-          sliderInput(ns("award_amount_range"), 
-                      label = NULL,
+          sliderInput(ns("award_amount_range"), "Award Amount Range",
+#                      label = NULL,
                       min = 0, 
                       max = 1500000000,  
-                      value = c(100000, 1000000),
+                      value = c(0, 50000),
                       step = 50000),
           div(
             style = "display: flex; justify-content: space-between; margin-top: -15px;",
@@ -140,9 +139,9 @@ network_analysis_ui <- function(id) {
         # Maximum edges to plot
         sliderInput(ns("max_edges"), "Maximum Edges to Plot",
                     min = 10, 
-                    max = 3000,
+                    max = 10000,
                     value = 500,
-                    step = 100),
+                    step = 5000),
         
         # Edge metric selection
         radioButtons(ns("edge_metric"), "Edge Thickness Based On",
@@ -165,12 +164,13 @@ network_analysis_ui <- function(id) {
         actionButton(ns("update_network"), "Update Network", 
                      class = "btn-primary", 
                      width = "100%"),
-        width = 3  # Set width of sidebar (out of 12)
+        width = 4  # Set width of sidebar (out of 12)
       ),
       #----------------------------------
       # Main panel for visualizations
       #----------------------------------
       mainPanel(  
+        width = 8,
         tabsetPanel(
           id = ns("network_tabs"),
           
@@ -284,8 +284,8 @@ network_analysis_ui <- function(id) {
             # When no node is selected
             uiOutput(ns("no_node_selected_message"))
           ))
-      ))
-    )
+      )
+    ))
     )}
 #--------------------------------
 # Network Analysis Server Module
@@ -1628,13 +1628,7 @@ ui <- dashboardPage(
               column(width = 12, network_analysis_ui("network_module"))
             )
     )
-  ),
-    
-    tabItems(
-      tabItem(tabName = "network",
-              box(width = 12, network_analysis_ui("network_module"))
-      )
-    )
+  )
   )
 )
 

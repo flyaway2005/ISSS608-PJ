@@ -97,7 +97,7 @@ network_community_ui <- function(id) {
                    )
                  ),
                  
-                 actionButton(ns("update_viz"), "Update Visualisation", 
+                 actionButton(ns("update_viz"), "Update Plot", 
                               class = "btn-primary",
                               style = "width: 100%; margin-top: 10px; margin-bottom: 10px"),
 
@@ -700,7 +700,9 @@ network_community_server <- function(id, dataset) {
       # Define a color palette based on the number of communities
       # Using the RColorBrewer palette or any other color scheme
       colors <- colorRampPalette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", 
-                                   "#FF7F00", "#FFFF33", "#A65628", "#F781BF"))(length(communities))
+                                   "#FF7F00", "#FFFF33", "#A65628", "#B5828C",
+                                   "#3E3F5B", "#336D82", "#015551", "#89AC46",
+                                   "#E53888", "#003092", "#73C7C7"))(length(communities))
       
       # Create a named vector for community colors
       community_colors <- setNames(colors, communities)
@@ -892,7 +894,10 @@ network_community_server <- function(id, dataset) {
         labs(x = "Community", y = "Number of Nodes", 
              title = "Community Size Distribution") +
         theme(legend.position = "none") +
-        scale_fill_brewer(palette = "Pastel1")
+        scale_fill_manual(values = c("#FBB4AE", "#B3CDE3", "#CCEBC5", "#DECBE4", "#FED9A6", "#FFFFCC",
+          "#E5D8BD", "#FDDAEC", "#F2F2F2", "#48A6A7", "#C890A7", "#AAB99A", "#FF9D23", "#441752", "#CBA35C",
+          "#33FF57", "#3357FF", "#F033FF", "#33FFF0", "#FFF033", "#FF33A8", "#E16A54", "#2E5077", "#FF8383",
+          "#D8C486", "#FB9EC6", "#BCCCDC", "#4B5945"))
     })
     
     #-----------    
