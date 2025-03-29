@@ -557,18 +557,18 @@ network_analysis_server <- function(id, data = NULL) {
   # For Start Date - restrict months based on year
   if (input$start_year == "2019") {
     # If 2019 is selected, only allow April-December
-    updateSelectInput(session, ns("start_month"),
+    updateSelectInput(session, "start_month",
                      choices = c("04" = 4, "05" = 5, "06" = 6, "07" = 7, "08" = 8, 
                                 "09" = 9, "10" = 10, "11" = 11, "12" = 12),
                      selected = ifelse(as.numeric(input$start_month) < 4, 4, input$start_month))
   } else if (input$start_year == "2024") {
     # If 2024 is selected, only allow January-March
-    updateSelectInput(session, ns("start_month"),
+    updateSelectInput(session, "start_month",
                      choices = c("01" = 1, "02" = 2, "03" = 3),
                      selected = ifelse(as.numeric(input$start_month) > 3, 3, input$start_month))
   } else {
     # For years 2020-2023, all months are valid
-    updateSelectInput(session, ns("start_month"),
+    updateSelectInput(session, "start_month",
                      choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
                                 "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
                      selected = input$start_month)
@@ -577,18 +577,18 @@ network_analysis_server <- function(id, data = NULL) {
   # For End Date - restrict months based on year
   if (input$end_year == "2019") {
     # If 2019 is selected, only allow April-December
-    updateSelectInput(session, ns("end_month"),
+    updateSelectInput(session, "end_month",
                      choices = c("04" = 4, "05" = 5, "06" = 6, "07" = 7, "08" = 8, 
                                 "09" = 9, "10" = 10, "11" = 11, "12" = 12),
                      selected = ifelse(as.numeric(input$end_month) < 4, 4, input$end_month))
   } else if (input$end_year == "2024") {
     # If 2024 is selected, only allow January-March
-    updateSelectInput(session, ns("end_month"),
+    updateSelectInput(session, "end_month",
                      choices = c("01" = 1, "02" = 2, "03" = 3),
                      selected = ifelse(as.numeric(input$end_month) > 3, 3, input$end_month))
   } else {
     # For years 2020-2023, all months are valid
-    updateSelectInput(session, ns("end_month"),
+    updateSelectInput(session, "end_month",
                      choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
                                 "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
                      selected = input$end_month)

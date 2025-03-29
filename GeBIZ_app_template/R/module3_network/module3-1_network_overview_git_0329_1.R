@@ -22,149 +22,223 @@ network_analysis_ui <- function(id) {
     sidebarLayout(
       # Left sidebar for controls
       sidebarPanel(
-        h4("Control Panel"),
+        h4("Control Panel", style = "margin-top: 5px; margin-bottom: 10px;"),
         
-        #---------------------------------------------
-        # 1. UI MODIFICATIONS - Replace the year filter with this
-        #---------------------------------------------
-        
-        h5("Date Range Filter"),
-        # Start date
-        fluidRow(
-          column(2, h5("Start", style = "margin-top: 7px; text-align: right;")),
-          column(5,
-                 selectInput(ns("start_year"), "Year",
-                             choices = c("2019", "2020", "2021", "2022", "2023", "2024"),
-                             selected = "2019",
-                             width = "100%"
-                 )
-          ),
-          column(5,
-                 selectInput(ns("start_month"), "Month",
-                             choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
-                                         "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
-                             selected = 1,
-                             width = "100%"
-                 )
-          )
-        ),
-        # End date
-        fluidRow(
-          column(2, h5("End", style = "margin-top: 7px; text-align: right;")),
-          column(5,
-                 selectInput(ns("end_year"),"",
-                             choices = c("2019", "2020", "2021", "2022", "2023", "2024"),
-                             selected = "2024",
-                             width = "100%"
-                 )
-          ),
-          column(5,
-                 selectInput(ns("end_month"), "",
-                             choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
-                                         "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
-                             selected = 12,
-                             width = "100%"
-                 )
-          )
-        ),
-        
-        # Agency Type filter
-        selectizeInput(ns("agency_type_filter"), "Select Agency Types", 
-                       choices = NULL,
-                       multiple = TRUE,
-                       options = list(
-                         placeholder = 'Select agency types',
-                         plugins = list('remove_button')
-                       )),
-                
-        # Agency filter
-        selectizeInput(ns("agency_filter"), "Select Agencies", 
-                       choices = NULL,
-                       multiple = TRUE,
-                       options = list(
-                         placeholder = 'Select agencies',
-                         plugins = list('remove_button')
-                       )),
-        
-        # Supplier filter
-        selectizeInput(ns("supplier_filter"), "Select Suppliers", 
-                       choices = NULL,
-                       multiple = TRUE,
-                       options = list(
-                         placeholder = 'Select suppliers',
-                         plugins = list('remove_button')
-                       )),
-        # Tender Category filter
-        selectizeInput(ns("tender_cat_filter"), "Select Tender Categories", 
-                       choices = NULL,
-                       multiple = TRUE,
-                       options = list(
-                         placeholder = 'Select tender categories',
-                         plugins = list('remove_button')
-                       )),
-        
-        # Award amount range with improved layout
-        div(
-          style = "margin-bottom: 25px;",
-          sliderInput(ns("award_amount_range"), "Award Amount Range",
-#                      label = NULL,
-                      min = 0, 
-                      max = 1500000000,  
-                      value = c(0, 50000),
-                      step = 50000),
-          div(
-            style = "display: flex; justify-content: space-between; margin-top: -15px;",
-            div(
-              style = "width: 45%;",
-              numericInput(ns("min_award_manual"), NULL, 
-                           value = 100000,
-                           min = 0,
-                           max = 1500000000),
-              div(style = "text-align: center; margin-top: -15px;", 
-                  tags$small("Min"))
+        # Collapsible panels for organization
+        div(class = "panel-group", id = ns("accordion"), role = "tablist", 
+            # Date range filter panel
+            div(class = "panel panel-default",
+                div(class = "panel-heading", role = "tab", id = ns("headingOne"),
+                    h5(class = "panel-title",
+                       tags$a(
+                         "Date Range Filter",
+                         style = "text-decoration: none; display: block;",
+                         `data-toggle` = "collapse",
+                         `data-parent` = "#accordion",
+                         href = paste0("#", ns("collapseOne"))
+                       )
+                    )
+                ),
+                div(id = ns("collapseOne"), class = "panel-collapse collapse in", role = "tabpanel",
+                    div(class = "panel-body", style = "padding: 5px;",
+                        # Start date - more compact layout
+                        fluidRow(style = "margin: 0px;",
+                                 column(2, h6("Start", style = "margin-top: 7px; text-align: right; font-size: 12px;")),
+                                 column(5, style = "padding: 0px 5px;",
+                                        selectInput(ns("start_year"), "Year", 
+                                                    choices = c("2019", "2020", "2021", "2022", "2023", "2024"),
+                                                    selected = "2019",
+                                                    width = "100%"
+                                        )
+                                 ),
+                                 column(5, style = "padding: 0px 5px;",
+                                        selectInput(ns("start_month"), "Month",
+                                                    choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
+                                                                "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
+                                                    selected = 1,
+                                                    width = "100%"
+                                        )
+                                 )
+                        ),
+                        # End date - more compact
+                        fluidRow(style = "margin: 0px;",
+                                 column(2, h6("End", style = "margin-top: 7px; text-align: right; font-size: 12px;")),
+                                 column(5, style = "padding: 0px 5px;",
+                                        selectInput(ns("end_year"), "", 
+                                                    choices = c("2019", "2020", "2021", "2022", "2023", "2024"),
+                                                    selected = "2024",
+                                                    width = "100%"
+                                        )
+                                 ),
+                                 column(5, style = "padding: 0px 5px;",
+                                        selectInput(ns("end_month"), "",
+                                                    choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
+                                                                "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
+                                                    selected = 12,
+                                                    width = "100%"
+                                        )
+                                 )
+                        )
+                    )
+                )
             ),
-            div(
-              style = "width: 45%;",
-              numericInput(ns("max_award_manual"), NULL, 
-                           value = 1000000,
-                           min = 0,
-                           max = 1500000000),
-              div(style = "text-align: center; margin-top: -15px;", 
-                  tags$small("Max"))
+            
+            # Filters panel
+            div(class = "panel panel-default",
+                div(class = "panel-heading", role = "tab", id = ns("headingTwo"),
+                    h5(class = "panel-title",
+                       tags$a(
+                         "Filter Data Range",
+                         style = "text-decoration: none; display: block;",
+                         `data-toggle` = "collapse",
+                         `data-parent` = "#accordion",
+                         href = paste0("#", ns("collapseTwo"))
+                       )
+                    )
+                ),
+                div(id = ns("collapseTwo"), class = "panel-collapse collapse", role = "tabpanel",
+                    div(class = "panel-body", style = "padding: 5px;",
+                        # Agency Type filter
+                        div(style = "margin-bottom: 8px;",
+                            selectizeInput(ns("agency_type_filter"), "Agency Types", 
+                                           choices = NULL,
+                                           multiple = TRUE,
+                                           options = list(
+                                             placeholder = 'Select agency types',
+                                             plugins = list('remove_button')
+                                           ))
+                        ),
+                        
+                        # Agency filter
+                        div(style = "margin-bottom: 8px;",
+                            selectizeInput(ns("agency_filter"), "Agencies", 
+                                           choices = NULL,
+                                           multiple = TRUE,
+                                           options = list(
+                                             placeholder = 'Select agencies',
+                                             plugins = list('remove_button')
+                                           ))
+                        ),
+                        
+                        # Supplier filter
+                        div(style = "margin-bottom: 8px;",
+                            selectizeInput(ns("supplier_filter"), "Suppliers", 
+                                           choices = NULL,
+                                           multiple = TRUE,
+                                           options = list(
+                                             placeholder = 'Select suppliers',
+                                             plugins = list('remove_button')
+                                           ))
+                        ),
+                        
+                        # Tender Category filter
+                        div(style = "margin-bottom: 8px;",
+                            selectizeInput(ns("tender_cat_filter"), "Tender Categories", 
+                                           choices = NULL,
+                                           multiple = TRUE,
+                                           options = list(
+                                             placeholder = 'Select tender categories',
+                                             plugins = list('remove_button')
+                                           ))
+                        ),
+                        
+                        # Award amount range
+                        div(style = "margin-bottom: 8px;",
+                            sliderInput(ns("award_amount_range"), "Award Amount Range",
+                                        min = 0, 
+                                        max = 1500000000,  
+                                        value = c(0, 50000),
+                                        step = 50000)
+                        ),
+                        
+                        # Min-Max inputs in a more compact layout
+                        fluidRow(style = "margin: -15px 0px 10px 0px;",
+                                 column(6, style = "padding: 0 5px 0 15px;",
+                                        numericInput(ns("min_award_manual"), NULL, 
+                                                     value = 100000,
+                                                     min = 0,
+                                                     max = 1500000000)
+                                 ),
+                                 column(6, style = "padding: 0 15px 0 5px;",
+                                        numericInput(ns("max_award_manual"), NULL, 
+                                                     value = 1000000,
+                                                     min = 0,
+                                                     max = 1500000000)
+                                 )
+                        ),
+                        fluidRow(style = "margin: -15px 0px 0px 0px;",
+                                 column(6, style = "text-align: center;", 
+                                        tags$small("Min", style = "font-size: 10px;")),
+                                 column(6, style = "text-align: center;", 
+                                        tags$small("Max", style = "font-size: 10px;"))
+                        )
+                    )
+                )
+            ),
+            
+            # Network Options panel
+            div(class = "panel panel-default",
+                div(class = "panel-heading", role = "tab", id = ns("headingThree"),
+                    h5(class = "panel-title",
+                       tags$a(
+                         "Network Options",
+                         style = "text-decoration: none; display: block;",
+                         `data-toggle` = "collapse",
+                         `data-parent` = "#accordion",
+                         href = paste0("#", ns("collapseThree"))
+                       )
+                    )
+                ),
+                div(id = ns("collapseThree"), class = "panel-collapse collapse", role = "tabpanel",
+                    div(class = "panel-body", style = "padding: 5px;",
+                        # Maximum edges
+                        div(style = "margin-bottom: 8px;",
+                            sliderInput(ns("max_edges"), "Maximum Edges",
+                                        min = 10, 
+                                        max = 10000,
+                                        value = 500,
+                                        step = 5000)
+                        ),
+                        
+                        # Edge metric - more compact
+                        div(style = "margin-bottom: 8px;",
+                            radioButtons(ns("edge_metric"), "Edge Thickness Based On",
+                                         choices = c("Award Amount" = "total_award_amount", 
+                                                     "Contract Count" = "total_contracts"),
+                                         inline = TRUE)
+                        ),
+                        
+                        # Layout algorithm
+                        div(style = "margin-bottom: 8px;",
+                            selectInput(ns("layout_type"), "Network Layout",
+                                        choices = c("Force-Directed" = "force", 
+                                                    "Bipartite" = "bipartite", 
+                                                    "Radial" = "radial"),
+                                        selected = "force")
+                        ),
+                        
+                        # Checkboxes in a single row
+                        fluidRow(style = "margin-bottom: 8px;",
+                                 column(6, style = "padding-right: 0px; padding-left: 20px;",
+                                        checkboxInput(ns("size_by_degree"), "Size by Degree", TRUE)
+                                 ),
+                                 column(6, style = "padding-right: 5px; padding-left: 2px;",
+                                        checkboxInput(ns("performance_mode"), "Performance Mode", TRUE)
+                                 )
+                        )
+                    )
+                )
             )
-          )
-        ),    
+        ),
         
+        # Fixed-position update button
+        div(style = "position: sticky; bottom: 10px; margin-top: 10px;",
+            actionButton(ns("update_network"), "Update Plot", 
+                         class = "btn-primary", 
+                         width = "100%")
+        ),
         
-        # Maximum edges to plot
-        sliderInput(ns("max_edges"), "Maximum Edges to Plot",
-                    min = 10, 
-                    max = 10000,
-                    value = 500,
-                    step = 5000),
-        
-        # Edge metric selection
-        radioButtons(ns("edge_metric"), "Edge Thickness Based On",
-                     choices = c("Award Amount" = "total_award_amount", 
-                                 "Contract Count" = "total_contracts")),
-        
-        # Layout algorithm
-        selectInput(ns("layout_type"), "Network Layout",
-                    choices = c("Force-Directed" = "force", 
-                                "Bipartite" = "bipartite", 
-                                "Radial" = "radial"),
-                    selected = "force"),
-        # Node size based on degree
-        checkboxInput(ns("size_by_degree"), "Size Nodes by Degree Centrality", TRUE),
-        
-        # Add a performance mode toggle
-        checkboxInput(ns("performance_mode"), "Performance Mode", TRUE),
-        
-        # Update button
-        actionButton(ns("update_network"), "Update Network", 
-                     class = "btn-primary", 
-                     width = "100%"),
-        width = 4  # Set width of sidebar (out of 12)
+        width = 4  
       ),
       #----------------------------------
       # Main panel for visualizations
@@ -177,7 +251,7 @@ network_analysis_ui <- function(id) {
           # Tab 1: Main Network Visualization
           tabPanel(
             title = "Network Overview",
-            # Main Network Visualization - Full Width
+           # Main Network Visualization - Full Width
             fluidRow(
               column(
                 width = 12,
@@ -186,11 +260,11 @@ network_analysis_ui <- function(id) {
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
-                  visNetworkOutput(ns("network_plot"), height = "600px")
+                  visNetworkOutput(ns("network_plot"), height = "400px")
                 )
               )
             ),
-            # Network Summary - Full Width
+          #  Network Summary - Full Width
             fluidRow(
               column(
                 width = 12,
@@ -202,8 +276,23 @@ network_analysis_ui <- function(id) {
                   verbatimTextOutput(ns("network_summary"))
                 )
               )
-            ),
-            # Network Details Tables - Full Width
+            )
+          ),
+          # NEW TAB 2: Network Metrics
+          tabPanel(
+            title = "Network Metrics",
+            # fluidRow(
+            #   column(
+            #     width = 12,
+            #     box(
+            #       title = "Network Summary",
+            #       width = NULL,
+            #       solidHeader = TRUE,
+            #       status = "info",
+            #       verbatimTextOutput(ns("network_summary"))
+            #     )
+            #   )
+            # ),
             fluidRow(
               column(
                 width = 12,
@@ -227,8 +316,7 @@ network_analysis_ui <- function(id) {
               )
             )
           ),
-        
-        # Tab 2: Ego-centric
+        # Tab 3: Ego-centric
         tabPanel(
           title = "Ego Network",
           tabPanel(
@@ -241,7 +329,7 @@ network_analysis_ui <- function(id) {
                   title = "Ego Network",
                   width = NULL,
                   solidHeader = TRUE,
-                  visNetworkOutput(ns("ego_network_plot"), height = "500px")
+                  visNetworkOutput(ns("ego_network_plot"), height = "390px")
                 )
               )
             ),
@@ -258,35 +346,57 @@ network_analysis_ui <- function(id) {
                 )
               )
             ),
-            # Third row: Detailed tables
-            fluidRow(
-              column(
-                width = 12,
-                # Tabbed box for detailed ego metrics
-                tabBox(
-                  title = "Ego Network Details",
-                  width = NULL,
-                  tabPanel(
-                    title = "Ego Agencies",
-                    DTOutput(ns("ego_agency_table"))
-                  ),
-                  tabPanel(
-                    title = "Ego Suppliers",
-                    DTOutput(ns("ego_supplier_table"))
-                  ),
-                  tabPanel(
-                    title = "Connections",
-                    DTOutput(ns("ego_connection_table"))
-                  )
-                )
-              )
-            ),
+
             # When no node is selected
             uiOutput(ns("no_node_selected_message"))
-          ))
+          )),
+        
+        # NEW TAB 4: Ego Network Metrics
+        tabPanel(
+          title = "Ego Metrics",
+          # fluidRow(
+          #   column(
+          #     width = 12, 
+          #     box(
+          #       title = "Ego Network Metrics",
+          #       width = NULL,
+          #       solidHeader = TRUE,
+          #       status = "info",
+          #       verbatimTextOutput(ns("ego_metrics"))
+          #     )
+          #   )
+          # ),
+          fluidRow(
+            column(
+              width = 12,
+              # Tabbed box for detailed ego metrics
+              tabBox(
+                title = "Ego Network Details",
+                width = NULL,
+                tabPanel(
+                  title = "Ego Agencies",
+                  DTOutput(ns("ego_agency_table"))
+                ),
+                tabPanel(
+                  title = "Ego Suppliers",
+                  DTOutput(ns("ego_supplier_table"))
+                ),
+                tabPanel(
+                  title = "Connections",
+                  DTOutput(ns("ego_connection_table"))
+                )
+              )
+            )
+          ),
+          # When no node is selected for ego metrics
+          uiOutput(ns("no_node_selected_metrics_message"))
+        )
+        )
       )
-    ))
-    )}
+    )
+  )
+}
+  
 #--------------------------------
 # Network Analysis Server Module
 #--------------------------------
@@ -557,18 +667,18 @@ network_analysis_server <- function(id, data = NULL) {
   # For Start Date - restrict months based on year
   if (input$start_year == "2019") {
     # If 2019 is selected, only allow April-December
-    updateSelectInput(session, ns("start_month"),
+    updateSelectInput(session, "start_month",
                      choices = c("04" = 4, "05" = 5, "06" = 6, "07" = 7, "08" = 8, 
                                 "09" = 9, "10" = 10, "11" = 11, "12" = 12),
                      selected = ifelse(as.numeric(input$start_month) < 4, 4, input$start_month))
   } else if (input$start_year == "2024") {
     # If 2024 is selected, only allow January-March
-    updateSelectInput(session, ns("start_month"),
+    updateSelectInput(session, "start_month",
                      choices = c("01" = 1, "02" = 2, "03" = 3),
                      selected = ifelse(as.numeric(input$start_month) > 3, 3, input$start_month))
   } else {
     # For years 2020-2023, all months are valid
-    updateSelectInput(session, ns("start_month"),
+    updateSelectInput(session, "start_month",
                      choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
                                 "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
                      selected = input$start_month)
@@ -577,18 +687,18 @@ network_analysis_server <- function(id, data = NULL) {
   # For End Date - restrict months based on year
   if (input$end_year == "2019") {
     # If 2019 is selected, only allow April-December
-    updateSelectInput(session, ns("end_month"),
+    updateSelectInput(session, "end_month",
                      choices = c("04" = 4, "05" = 5, "06" = 6, "07" = 7, "08" = 8, 
                                 "09" = 9, "10" = 10, "11" = 11, "12" = 12),
                      selected = ifelse(as.numeric(input$end_month) < 4, 4, input$end_month))
   } else if (input$end_year == "2024") {
     # If 2024 is selected, only allow January-March
-    updateSelectInput(session, ns("end_month"),
+    updateSelectInput(session, "end_month",
                      choices = c("01" = 1, "02" = 2, "03" = 3),
                      selected = ifelse(as.numeric(input$end_month) > 3, 3, input$end_month))
   } else {
     # For years 2020-2023, all months are valid
-    updateSelectInput(session, ns("end_month"),
+    updateSelectInput(session, "end_month",
                      choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
                                 "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
                      selected = input$end_month)

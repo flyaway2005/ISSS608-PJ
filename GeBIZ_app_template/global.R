@@ -87,6 +87,23 @@ app_theme <- list(
       width: 208px;
     }
     
+    /* Force consistent sidebar width */
+    .sidebar-panel, .well {
+    width: 100% !important;
+    max-width: 100% !important;
+    }
+    
+    /* Ensure accordion doesn't overflow */
+    .panel-group {
+    width: 100% !important;
+    }
+    
+    /* Ensure inputs don't cause width changes */
+    .selectize-control, .form-control, .shiny-input-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    }
+    
     /* Content wrapper adjustment */
     .content-wrapper, .right-side {
       margin-left: 200px;
@@ -140,6 +157,160 @@ app_theme <- list(
       flex-grow: 1;
       padding-left: 15px;
     }
+    
+    /* Force consistent sidebar width across all modules */
+.sidebar-panel {
+  width: 33.33% !important;
+  max-width: 33.33% !important;
+  flex: 0 0 33.33% !important;
+}
+
+/* Main panel consistency */
+.main-panel {
+  width: 66.67% !important;
+  max-width: 66.67% !important;
+  flex: 0 0 66.67% !important;
+}
+
+/* Ensures the sidebarLayout container itself is full width */
+.shiny-tab-content .sidebarLayout {
+  width: 100% !important;
+}
+
+/* Ensure all boxes in main content expand properly */
+.shiny-tab-content .box {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Fix for network visualization containers */
+.visNetwork {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ensure all inputs maintain consistent width */
+.sidebar-panel .shiny-input-container {
+  width: 100% !important;
+}
+
+/* Fix accordion width */
+.sidebar-panel .panel-group {
+  width: 100% !important;
+}
+
+/* Force ALL sidebar panels to be exactly the same width */
+.sidebar-panel, .well, .shiny-split-layout > div:first-child {
+  width: 33.33% !important;
+  max-width: 33.33% !important;
+  min-width: 33.33% !important;
+  flex: 0 0 33.33% !important;
+  box-sizing: border-box !important;
+}
+
+/* Fix ALL main panels */
+.main-panel, .shiny-split-layout > div:last-child {
+  width: 66.67% !important;
+  max-width: 66.67% !important;
+  min-width: 66.67% !important;
+  flex: 0 0 66.67% !important;
+  box-sizing: border-box !important;
+}
+
+/* Fix the tabset container */
+.tab-content, .tab-pane {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Target specific tab layouts */
+#network_tabs-Ego-Network .sidebar-panel,
+#network_tabs-Ego-Metrics .sidebar-panel,
+#network_tabs-Network-Metrics .sidebar-panel,
+#network_tabs-Network-Overview .sidebar-panel {
+  width: 33.33% !important;
+  max-width: 33.33% !important;
+  flex: 0 0 33.33% !important;
+}
+
+/* Override any Bootstrap column widths in the sidebar */
+.sidebar-panel .col-sm-1, .sidebar-panel .col-sm-2, .sidebar-panel .col-sm-3,
+.sidebar-panel .col-sm-4, .sidebar-panel .col-sm-5, .sidebar-panel .col-sm-6,
+.sidebar-panel .col-sm-7, .sidebar-panel .col-sm-8, .sidebar-panel .col-sm-9,
+.sidebar-panel .col-sm-10, .sidebar-panel .col-sm-11, .sidebar-panel .col-sm-12 {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+}
+
+/* Fix the sidebar layout container and all its children */
+.sidebarLayout, .sidebarLayout > * {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Fix panel display issues */
+.panel-body {
+  width: 100% !important;
+  padding: 5px !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure consistent layout for network module */
+.network-module-container {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.network-sidebar {
+  width: 33.33% !important;
+  max-width: 33.33% !important;
+  flex: 0 0 33.33% !important;
+}
+
+.network-main-panel {
+  width: 66.67% !important;
+  max-width: 66.67% !important;
+  flex: 0 0 66.67% !important;
+}
+
+.network-container {
+  height: calc(100vh - 250px);
+  min-height: 600px;
+}
+
+/* Force taller visualization containers */
+.visNetwork, .visNetwork > div, .visNetwork canvas {
+  min-height: 500px !important;
+  height: 500px !important;
+}
+
+/* Force the container to be tall enough */
+.shiny-output-error, 
+.visNetwork-container,
+.htmlwidget-container {
+  min-height: 500px !important; 
+  height: 500px !important;
+}
+
+/* Make sure the visualization canvas is in the right place */
+canvas.vis-network-canvas {
+  position: relative !important;
+  height: 500px !important;
+}
+
+/* Make sure visualizations use full width */
+.network-main-panel .visNetwork,
+.network-main-panel .box {
+  width: 100% !important;
+}
+
+/* Debug outline to see containers - remove after fixing
+.sidebar-panel { border: 2px solid red !important; }
+.main-panel { border: 2px solid blue !important; }
+*/
   "
 )
 
