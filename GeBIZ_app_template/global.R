@@ -31,15 +31,15 @@ options(shiny.useragg = TRUE)  # For improved plot rendering
 app_theme <- list(
   # Color palette - use this consistently across modules
   colors = list(
-    primary = "#B7CADB",       # Main blue - used for headers, buttons
-    primary_dark = "#A7BDCD",  # Darker blue for hover states
-    primary_light = "#D7EAFB", # Lighter blue for highlights
-    secondary = "#F7E3C1",     # Beige/cream for accents
-    background = "#FDF6EC",    # Very light beige for backgrounds
-    text = "#444444",          # Dark gray for text
-    success = "#91ac8f",       # Green for positive values
-    warning = "#F0AD4E",       # Orange for warnings
-    danger = "#D9534F",         # Red for errors/problems
+    primary = "#B7CADB",       
+    primary_dark = "#A7BDCD",  
+    primary_light = "#D7EAFB", 
+    secondary = "#F7E3C1",     
+    background = "#FDF6EC",    
+    text = "#444444",          
+    success = "#91ac8f",       
+    warning = "#F0AD4E",       
+    danger = "#D9534F",        
     info = "#5c7285",       
     neutral = "#f4f4f4",    # Light gray background
     # Add more colors as needed

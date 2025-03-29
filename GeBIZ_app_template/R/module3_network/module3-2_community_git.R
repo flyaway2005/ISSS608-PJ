@@ -15,7 +15,7 @@ library(shinyjs)
 
 # Load preprocessed network-community data
 
-community_data_global <- read_csv("/Users/cathyc/Documents/cathyschu/VAA_project/test_learning/data/network_community_data.csv")
+community_data_global <- read_csv("data/network_community_data.csv")
 #--------
 # Debug
 
@@ -97,7 +97,7 @@ network_community_ui <- function(id) {
                    )
                  ),
                  
-                 actionButton(ns("update_viz"), "Update Visualisation", 
+                 actionButton(ns("update_viz"), "Update Plot", 
                               class = "btn-primary",
                               style = "width: 100%; margin-top: 10px; margin-bottom: 10px"),
 
@@ -185,7 +185,7 @@ network_community_server <- function(id, dataset) {
   moduleServer(id, function(input, output, session) {
     cat("Starting moduleServer function\n")
     
-    cat("Executing line [167]\n")
+    cat("Executing line [188]\n")
     
     # Initialise reactive values
     rv <- reactiveValues(
@@ -193,7 +193,7 @@ network_community_server <- function(id, dataset) {
       communities = NULL
     )
     
-    cat("Executing line [175]\n")
+    cat("Executing line [196]\n")
     
     # For the update button
     observeEvent(input$some_trigger, {
@@ -212,18 +212,18 @@ network_community_server <- function(id, dataset) {
       
       # Check if dataset exists and is a function
       if (!is.function(dataset)) {
-        cat("ERROR: dataset is not a function\n")
+        cat("ERROR: dataset is NULL\n")
         return()
       }
       
       # Try to execute the dataset function
       tryCatch({
-        data <- dataset()
+        data <- dataset
         cat("DEBUG: Dataset function executed successfully\n")
         
         # Check if data is NULL or empty
         if (is.null(data) || nrow(data) == 0) {
-          cat("ERROR: dataset() returned NULL or empty data frame\n")
+          cat("ERROR: dataset returned NULL or empty data frame\n")
           return()
         }
         
@@ -246,14 +246,14 @@ network_community_server <- function(id, dataset) {
         cat("ERROR in debug observer:", e$message, "\n")
       })
       
-      cat("Executing line [228]\n")      
+      cat("Executing line [249]\n")      
       #------------------------------------
       req(dataset)
       
-      agency_type_choices <- c("All" = "All", unique(dataset()$agency_type))
-      agency_choices <- c("All" = "All", unique(dataset()$agency))
-      supplier_choices <- c("All" = "All", unique(dataset()$supplier_name))
-      tender_type_choices <- c("All" = "All", unique(dataset()$tender_type))      
+      agency_type_choices <- c("All" = "All", unique(dataset$agency_type))
+      agency_choices <- c("All" = "All", unique(dataset$agency))
+      supplier_choices <- c("All" = "All", unique(dataset$supplier_name))
+      tender_type_choices <- c("All" = "All", unique(dataset$tender_type))      
       
       updateSelectInput(session, "agency_type", 
                         choices = agency_type_choices,
@@ -282,10 +282,10 @@ network_community_server <- function(id, dataset) {
       
       # Filter agencies based on agency_type selection
       filtered_agencies <- if (is.null(input$agency_type) || "All" %in% input$agency_type) {
-        c("All" = "All", unique(dataset()$agency))
+        c("All" = "All", unique(dataset$agency))
       } else {
         c("All" = "All", 
-          filter(dataset(), agency_type %in% input$agency_type) %>%
+          filter(dataset, agency_type %in% input$agency_type) %>%
             pull(agency) %>%
             unique())
       }
@@ -319,14 +319,14 @@ network_community_server <- function(id, dataset) {
       }
     }, ignoreInit = TRUE)
 #-----    
-    cat("Executing line [291]\n")
+    cat("Executing line [322]\n")
     
     create_filtered_graph <- eventReactive(input$update_viz, {
       req(dataset)
       cat("Creating filtered graph...\n") 
       
       # TEMPORARY: Skip filtering for debugging
-      filtered_data <- dataset()
+      filtered_data <- dataset
       
       cat("Using all data with dimensions:", nrow(filtered_data), "rows x", ncol(filtered_data), "columns\n")
       
@@ -339,7 +339,7 @@ network_community_server <- function(id, dataset) {
       #------
       # Print filtered data dimensions
       cat("Filtered data dimensions:", nrow(filtered_data), "rows x", ncol(filtered_data), "columns\n")
-      cat("Executing line [300]\n")      
+      cat("Executing line [342]\n")      
       #-----
       
       # Apply filters 
@@ -615,7 +615,7 @@ network_community_server <- function(id, dataset) {
       #   }
       # }
       
-      cat("Executing line [517]\n")     
+      cat("Executing line [618]\n")     
       
       
       # Calculate centrality measure based on user selection
@@ -700,7 +700,9 @@ network_community_server <- function(id, dataset) {
       # Define a color palette based on the number of communities
       # Using the RColorBrewer palette or any other color scheme
       colors <- colorRampPalette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", 
-                                   "#FF7F00", "#FFFF33", "#A65628", "#F781BF"))(length(communities))
+                                   "#FF7F00", "#FFFF33", "#A65628", "#B5828C",
+                                   "#3E3F5B", "#336D82", "#015551", "#89AC46",
+                                   "#E53888", "#003092", "#73C7C7"))(length(communities))
       
       # Create a named vector for community colors
       community_colors <- setNames(colors, communities)
@@ -812,7 +814,7 @@ network_community_server <- function(id, dataset) {
       return(network)
     })
     
-    cat("Executing line [676]\n") 
+    cat("Executing line [815]\n") 
     
     # Render metrics cards
     output$community_metrics <- renderUI({
@@ -844,7 +846,7 @@ network_community_server <- function(id, dataset) {
       
       between_density <- edge_density(igraph_obj) - within_density
       
-      cat("Executing line [708]\n")
+      cat("Executing line [847]\n")
       
       # Create UI cards
       fluidRow(
@@ -866,7 +868,7 @@ network_community_server <- function(id, dataset) {
         )
       )
     })
-    cat("Executing line [821]\n")
+    cat("Executing line [869]\n")
     
     # Render community structure bar chart
     output$community_barchart <- renderPlot({
@@ -892,7 +894,10 @@ network_community_server <- function(id, dataset) {
         labs(x = "Community", y = "Number of Nodes", 
              title = "Community Size Distribution") +
         theme(legend.position = "none") +
-        scale_fill_brewer(palette = "Pastel1")
+        scale_fill_manual(values = c("#FBB4AE", "#B3CDE3", "#CCEBC5", "#DECBE4", "#FED9A6", "#FFFFCC",
+          "#E5D8BD", "#FDDAEC", "#F2F2F2", "#48A6A7", "#C890A7", "#AAB99A", "#FF9D23", "#441752", "#CBA35C",
+          "#33FF57", "#3357FF", "#F033FF", "#33FFF0", "#FFF033", "#FF33A8", "#E16A54", "#2E5077", "#FF8383",
+          "#D8C486", "#FB9EC6", "#BCCCDC", "#4B5945"))
     })
     
     #-----------    
@@ -1188,28 +1193,16 @@ network_community_server <- function(id, dataset) {
 ui <- network_community_ui("community_module")
 
 server <- function(input, output, session) {
-  community_data_reactive <- reactive({
-    community_data_global %>%
-      mutate(
-        award_date = as.Date(award_date),
-        awarded_amt = as.numeric(awarded_amt)
-      ) %>%
-      rename(tender_type = tender_cat)
-  })
+  # Process the data once, not as a reactive
+  community_data_processed <- community_data_global %>%
+    mutate(
+      award_date = as.Date(award_date),
+      awarded_amt = as.numeric(awarded_amt)
+    ) %>%
+    rename(tender_type = tender_cat)
   
-  #--------
-  # Validation output
-  #--------
-  output$debug_data <- renderPrint({
-    cat("Data dimensions:", nrow(community_data_reactive()), "rows x", 
-        ncol(community_data_reactive()), "columns\n")
-    cat("Sample data:\n")
-    print(head(community_data_reactive()))
-  })
-  
-  network_community_server("community_module", community_data_reactive)
+  network_community_server("community_module", community_data_processed)
 }
-
 
 # Run the application 
 shinyApp(ui = ui, server = server)
