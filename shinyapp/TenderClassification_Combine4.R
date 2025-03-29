@@ -1,4 +1,3 @@
-
 library(shiny)
 library(shinydashboard)
 library(tidyverse)
@@ -15,12 +14,13 @@ library(text2vec)
 library(tm)
 library(tidytext)
 library(lubridate)
-
+library(scales)
 
 
 
 # **📌 讀取 Cleaned_GP_LDA 數據**
 Cleaned_GP_LDA <- read_csv("data/Cleaned_GP_LDA.csv")
+Cleaned_GP <- read_csv("data/Cleaned_GP.csv")  # 新增讀取完整資料
 
 # **📌 預設 Stopwords**
 default_stopwords <- c(stopwords("en"), "please", "refer", "another", "one", "two", "three", 
@@ -35,12 +35,22 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Data Selection", tabName = "data_selection", icon = icon("database")),
-      menuItem("LDA Supervised Classification", tabName = "supervised", icon = icon("brain")),
+      menuItem("LDA Supervised Learning", tabName = "supervised", icon = icon("brain")),
       menuItem("LDA Clustering", tabName = "unsupervised", icon = icon("chart-line")),
-      menuItem("Tender Analysis", tabName = "tender_analysis", icon = icon("chart-bar"))
+      menuItem("Market Analysis", tabName = "market_analysis", icon = icon("chart-bar"))  # ✅ 新增市場分析分頁
     )
   ),
   dashboardBody(
+    tags$head(
+      tags$style(HTML("
+      .small-box .inner h3 {
+        font-size: 20px !important;  /* 調整數值的字體大小 */
+      }
+      .small-box .inner p {
+        font-size: 20px !important;  /* 調整標題的字體大小 */
+      }
+    "))
+    ),
     tabItems(
       # **📌 選擇數據量**
       tabItem(tabName = "data_selection",
@@ -63,13 +73,21 @@ ui <- dashboardPage(
       # **📌 LDA 監督學習**
       tabItem(tabName = "supervised",
               fluidPage(
-                titlePanel("LDA Supervised Classification"),
+                titlePanel("LDA Supervised Learning"),
                 sidebarLayout(
                   sidebarPanel(
                     actionButton("run_supervised", "Run LDA Analysis"),
                     sliderInput("num_words", "Number of Words:", min = 5, max = 20, value = 10),
                     selectInput("lda_category", "Select LDA Category:", choices = NULL, selected = "All"),
-                    actionButton("reload_lda", "Reload")  # ✅ 新增 Reload 按鈕
+                    actionButton("reload_lda", "Reload"),
+                    hr(),
+                    # 新增 Stopwords 管理區塊
+                    h4("Stopwords Management"),
+                    DTOutput("stopwords_table"),
+                    textInput("new_stopword", "Add New Stopword:"),
+                    actionButton("add_stopword", "Add Stopword"),
+                    actionButton("remove_stopword", "Remove Selected"),
+                    actionButton("reset_stopwords", "Reset to Default")
                   ),
                   mainPanel(
                     tabsetPanel(
@@ -102,36 +120,252 @@ ui <- dashboardPage(
                 )
               )
       ),
-      # 在 dashboardBody 加入新 tabItem：
-      tabItem(tabName = "tender_analysis",
+      # **📌 Market Analysis**
+      tabItem(tabName = "market_analysis",
               fluidPage(
-                titlePanel("Tender Analysis"),
+                titlePanel("Tender Market Analysis"),
                 sidebarLayout(
                   sidebarPanel(
-                    selectInput("analysis_category", "Select LDA Category:", choices = NULL),
-                    sliderInput("value_range", "Tender Value Range:", min = 0, max = 10000000, value = c(0, 5000000)),
-                    checkboxInput("show_outliers", "Show Outliers", value = TRUE)
+                    # 修改日期選擇為滑動條
+                    uiOutput("date_slider"),
+                    selectInput("market_category", "Select Category:",
+                                choices = c("All", "General Procurement", "Engineering Procurement", "PPP Procurement")),
+                    selectInput("tender_status", "Select Tender Status:",
+                                choices = c("All", 
+                                          "Award by interface record",
+                                          "Awarded by Items",
+                                          "Awarded to Suppliers")),
+                    actionButton("run_market_analysis", "Run Analysis")
                   ),
                   mainPanel(
                     tabsetPanel(
-                      tabPanel("Value Distribution", plotlyOutput("value_boxplot")),
-                      tabPanel("Summary Table", DTOutput("summary_table")),
-                      tabPanel("Category Trend (if date available)", plotlyOutput("trend_plot"))
+                      tabPanel("Market Overview",
+                               fluidRow(
+                                 valueBoxOutput("total_tenders", width = 4),
+                                 valueBoxOutput("total_value", width = 4),
+                                 valueBoxOutput("avg_value", width = 4)
+                               ),
+                               plotlyOutput("market_trend_plot")),
+                      tabPanel("Category Distribution",
+                               plotlyOutput("category_dist_plot")),
+                      tabPanel("Top Agencies",
+                               DTOutput("top_agencies_table")),
+                      tabPanel("Monthly Analysis",
+                               plotlyOutput("monthly_analysis_plot"))
                     )
                   )
                 )
               )
       )
-      
     )
   )
 )
 
+
+
+
+
 # **📌 Shiny Server**
 server <- function(input, output, session) {
   selected_data <- reactiveVal(NULL)
+  lda_results <- reactiveVal(NULL)
+  current_stopwords <- reactiveVal(default_stopwords)  # 新增：管理當前 stopwords
   
-  # **📌 預設載入 1000 筆數據**
+  # 顯示 Stopwords 表格
+  output$stopwords_table <- renderDT({
+    datatable(
+      data.frame(stopword = current_stopwords()),
+      selection = "multiple",
+      options = list(
+        pageLength = 10,
+        scrollX = TRUE,
+        scrollY = "200px"
+      )
+    )
+  })
+  
+  # 新增 Stopword
+  observeEvent(input$add_stopword, {
+    new_word <- trimws(input$new_stopword)
+    if (new_word != "") {
+      current_stopwords(c(current_stopwords(), new_word))
+      updateTextInput(session, "new_stopword", value = "")
+      
+      # 如果已經有 LDA 結果，重新處理資料
+      if (!is.null(selected_data())) {
+        sample_data <- selected_data()
+        sample_data <- sample_data %>%
+          mutate(
+            tender_clean = tender_description %>%
+              tolower() %>%
+              removePunctuation() %>%
+              removeNumbers() %>%
+              stripWhitespace() %>%
+              removeWords(current_stopwords())
+          )
+        selected_data(sample_data)
+        
+        # 重新執行 LDA 分析
+        if (!is.null(lda_results())) {
+          # 重新建立 Document-Term Matrix
+          dtm <- sample_data %>%
+            unnest_tokens(word, tender_clean) %>%
+            count(tender_no, word) %>%
+            cast_dtm(document = tender_no, term = word, value = n)
+          
+          # 重新訓練 LDA 模型
+          lda_model <- LDA(dtm, k = 7, control = list(seed = 1234))
+          
+          # 取得新的 LDA 分類結果
+          lda_assignments <- tidy(lda_model, matrix = "gamma")
+          
+          sample_data <- sample_data %>%
+            left_join(lda_assignments %>% group_by(document) %>% top_n(1, gamma),
+                      by = c("tender_no" = "document")) %>%
+            mutate(
+              LDA_Category = case_when(
+                topic == 1 ~ "General Procurement - Goods",
+                topic == 2 ~ "General Procurement - Services",
+                topic == 3 ~ "Engineering Procurement - Goods",
+                topic == 4 ~ "Engineering Procurement - Services",
+                topic == 5 ~ "Engineering Procurement - EPC",
+                topic == 6 ~ "PPP Procurement - DBO",
+                topic == 7 ~ "PPP Procurement - DBFO",
+                TRUE ~ "Unclassified"
+              )
+            )
+          
+          # 更新 LDA 結果
+          lda_results(sample_data %>% select(tender_no, LDA_Category, tender_clean))
+          
+          # 觸發重新載入
+          updateSelectInput(session, "lda_category", choices = c("All", unique(sample_data$LDA_Category)))
+          shinyjs::click("reload_lda")
+        }
+      }
+    }
+  })
+  
+  # 移除選中的 Stopwords
+  observeEvent(input$remove_stopword, {
+    selected_rows <- input$stopwords_table_rows_selected
+    if (!is.null(selected_rows)) {
+      current_stopwords(current_stopwords()[-selected_rows])
+      
+      # 如果已經有 LDA 結果，重新處理資料
+      if (!is.null(selected_data())) {
+        sample_data <- selected_data()
+        sample_data <- sample_data %>%
+          mutate(
+            tender_clean = tender_description %>%
+              tolower() %>%
+              removePunctuation() %>%
+              removeNumbers() %>%
+              stripWhitespace() %>%
+              removeWords(current_stopwords())
+          )
+        selected_data(sample_data)
+        
+        # 重新執行 LDA 分析
+        if (!is.null(lda_results())) {
+          # 重新建立 Document-Term Matrix
+          dtm <- sample_data %>%
+            unnest_tokens(word, tender_clean) %>%
+            count(tender_no, word) %>%
+            cast_dtm(document = tender_no, term = word, value = n)
+          
+          # 重新訓練 LDA 模型
+          lda_model <- LDA(dtm, k = 7, control = list(seed = 1234))
+          
+          # 取得新的 LDA 分類結果
+          lda_assignments <- tidy(lda_model, matrix = "gamma")
+          
+          sample_data <- sample_data %>%
+            left_join(lda_assignments %>% group_by(document) %>% top_n(1, gamma),
+                      by = c("tender_no" = "document")) %>%
+            mutate(
+              LDA_Category = case_when(
+                topic == 1 ~ "General Procurement - Goods",
+                topic == 2 ~ "General Procurement - Services",
+                topic == 3 ~ "Engineering Procurement - Goods",
+                topic == 4 ~ "Engineering Procurement - Services",
+                topic == 5 ~ "Engineering Procurement - EPC",
+                topic == 6 ~ "PPP Procurement - DBO",
+                topic == 7 ~ "PPP Procurement - DBFO",
+                TRUE ~ "Unclassified"
+              )
+            )
+          
+          # 更新 LDA 結果
+          lda_results(sample_data %>% select(tender_no, LDA_Category, tender_clean))
+          
+          # 觸發重新載入
+          updateSelectInput(session, "lda_category", choices = c("All", unique(sample_data$LDA_Category)))
+          shinyjs::click("reload_lda")
+        }
+      }
+    }
+  })
+  
+  # 重置為預設 Stopwords
+  observeEvent(input$reset_stopwords, {
+    current_stopwords(default_stopwords)
+    
+    # 如果已經有 LDA 結果，重新處理資料
+    if (!is.null(selected_data())) {
+      sample_data <- selected_data()
+      sample_data <- sample_data %>%
+        mutate(
+          tender_clean = tender_description %>%
+            tolower() %>%
+            removePunctuation() %>%
+            removeNumbers() %>%
+            stripWhitespace() %>%
+            removeWords(current_stopwords())
+        )
+      selected_data(sample_data)
+      
+      # 重新執行 LDA 分析
+      if (!is.null(lda_results())) {
+        # 重新建立 Document-Term Matrix
+        dtm <- sample_data %>%
+          unnest_tokens(word, tender_clean) %>%
+          count(tender_no, word) %>%
+          cast_dtm(document = tender_no, term = word, value = n)
+        
+        # 重新訓練 LDA 模型
+        lda_model <- LDA(dtm, k = 7, control = list(seed = 1234))
+        
+        # 取得新的 LDA 分類結果
+        lda_assignments <- tidy(lda_model, matrix = "gamma")
+        
+        sample_data <- sample_data %>%
+          left_join(lda_assignments %>% group_by(document) %>% top_n(1, gamma),
+                    by = c("tender_no" = "document")) %>%
+          mutate(
+            LDA_Category = case_when(
+              topic == 1 ~ "General Procurement - Goods",
+              topic == 2 ~ "General Procurement - Services",
+              topic == 3 ~ "Engineering Procurement - Goods",
+              topic == 4 ~ "Engineering Procurement - Services",
+              topic == 5 ~ "Engineering Procurement - EPC",
+              topic == 6 ~ "PPP Procurement - DBO",
+              topic == 7 ~ "PPP Procurement - DBFO",
+              TRUE ~ "Unclassified"
+            )
+          )
+        
+        # 更新 LDA 結果
+        lda_results(sample_data %>% select(tender_no, LDA_Category, tender_clean))
+        
+        # 觸發重新載入
+        updateSelectInput(session, "lda_category", choices = c("All", unique(sample_data$LDA_Category)))
+        shinyjs::click("reload_lda")
+      }
+    }
+  })
+  
+  # 修改資料清理部分，使用 current_stopwords
   observe({
     sample_size <- 1000
     set.seed(1234)
@@ -144,7 +378,7 @@ server <- function(input, output, session) {
           removePunctuation() %>%
           removeNumbers() %>%
           stripWhitespace() %>%
-          removeWords(default_stopwords)
+          removeWords(current_stopwords())  # 使用 current_stopwords
       )
     
     selected_data(sample_data)
@@ -154,7 +388,7 @@ server <- function(input, output, session) {
     })
   })
   
-  # **📌 手動選擇數據量**
+  # 修改手動選擇數據量部分
   observeEvent(input$load_data, {
     sample_size <- as.numeric(input$sample_size)
     set.seed(1234)
@@ -167,7 +401,7 @@ server <- function(input, output, session) {
           removePunctuation() %>%
           removeNumbers() %>%
           stripWhitespace() %>%
-          removeWords(default_stopwords)
+          removeWords(current_stopwords())  # 使用 current_stopwords
       )
     
     selected_data(sample_data)
@@ -178,7 +412,7 @@ server <- function(input, output, session) {
   })
   
   # **📌 LDA Supervised Learning**
- 
+  
   observeEvent(input$run_supervised, {
     req(selected_data())
     
@@ -211,21 +445,29 @@ server <- function(input, output, session) {
           TRUE ~ "Unclassified"
         )
       )
-    # ✅ 寫入帶有 LDA 標籤的資料集
-    dir.create("output", showWarnings = FALSE)  # 確保資料夾存在
-    write_csv(sample_data, "output/tender_lda_labeled_all.csv")
+    
+    # 儲存 LDA 結果，包含必要的欄位
+    lda_results(sample_data %>% select(tender_no, LDA_Category, tender_clean))
     
     updateSelectInput(session, "lda_category", choices = c("All", unique(sample_data$LDA_Category)))
-    
-    # ✅ **存儲計算結果，等 Reload 按鈕被點擊後才更新圖表**
-    lda_results <<- sample_data
   })
   
   observeEvent(input$reload_lda, {
-    req(lda_results)
+    req(lda_results())
+    
+    # 重新處理文本，使用當前的 stopwords
+    processed_data <- lda_results() %>%
+      mutate(
+        tender_clean = tender_clean %>%
+          tolower() %>%
+          removePunctuation() %>%
+          removeNumbers() %>%
+          stripWhitespace() %>%
+          removeWords(current_stopwords())
+      )
     
     # ✅ **TF-IDF 計算，確保 `filtered_data()` 不為空**
-    word_tf_idf <- lda_results %>%
+    word_tf_idf <- processed_data %>%
       unnest_tokens(word, tender_clean) %>%
       count(LDA_Category, tender_no, word) %>%
       bind_tf_idf(word, LDA_Category, n) %>%
@@ -242,7 +484,7 @@ server <- function(input, output, session) {
     
     # ✅ **LDA Distribution**
     output$lda_category_plot <- renderPlotly({
-      lda_counts <- lda_results %>%
+      lda_counts <- lda_results() %>%
         count(LDA_Category) %>%
         arrange(desc(n))
       
@@ -253,7 +495,7 @@ server <- function(input, output, session) {
         labs(title = "LDA Distribution", x = "LDA Category", y = "Number of Tenders")
       
       ggplotly(p) %>%
-        layout(showlegend = FALSE)  # ✅ 隱藏 Legend
+        layout(showlegend = FALSE)
     })
     
     # ✅ **TF-IDF Table**
@@ -404,98 +646,251 @@ server <- function(input, output, session) {
         })
       }
     })
-    # === Tender Analysis Dataset Loading ===
-    # === Tender Analysis 使用 lda_results ===
-    observe({
-      req(lda_results)
+  })
+  
+  # **📌 Market Analysis**
+  # 初始化日期選擇器
+  output$date_slider <- renderUI({
+    tryCatch({
+      # 使用完整的 Cleaned_GP 資料來計算日期範圍
+      market_data <- Cleaned_GP %>%
+        mutate(
+          tender_date = as.Date(award_date, format = "%d/%m/%Y")
+        ) %>%
+        filter(!is.na(tender_date))
       
-      df <- lda_results
-      
-      # 初始化 Category 選單
-      if ("LDA_Category" %in% names(df)) {
-        updateSelectInput(session, "analysis_category",
-                          choices = c("All", unique(df$LDA_Category)),
-                          selected = "All")
-      }
-      output$debug_colnames <- renderPrint({
-        colnames(lda_results)
-      })
-      
-      # 反應式篩選資料
-      filtered_analysis_data <- reactive({
-        data <- df
-        if (input$analysis_category != "All") {
-          data <- data %>% filter(LDA_Category == input$analysis_category)
-        }
-        if ("tender_value" %in% names(data)) {
-          data <- data %>% filter(tender_value >= input$value_range[1],
-                                  tender_value <= input$value_range[2])
-        }
-        data
-      })
-      
-      # 📊 Value Distribution 圖
-      output$value_boxplot <- renderPlotly({
-        data <- filtered_analysis_data()
-        req(nrow(data) > 0)
+      if (nrow(market_data) > 0) {
+        min_date <- floor_date(min(market_data$tender_date), "month")
+        max_date <- ceiling_date(max(market_data$tender_date), "month")
         
-        p <- ggplot(data, aes(x = LDA_Category, y = tender_value, fill = LDA_Category)) +
-          geom_boxplot(outlier.shape = ifelse(input$show_outliers, 16, NA)) +
+        dateRangeInput("date_range",
+                      "Select Date Range:",
+                      start = min_date,
+                      end = max_date,
+                      min = min_date,
+                      max = max_date,
+                      format = "yyyy-mm",
+                      startview = "month",
+                      autoclose = TRUE,
+                      language = "en",
+                      separator = " to ",
+                      width = "100%")
+      } else {
+        dateRangeInput("date_range",
+                      "No valid dates available",
+                      start = Sys.Date(),
+                      end = Sys.Date(),
+                      format = "yyyy-mm",
+                      startview = "month",
+                      autoclose = TRUE,
+                      language = "en",
+                      separator = " to ",
+                      width = "100%")
+      }
+    }, error = function(e) {
+      dateRangeInput("date_range",
+                    "Error loading dates",
+                    start = Sys.Date(),
+                    end = Sys.Date(),
+                    format = "yyyy-mm",
+                    startview = "month",
+                    autoclose = TRUE,
+                    language = "en",
+                    separator = " to ",
+                    width = "100%")
+    })
+  })
+  
+  observeEvent(input$run_market_analysis, {
+    tryCatch({
+      # 檢查是否已經執行過 LDA
+      if (is.null(lda_results())) {
+        showNotification(
+          "Please run LDA Analysis first to get category information",
+          type = "warning"
+        )
+        return(NULL)
+      }
+      
+      # 使用完整的 Cleaned_GP 資料並與 LDA 結果合併
+      market_data <- Cleaned_GP %>%
+        left_join(lda_results(), by = "tender_no")
+      
+      # 檢查必要的欄位是否存在
+      required_columns <- c("award_date", "awarded_amt", "agency", "LDA_Category")
+      missing_columns <- required_columns[!required_columns %in% names(market_data)]
+      
+      if (length(missing_columns) > 0) {
+        showNotification(
+          paste("Missing required columns:", paste(missing_columns, collapse = ", ")),
+          type = "error"
+        )
+        return(NULL)
+      }
+      
+      # 資料清理和轉換
+      market_data <- market_data %>%
+        mutate(
+          tender_date = as.Date(award_date, format = "%d/%m/%Y"),
+          tender_value = as.numeric(gsub("[^0-9.]", "", awarded_amt))
+        )
+      
+      # 過濾 NA 值
+      market_data <- market_data %>%
+        filter(
+          !is.na(tender_date),
+          !is.na(tender_value)
+        )
+      
+      if (nrow(market_data) == 0) {
+        showNotification("No valid data available after filtering NA values", type = "warning")
+        return(NULL)
+      }
+      
+      # 使用選擇的日期範圍
+      if (!is.null(input$date_range)) {
+        market_data <- market_data %>%
+          filter(
+            tender_date >= input$date_range[1],
+            tender_date <= input$date_range[2]
+          )
+      }
+      
+      # 過濾類別
+      if (input$market_category != "All") {
+        market_data <- market_data %>%
+          filter(grepl(input$market_category, LDA_Category))
+      }
+      
+      # 過濾標案狀態
+      if (input$tender_status != "All") {
+        market_data <- market_data %>%
+          filter(tender_detail_status == input$tender_status)
+      }
+      
+      if (nrow(market_data) == 0) {
+        showNotification("No data available for the selected filters", type = "warning")
+        return(NULL)
+      }
+      
+      # Market Overview Boxes
+      output$total_tenders <- renderValueBox({
+        valueBox(
+          value = nrow(market_data),
+          subtitle = HTML("<span style='font-size: 16px; font-weight: bold;'>Total Tenders</span>"),
+          icon = icon("file-contract"),
+          color = "blue",
+          width = 4
+        )
+      })
+      
+      output$total_value <- renderValueBox({
+        valueBox(
+          value = paste("$", format(sum(market_data$tender_value, na.rm = TRUE), big.mark = ",")),
+          subtitle = HTML("<span style='font-size: 16px; font-weight: bold;'>Total Value</span>"),
+          icon = icon("dollar-sign"),
+          color = "green",
+          width = 4
+        )
+      })
+      
+      output$avg_value <- renderValueBox({
+        valueBox(
+          value = paste("$", format(mean(market_data$tender_value, na.rm = TRUE), big.mark = ",")),
+          subtitle = HTML("<span style='font-size: 16px; font-weight: bold;'>Average Value</span>"),
+          icon = icon("chart-line"),
+          color = "purple",
+          width = 4
+        )
+      })
+      
+      # Market Trend Plot
+      output$market_trend_plot <- renderPlotly({
+        trend_data <- market_data %>%
+          group_by(tender_date) %>%
+          summarise(
+            count = n(),
+            total_value = sum(tender_value, na.rm = TRUE)
+          )
+        
+        p <- ggplot(trend_data, aes(x = tender_date)) +
+          geom_line(aes(y = count, color = "Number of Tenders")) +
+          geom_line(aes(y = total_value/1000, color = "Total Value (K)")) +
+          scale_y_continuous(sec.axis = sec_axis(~.*1000, name = "Total Value")) +
           theme_minimal() +
-          labs(title = "Tender Value Distribution by Category",
-               x = "LDA Category", y = "Tender Value")
+          labs(title = "Market Trends Over Time",
+               x = "Date",
+               y = "Number of Tenders",
+               color = "Metric")
         
         ggplotly(p)
       })
       
-      # 📋 Summary Table
-      output$summary_table <- renderDT({
-        data <- filtered_analysis_data()
-        req(nrow(data) > 0)
-        
-        data %>%
+      # Category Distribution Plot
+      output$category_dist_plot <- renderPlotly({
+        category_data <- market_data %>%
           group_by(LDA_Category) %>%
           summarise(
-            Count = n(),
-            Total_Value = sum(tender_value, na.rm = TRUE),
-            Mean_Value = mean(tender_value, na.rm = TRUE),
-            .groups = "drop"
-          ) %>%
-          datatable(options = list(pageLength = 10))
-      })
-      
-      # 📈 時間趨勢圖（如果有日期欄位）
-      output$trend_plot <- renderPlotly({
-        data <- filtered_analysis_data()
+            count = n(),
+            total_value = sum(tender_value, na.rm = TRUE)
+          )
         
-        if ("tender_date" %in% names(data)) {
-          # 處理日期欄位（轉為 Date → floor to month）
-          data <- data %>%
-            mutate(
-              tender_date = as.Date(tender_date),  # 若原本是 character
-              tender_month = floor_date(tender_date, unit = "month")
-            )
-          
-          # 月別加總
-          monthly_summary <- data %>%
-            group_by(tender_month, LDA_Category) %>%
-            summarise(count = n(), .groups = "drop")
-          
-          # 繪圖
-          p <- ggplot(monthly_summary, aes(x = tender_month, y = count, color = LDA_Category)) +
-            geom_line(size = 1) +
-            labs(title = "Monthly Tender Count by Category",
-                 x = "Month", y = "Number of Tenders") +
-            theme_minimal()
-          
-          ggplotly(p)
-        } else {
-          plotly_empty()
-        }
+        p <- ggplot(category_data, aes(x = reorder(LDA_Category, count), y = count)) +
+          geom_bar(stat = "identity", fill = "steelblue") +
+          coord_flip() +
+          theme_minimal() +
+          labs(title = "Distribution by Category",
+               x = "Category",
+               y = "Number of Tenders")
+        
+        ggplotly(p)
       })
       
+      # Top Agencies Table
+      output$top_agencies_table <- renderDT({
+        agency_data <- market_data %>%
+          group_by(agency) %>%
+          summarise(
+            total_tenders = n(),
+            total_value = sum(tender_value, na.rm = TRUE),
+            avg_value = mean(tender_value, na.rm = TRUE)
+          ) %>%
+          arrange(desc(total_value))
+        
+        datatable(agency_data,
+                  options = list(
+                    pageLength = 10,
+                    scrollX = TRUE
+                  ),
+                  colnames = c("Agency", "Total Tenders", "Total Value", "Average Value"))
+      })
+      
+      # Monthly Analysis Plot
+      output$monthly_analysis_plot <- renderPlotly({
+        monthly_data <- market_data %>%
+          mutate(
+            month = floor_date(tender_date, "month")
+          ) %>%
+          group_by(month) %>%
+          summarise(
+            count = n(),
+            total_value = sum(tender_value, na.rm = TRUE)
+          )
+        
+        p <- ggplot(monthly_data, aes(x = month)) +
+          geom_bar(aes(y = count), stat = "identity", fill = "steelblue") +
+          geom_line(aes(y = total_value/1000), color = "red") +
+          scale_y_continuous(sec.axis = sec_axis(~.*1000, name = "Total Value")) +
+          theme_minimal() +
+          labs(title = "Monthly Analysis",
+               x = "Month",
+               y = "Number of Tenders")
+        
+        ggplotly(p)
+      })
+    }, error = function(e) {
+      showNotification(paste("Error in market analysis:", e$message), type = "error")
     })
-    
   })
 }
 
