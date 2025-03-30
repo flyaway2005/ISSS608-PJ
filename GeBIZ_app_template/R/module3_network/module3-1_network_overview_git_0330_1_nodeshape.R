@@ -1028,7 +1028,7 @@ network_analysis_server <- function(id, data = NULL) {
         return(NULL)
       }
       
-      # Prepare nodes for visualization
+      # Prepare nodes for visualisation
       nodes_vis <- data$nodes %>%
         mutate(
           id = name,
@@ -1200,7 +1200,7 @@ network_analysis_server <- function(id, data = NULL) {
       # Add remaining visualization settings
       network %>%
         visNodes(
-          shape = "dot",
+        #  shape = "dot",
           color = list(
             background = "#666666",
             border = "#2B7CE9"

@@ -1,0 +1,12 @@
+name: test_module3_2
+title: test_module3_2
+username: cathyschu
+account: cathyschu
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14375646
+bundleId: 10025324
+url: https://cathyschu.shinyapps.io/test_module3_2/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

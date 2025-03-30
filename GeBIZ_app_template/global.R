@@ -1,5 +1,4 @@
 
-# This file is sourced once when the app starts
 #------------------------------------------------------------------------------
 library(shiny)
 library(shinydashboard)
@@ -287,6 +286,16 @@ app_theme <- list(
   height: 500px !important;
 }
 
+/* Target the specific network plot element */
+#network_module-network_plot, 
+#network_module-network_plot .visNetwork, 
+#network_module-network_plot .htmlwidget, 
+#network_module-network_plot .htmlwidget-container {
+  height: 400px !important;
+  min-height: 400px !important;
+  max-height: 400px !important;
+}
+
 /* Force the container to be tall enough */
 .shiny-output-error, 
 .visNetwork-container,
@@ -305,6 +314,26 @@ canvas.vis-network-canvas {
 .network-main-panel .visNetwork,
 .network-main-panel .box {
   width: 100% !important;
+}
+
+/* Target the ego network plot specifically */
+#network_module-ego_network_plot,
+#network_module-ego_network_plot .visNetwork,
+#network_module-ego_network_plot .htmlwidget,
+#network_module-ego_network_plot .htmlwidget-container {
+  height: 390px !important;
+  min-height: 390px !important;
+  max-height: 390px !important;
+}
+
+/* Also target the community module */
+#community_module-ego_network_plot,
+#community_module-ego_network_plot .visNetwork,
+#community_module-ego_network_plot .htmlwidget,
+#community_module-ego_network_plot .htmlwidget-container {
+  height: 390px !important;
+  min-height: 390px !important;
+  max-height: 390px !important;
 }
 
 /* Debug outline to see containers - remove after fixing
