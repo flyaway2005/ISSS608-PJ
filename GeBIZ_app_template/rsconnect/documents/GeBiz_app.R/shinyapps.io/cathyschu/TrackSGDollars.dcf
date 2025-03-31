@@ -5,7 +5,7 @@ account: cathyschu
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 14375421
-bundleId: 10025700
+bundleId: 10028653
 url: https://cathyschu.shinyapps.io/TrackSGDollars/
 version: 1
 asMultiple: FALSE

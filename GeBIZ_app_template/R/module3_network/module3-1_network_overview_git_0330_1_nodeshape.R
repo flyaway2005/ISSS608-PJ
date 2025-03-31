@@ -197,7 +197,7 @@ network_analysis_ui <- function(id) {
                                         min = 10, 
                                         max = 10000,
                                         value = 500,
-                                        step = 5000)
+                                        step = 10)
                         ),
                         
                         # Edge metric - more compact
@@ -212,8 +212,8 @@ network_analysis_ui <- function(id) {
                         div(style = "margin-bottom: 8px;",
                             selectInput(ns("layout_type"), "Network Layout",
                                         choices = c("Force-Directed" = "force", 
-                                                    "Bipartite" = "bipartite", 
-                                                    "Radial" = "radial"),
+                                                    "Repulsion" = "repulsion",
+                                                    "Barnes-Hut" = "barnesHut"),
                                         selected = "force")
                         ),
                         
@@ -1033,7 +1033,7 @@ network_analysis_server <- function(id, data = NULL) {
         mutate(
           id = name,
           label = name,
-          color = ifelse(type == "supplier", "red", "blue"),
+          color = ifelse(type == "supplier", "#E4003A", "#A6CDC6"),
           shape = ifelse(type == "supplier", "dot", "diamond"),
           title = paste0(
             "<strong>", name, "</strong><br>",
@@ -1177,25 +1177,55 @@ network_analysis_server <- function(id, data = NULL) {
           nodesIdSelection = list(enabled = TRUE)
         )
       
-      # Apply physics settings based on performance mode
-      if (input$performance_mode) {
-        # Optimized physics for performance
+      # Apply layout based on selection and performance mode
+      iterations <- if (input$performance_mode) 100 else 1000
+      timestep <- if (input$performance_mode) 0.5 else 0.3
+      adaptive <- if (input$performance_mode) TRUE else FALSE
+      maxVel <- if (input$performance_mode) 50 else 30
+      
+      # Apply physics based on layout type
+      if (input$layout_type == "force") {
         network <- network %>%
           visPhysics(
             solver = "forceAtlas2Based",
-            stabilization = list(enabled = TRUE, iterations = 100),
-            timestep = 0.5,
-            adaptiveTimestep = TRUE,
-            maxVelocity = 50
+            stabilization = list(enabled = TRUE, iterations = iterations),
+            timestep = timestep,
+            adaptiveTimestep = adaptive,
+            maxVelocity = maxVel
           )
-      } else {
-        # Regular physics settings for better visualization
+      } else if (input$layout_type == "repulsion") {
         network <- network %>%
           visPhysics(
-            solver = "forceAtlas2Based",
-            stabilization = list(enabled = TRUE, iterations = 1000)
+            solver = "repulsion",
+            repulsion = list(
+              nodeDistance = 200,
+              centralGravity = 0.2,
+              springLength = 200,
+              springConstant = 0.05,
+              damping = 0.09
+            ),
+            stabilization = list(enabled = TRUE, iterations = iterations),
+            timestep = timestep,
+            adaptiveTimestep = adaptive,
+            maxVelocity = maxVel
           )
-      }
+      } else if (input$layout_type == "barnesHut") {
+        network <- network %>%
+          visPhysics(
+            solver = "barnesHut",
+            barnesHut = list(
+              gravitationalConstant = -2000,
+              centralGravity = 0.3,
+              springLength = 150,
+              springConstant = 0.04,
+              damping = 0.09
+            ),
+            stabilization = list(enabled = TRUE, iterations = iterations),
+            timestep = timestep,
+            adaptiveTimestep = adaptive,
+            maxVelocity = maxVel
+          )
+      } 
       
       # Add remaining visualization settings
       network %>%
@@ -1352,7 +1382,6 @@ network_analysis_server <- function(id, data = NULL) {
     
     # Network Summary Statistics
     output$network_summary <- renderPrint({
-      # Make sure we have data
       data <- filtered_data()
       req(data)
       req(nrow(data$nodes) > 0)
@@ -1363,7 +1392,6 @@ network_analysis_server <- function(id, data = NULL) {
       total_contracts <- sum(data$edges$total_contracts)
       total_award_amount <- sum(data$edges$total_award_amount)
       
-      # Create summary data frame
       summary_df <- data.frame(
         Metric = c(
           "Total Nodes",
@@ -1686,22 +1714,6 @@ network_analysis_server <- function(id, data = NULL) {
       req(nrow(ego_data$edges) > 0)
       
       connections <- ego_data$edges
-      
-      # Check if tender_cat exists
-      # if ("tender_cat" %in% names(connections)) {
-      #   # Select relevant columns including tender category
-      #   connections <- connections %>%
-      #     select(from, to, tender_cat, total_contracts, total_award_amount) %>%
-      #     arrange(desc(total_award_amount))
-      # } else {
-      #   # Select relevant columns without tender category
-      #   connections <- connections %>%
-      #     select(from, to, total_contracts, total_award_amount) %>%
-      #     arrange(desc(total_award_amount))
-      #   
-      #   # placeholder column
-      #   connections$tender_cat <- "Not available"
-      # }
 
       connections$total_award_amount <- paste0("$", format(connections$total_award_amount, big.mark = ",", scientific = FALSE))
       
