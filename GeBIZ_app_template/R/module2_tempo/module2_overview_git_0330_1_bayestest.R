@@ -1,4 +1,5 @@
-# Module 2-1 
+# Module 2-1
+
 library(shiny)
 library(shinydashboard)
 library(dplyr)
@@ -7,7 +8,7 @@ library(ggplot2)
 library(scales)
 library(shinyWidgets)
 library(plotly)
-library(ggstatsplot)
+#library(ggstatsplot)
 
 
 # Load preprocessed network data
@@ -738,24 +739,20 @@ time_series_server <- function(id, data) {
     # Using tryCatch to capture any errors in plot creation
     tryCatch({
       if(input$stat_time_period == "award_year") {
-        # For year comparisons, use ggbetweenstats
-        p <- ggbetweenstats(
-          data = plot_data,
-          x = award_year,
-          y = awarded_amt,
-          title = "Comparison of Award Amounts by Year",
-          xlab = "Year",
-          ylab = "Award Amount (S$ Billion)",
-          type = input$test_type,
-          bf.message = FALSE,
-          mean.ci = TRUE, 
-          pairwise.comparisons = TRUE, 
-          pairwise.display = "s",
-          p.adjust.method = "fdr",
-          messages = FALSE
-        ) +
-          scale_y_continuous(labels = scales::dollar_format(prefix = "S$", 
-                                                            big.mark = ","))
+        # For year comparisons, use boxplot with mean points
+        p <- ggplot(plot_data, aes(x = award_year, y = awarded_amt)) +
+          geom_boxplot(fill = "#9BB8CD", alpha = 0.7) +
+          geom_point(stat = "summary", fun = "mean", color = "red", size = 2) +
+          labs(
+            title = "Comparison of Award Amounts by Year",
+            subtitle = ifelse(input$test_type == "parametric", 
+                              "ANOVA test for mean differences", 
+                              "Kruskal-Wallis test for median differences"),
+            x = "Year",
+            y = "Award Amount (S$ Billion)"
+          ) +
+          theme_minimal() +
+          scale_y_continuous(labels = scales::dollar_format(prefix = "S$", big.mark = ","))
         
         return(p)
         
@@ -764,23 +761,19 @@ time_series_server <- function(id, data) {
         plot_data <- plot_data %>%
           mutate(quarter_only = sub(".*-(Q[1-4])", "\\1", quarter))
         
-        p <- ggbetweenstats(
-          data = plot_data,
-          x = quarter_only,
-          y = awarded_amt,
-          title = "Distribution of Award Amounts by Quarter",
-          xlab = "Quarter",
-          ylab = "Award Amount (S$ Billion)",
-          type = input$test_type,
-          bf.message = FALSE,
-          mean.ci = TRUE, 
-          pairwise.comparisons = TRUE, 
-          pairwise.display = "s",
-          p.adjust.method = "fdr",
-          messages = FALSE
-        ) +
-          scale_y_continuous(labels = scales::dollar_format(prefix = "S$", 
-                                                            big.mark = ","))
+        p <- ggplot(plot_data, aes(x = quarter_only, y = awarded_amt)) +
+          geom_boxplot(fill = "#9BB8CD", alpha = 0.7) +
+          geom_point(stat = "summary", fun = "mean", color = "red", size = 2) +
+          labs(
+            title = "Distribution of Award Amounts by Quarter",
+            subtitle = ifelse(input$test_type == "parametric", 
+                              "ANOVA test for mean differences", 
+                              "Kruskal-Wallis test for median differences"),
+            x = "Quarter",
+            y = "Award Amount (S$ Billion)"
+          ) +
+          theme_minimal() +
+          scale_y_continuous(labels = scales::dollar_format(prefix = "S$", big.mark = ","))
         
         return(p)
       }

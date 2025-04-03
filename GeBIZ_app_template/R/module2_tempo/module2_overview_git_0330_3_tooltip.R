@@ -1,4 +1,5 @@
 # Module 2-1 
+
 library(shiny)
 library(shinydashboard)
 library(dplyr)
@@ -46,12 +47,14 @@ fluidPage(
 
       # Date range filter
       dateRangeInput(ns("date_range"), "Date Range:",
-                     start = NULL,
-                     end = NULL),
+                     start = as.Date("2019-04-01"),
+                     end = as.Date("2024-03-31"),
+                     min = as.Date("2019-04-01"),
+                     max = as.Date("2024-03-31")),
       
       # Agency selection (multi-select)
       selectizeInput(ns("agency"), "Select Agency:",
-                     choices = NULL,
+                     choices = "All",
                      multiple = TRUE,
                      selected = "All"),
       
@@ -95,18 +98,23 @@ fluidPage(
         
         tabPanel("Overview", 
                  fluidRow(
-                   column(12, 
-                          div(style = "display: flex; justify-content: flex-end; margin-bottom: 15px;",
-                              prettyRadioButtons(
-                                inputId = ns("time_period"),
-                                label = "View by:",
-                                choices = c("Year" = "year", "Quarter" = "quarter", "Month" = "month"),
-                                selected = "year",
-                                inline = TRUE,
-                                status = "primary",
-                                fill = TRUE))
+
+                   column(12,
+                          div(style = "display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 15px;",
+                              h4("Procurement Trend", style = "margin: 0;"),
+                              div(
+                                prettyRadioButtons(
+                                  inputId = ns("time_period"),
+                                  label = "View by:",
+                                  choices = c("Year" = "year", "Quarter" = "quarter", "Month" = "month"),
+                                  selected = "year",
+                                  inline = TRUE,
+                                  status = "primary",
+                                  fill = TRUE)
+                              )
+                          )
                  )),
-                 plotOutput(ns("time_series_plot")),
+                 plotlyOutput(ns("time_series_plot")),
         
                  # Metrics table below the plot
                  h4("Key Metrics", style = "margin-top: 30px;"),
@@ -132,13 +140,13 @@ fluidPage(
                  fluidRow(
                    column(12, 
                           h4("Seasonal Cycle Plot"),
-                             plotlyOutput(ns("seasonal_cycle_plot"), height = "400px")
+                             plotlyOutput(ns("seasonal_cycle_plot"), height = "280px")
                           )
                              ),
                    fluidRow(
                      column(12,
                             h4("Seasonal Trends by Year"),
-                            plotlyOutput(ns("seasonal_line_plot"), height = "400px")
+                            plotlyOutput(ns("seasonal_line_plot"), height = "250px")
                             )
                  ),
                  
@@ -152,7 +160,7 @@ fluidPage(
                    )
                  )
         ),
-        tabPanel("Stats Tests",
+        tabPanel("ANOVA Test",
                  fluidRow(
                    column(12, 
                           div(style = "display: flex; justify-content: flex-end; margin-bottom: 15px;",
@@ -164,17 +172,18 @@ fluidPage(
                                 inline = TRUE,
                                 status = "primary",
                                 fill = TRUE)
-                          )),
-                   column(12,
-                          plotOutput(ns("stats_plot"), height = "600px")
+                          ))
+                 ),
+                 fluidRow(
+                   column(7,
+                          h4("One-Way ANOVA Test"),
+                          plotOutput(ns("stats_plot"))
                    ),
-                   column(12,
-                          h4("Statistical Test Results"),
+                   column(5,
+                          h4("Test Results"),
                           verbatimTextOutput(ns("stats_results"))
                    )
-                 )),
-
-        tabPanel("Agency Analysis", "Content for Tab 3")
+                 ))
       )
     )
   )
@@ -206,20 +215,28 @@ time_series_server <- function(id, data) {
       # Update date range input
       updateDateRangeInput(session, "date_range",
                            start = min(data$award_date),
-                           end = max(data$award_date))
+                           end = max(data$award_date),
+                           min = as.Date("2019-04-01"),
+                           max = as.Date("2024-03-31"))
       
       # Update agency selection
+      agency_choices <- c("All", sort(unique(data$agency)))
       updateSelectizeInput(session, "agency",
-                           choices = c("All", sort(unique(data$agency))))
+                           choices = agency_choices,
+                           selected = "All")
       
       # Update supplier selection
+      supplier_choices <- c("All", sort(unique(data$supplier_name)))
       updateSelectizeInput(session, "supplier",
-                           choices = c("All", sort(unique(data$supplier_name))))
+                           choices = supplier_choices,
+                           selected = "All")
       
       # Update tender type selection
       if("tender_detail_status" %in% names(data)) {
+        tender_choices <- c("All", sort(unique(data$tender_detail_status)))
         updateSelectizeInput(session, "tender_type",
-                             choices = c("All", sort(unique(data$tender_detail_status))))
+                             choices = tender_choices,
+                             selected = "All")
       }
       
       initial_load(TRUE)
@@ -370,13 +387,13 @@ time_series_server <- function(id, data) {
         "Average Period-over-Period Growth"
       ),
       Value = c(
-        format(round(total), big.mark = ","),
-        format(round(avg), big.mark = ","),
-        format(round(median_val), big.mark = ","),
-        paste0(max_period, " (", format(round(max_val), big.mark = ","), ")"),
-        paste0(min_period, " (", format(round(min_val), big.mark = ","), ")"),
+        paste0("S$", format(round(total), big.mark = ",")),
+        paste0("S$", format(round(avg), big.mark = ",")),  
+        paste0("S$", format(round(median_val), big.mark = ",")),
+        paste0(max_period, " (S$", format(round(max_val), big.mark = ","), ")"),
+        paste0(min_period, " (S$", format(round(min_val), big.mark = ","), ")"),
         ifelse(is.na(total_growth), "N/A", 
-               format(round(total_growth), big.mark = ",")),
+               paste0("S$", format(round(total_growth), big.mark = ","))), 
         ifelse(is.na(pct_growth), "N/A", 
                paste0(round(pct_growth, 1), "%")),
         ifelse(is.na(pop_growth), "N/A", 
@@ -504,7 +521,8 @@ time_series_server <- function(id, data) {
         strip.background = element_rect(fill = "#C4E1F6", color = "gray"),
         strip.text = element_text(face = "bold"),
         axis.title.x = element_text(size = 10),
-        axis.title.y = element_text(size = 10)
+        axis.title.y = element_text(size = 10),
+        plot.margin = margin(t = 20, r = 25, b = 20, l = 25, unit = "pt") 
       ) +
       scale_y_continuous(labels = function(x) {
         paste0(format(round(x/1e9), big.mark = ","))
@@ -538,12 +556,14 @@ time_series_server <- function(id, data) {
                                     "2022" = "#B7CADB", "2023" = "#B5828C", "2024" = "#8967B3")) +
       labs(
         x = ifelse(current_seasonal_view() == "quarter", "Quarter", "Month"),
-        y = "Total Awarded Amount (S$ Billion)",
+        y = "Total Awarded Amount \n(S$ Billion)",
         color = "Year"
       ) +
       theme_minimal() +
       theme(
-        axis.text.x = element_text(angle = 0, hjust = 0.5),
+        plot.title = element_text(size = 18, face = "bold"),
+        plot.subtitle = element_text(size = 14),
+        axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "bottom",
         legend.text = element_text(size = 7),    
         legend.title = element_text(size = 10),
@@ -554,7 +574,8 @@ time_series_server <- function(id, data) {
     # ggplotly
     ggplotly(p, tooltip = "text") %>%
       layout(
-        hoverlabel = list(bgcolor = "white")
+        hoverlabel = list(bgcolor = "white"),
+        margin = list(l = 80, r = 50, b = 80, t = 50, pad = 4)
       )
   })
   
@@ -602,26 +623,90 @@ time_series_server <- function(id, data) {
   
   
   # Render the time series plot
-  output$time_series_plot <- renderPlot({
+  output$time_series_plot <- renderPlotly({
     req(time_aggregated_data())
     plot_data <- time_aggregated_data()
     
-    # Create the bar chart
-    ggplot(plot_data, aes(x = time_label, y = total_awarded)) +
+    # Get the detailed data for tooltips
+    detailed_data <- filtered_data()
+    
+    # Create a data frame with tooltip information
+    tooltip_data <- plot_data %>%
+      mutate(
+        # Count agencies, suppliers, and tenders for each time period
+        agency_count = sapply(time_label, function(tl) {
+          if(current_time_period() == "year") {
+            period_data <- detailed_data %>% filter(award_year == tl)
+          } else if(current_time_period() == "quarter") {
+            period_data <- detailed_data %>% filter(quarter == tl)
+          } else { # month
+            period_data <- detailed_data %>% filter(year_month == tl)
+          }
+          return(length(unique(period_data$agency)))
+        }),
+        supplier_count = sapply(time_label, function(tl) {
+          if(current_time_period() == "year") {
+            period_data <- detailed_data %>% filter(award_year == tl)
+          } else if(current_time_period() == "quarter") {
+            period_data <- detailed_data %>% filter(quarter == tl)
+          } else { # month
+            period_data <- detailed_data %>% filter(year_month == tl)
+          }
+          return(length(unique(period_data$supplier_name)))
+        }),
+        tender_count = sapply(time_label, function(tl) {
+          if(current_time_period() == "year") {
+            period_data <- detailed_data %>% filter(award_year == tl)
+          } else if(current_time_period() == "quarter") {
+            period_data <- detailed_data %>% filter(quarter == tl)
+          } else { # month
+            period_data <- detailed_data %>% filter(year_month == tl)
+          }
+          return(nrow(period_data))
+        }),
+        # Create formatted text for tooltip
+        tooltip_text = paste0(
+          time_label, "<br>",
+          "Total Awarded: S$", format(round(total_awarded / 1e6), big.mark = ","), " Million<br>",
+          "# of Agencies: ", agency_count, "<br>",
+          "# of Suppliers: ", supplier_count, "<br>",
+          "# of Tenders: ", tender_count
+        )
+      )
+    
+# Dynamic title
+    filters <- filter_settings()
+    agency_filter <- if("All" %in% filters$agency || length(filters$agency) == 0) 
+      "All Agencies" else paste(filters$agency, collapse=", ")
+    
+# ggplot
+    p <- ggplot(tooltip_data, aes(x = time_label, y = total_awarded, 
+                                  text = tooltip_text)) +
       geom_bar(stat = "identity", fill = "#9BB8CD") +
       labs(
-        title = paste("Total Awarded Amount by", 
-                      tools::toTitleCase(input$time_period)),
+        title = paste0("Total Awarded Amount by ", 
+                       tools::toTitleCase(current_time_period())),
+        subtitle = paste0("Period: ", format(filters$date_range[1], "%b %Y"), 
+                          " to ", format(filters$date_range[2], "%b %Y")),
         x = tools::toTitleCase(current_time_period()),
         y = "Total Awarded Amount (S$ Billion)"
       ) +
       theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1),
-            axis.title.x = element_text(size = 10),
-            axis.title.y = element_text(size = 10)) +
+      theme(
+        plot.title = element_text(size = 10, face = "bold", color = "#51829B"),
+        plot.subtitle = element_text(size = 12),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        plot.margin = margin(t = 20, r = 25, b = 20, l = 25, unit = "pt") 
+      ) +
       scale_y_continuous(labels = function(x) {
         paste0("$", format(x / 1e9, digits = 1, nsmall = 1))
       })
+    
+    # Convert to plotly with custom tooltip
+    ggplotly(p, tooltip = "text") %>%
+      layout(hoverlabel = list(bgcolor = "white"))
   })
   
   # Force an initial update when the module loads
@@ -755,7 +840,8 @@ time_series_server <- function(id, data) {
           messages = FALSE
         ) +
           scale_y_continuous(labels = scales::dollar_format(prefix = "S$", 
-                                                            big.mark = ","))
+                                                            big.mark = ",")) +
+          theme(plot.margin = margin(t = 20, r = 25, b = 20, l = 25, unit = "pt"))
         
         return(p)
         
@@ -780,7 +866,8 @@ time_series_server <- function(id, data) {
           messages = FALSE
         ) +
           scale_y_continuous(labels = scales::dollar_format(prefix = "S$", 
-                                                            big.mark = ","))
+                                                            big.mark = ",")) +
+          theme(plot.margin = margin(t = 20, r = 25, b = 20, l = 25, unit = "pt"))
         
         return(p)
       }

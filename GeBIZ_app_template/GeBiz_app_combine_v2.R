@@ -16,12 +16,16 @@ source("global.R")
 # add more source (modules here)
 #-----------------------------------------------------
 # Source module file
-
+source("R/module1_tender/mod_text_data_ui.R")
+source("R/module1_tender/mod_text_data_server.R")
+source("R/module1_tender/mod_lda_supervised_ui.R")
+source("R/module1_tender/mod_lda_supervised_server.R")
+source("R/module1_tender/mod_lda_clustering_ui.R")
+source("R/module1_tender/mod_lda_clustering_server.R")
 source("R/module2_tempo/module2_overview_git_0330_3_tooltip.R")
 source("R/module2_tempo/module2_agency_git.R")
 source("R/module3_network/module3-1_network_overview_git_0330_1_nodeshape.R")
 source("R/module3_network/module3-2_community_git_0329_3.R")
-
 
 #-----------------------------------------------------
 # This is the app UI
@@ -37,7 +41,7 @@ ui <- dashboardPage(
       id = "sidebar",
       menuItem("Tender Analysis", icon = icon("search"),
                menuSubItem("Data Sampling", tabName = "data_sampling"),
-               menuSubItem("LDA Supervised", tabName = "lda_supervised"),
+               menuSubItem("LDA Supervised ML", tabName = "lda_supervised"),
                menuSubItem("LDA Clustering", tabName = "lda_clustering"),
                menuSubItem("Market Insights", tabName = "market_analysis")
                ),
@@ -148,93 +152,22 @@ ui <- dashboardPage(
 # Each tanItem() is a module that we develop, whether we categorise it as main or sub-module.
 #-----------------------------------------------------
     tabItems(
-#-------------      
-# Module 1-1 tab
-#-------------
-      tabItem(tabName = "supervised_learning",
-              # Flexbox container for layout
-              div(class = "tab-content",
-                  # Control section (left)
-                  div(class = "control-section",
-                      div(class = "control-panel",
-                          h3("Dashboard Controls"),
-                          dateRangeInput("date_range", "Date range:",
-                                         start = Sys.Date() - 30, end = Sys.Date()),
-                          selectInput("dashboard_metric", "Metric:", 
-                                      choices = c("Visitors", "Revenue", "Conversions")),
-                          actionButton("refresh", "Refresh Data", class = "btn-primary")
-                      )
-                  ),
-                  
-                  # Content section (right)
-                  div(class = "content-section",
-                      h2("Dashboard"),
-                      box(
-                        title = "Overview", status = "primary", solidHeader = TRUE,
-                        width = NULL,
-                        "Dashboard content goes here"
-                      ),
-                      fluidRow(
-                        infoBox(
-                          title = "Visitors", value = "10,521", subtitle = "Total",
-                          icon = icon("users"), color = "light-blue", width = 4
-                        ),
-                        infoBox(
-                          title = "Revenue", value = "$45,820", subtitle = "Total",
-                          icon = icon("dollar-sign"), color = "light-blue", width = 4
-                        ),
-                        infoBox(
-                          title = "Conversions", value = "521", subtitle = "Total",
-                          icon = icon("shopping-cart"), color = "light-blue", width = 4
-                        )
-                      )
-                  )
-          )
-),
-
-#-------------      
-# Module 1-2 tab
-#-------------
-              tabItem(tabName = "unsupervised_learning",
-              # Flexbox container for layout
-              div(class = "tab-content",
-                  # Control section (left)
-                  div(class = "control-section",
-                      div(class = "control-panel",
-                          h3("Dashboard Controls"),
-                          dateRangeInput("date_range_ul", "Date range:",
-                                         start = Sys.Date() - 30, end = Sys.Date()),
-                          selectInput("dashboard_metric_ul", "Metric:", 
-                                      choices = c("Visitors", "Revenue", "Conversions")),
-                          actionButton("refresh_ul", "Refresh Data", class = "btn-primary")
-                      )
-                  ),
-                  
-                  # Content section (right)
-                  div(class = "content-section",
-                      h2("Unsupervised Learning Dashboard"),
-                      box(
-                        title = "Overview", status = "primary", solidHeader = TRUE,
-                        width = NULL,
-                        "Dashboard content goes here"
-                      ),
-                      fluidRow(
-                        infoBox(
-                          title = "Visitors", value = "10,521", subtitle = "Total",
-                          icon = icon("users"), color = "light-blue", width = 4
-                        ),
-                        infoBox(
-                          title = "Revenue", value = "$45,820", subtitle = "Total",
-                          icon = icon("dollar-sign"), color = "light-blue", width = 4
-                        ),
-                        infoBox(
-                          title = "Conversions", value = "521", subtitle = "Total",
-                          icon = icon("shopping-cart"), color = "light-blue", width = 4
-                        )
-                      )
-                  )
-              )
-              
+      #-------------      
+      # Module 1-1 tab
+      #-------------
+      tabItem(tabName = "data_sampling",
+              mod_text_data_ui("data_sampling_module")
+      ),
+      
+      #-------------      
+      # Module 1-2 tab
+      #-------------
+      tabItem(tabName = "lda_supervised",
+              mod_lda_supervised_ui("lda_supervised_module")
+      ),
+      
+      tabItem(tabName = "lda_clustering",
+              mod_lda_clustering_ui("lda_clustering_module")
       ),
 
 #------------------------------
@@ -339,6 +272,19 @@ tabItem(tabName = "introduction",
 # Server
 #-------------------------
 server <- function(input, output, session) {
+  selected_data <- reactiveVal(NULL)
+  # Shared reactive values
+  selected_data <- reactiveVal(NULL)
+  lda_results <- reactiveVal(NULL)
+  default_stopwords <- c(stopwords("en"), "please", "refer", "another", "one", "two", "three", 
+                         "framework", "edition", "related", "whole", "period", "government", 
+                         "entities", "various", "including", "requirement", "provide", "supply", 
+                         "service", "procurement", "year", "option", "extend", "agreement", 
+                         "singapore", "Singapore")
+  current_stopwords <- reactiveVal(default_stopwords)
+  
+  # Load cleaned LDA dataset for sampling
+  Cleaned_GP_LDA <- readr::read_csv("data/Cleaned_GP_LDA.csv")
 
   # Load time series data
   ts_overview_data <- read_csv("data/GeBiz_add_y_m.csv")
@@ -366,6 +312,28 @@ server <- function(input, output, session) {
     
     p
   })
+  
+  #Initialise data sampling module server
+  mod_text_data_server(
+    id = "data_sampling_module",
+    selected_data = selected_data,
+    current_stopwords = current_stopwords,
+    Cleaned_GP_LDA = readr::read_csv("data/Cleaned_GP_LDA.csv")
+  )
+  
+  # Initiate LDA sup learning server
+  mod_lda_supervised_server(
+    id = "lda_supervised_module",
+    selected_data = selected_data,
+    lda_results = lda_results,
+    current_stopwords = current_stopwords
+  )
+  
+  # Initiate LDA clustering
+  mod_lda_clustering_server(
+    id = "lda_clustering_module",
+    selected_data = selected_data
+  )
   
   # Initialise time series module server
   time_series_server("timeSeries", ts_overview_data)

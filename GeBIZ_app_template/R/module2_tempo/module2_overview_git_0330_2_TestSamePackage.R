@@ -1,4 +1,7 @@
 # Module 2-1 
+if (!requireNamespace("bayestestR", quietly = TRUE)) {
+  install.packages("bayestestR", version = "0.12.0", repos = "http://cran.rstudio.com")
+}
 library(shiny)
 library(shinydashboard)
 library(dplyr)
@@ -106,6 +109,7 @@ fluidPage(
                                 status = "primary",
                                 fill = TRUE))
                  )),
+                 h4("Procurement Trend", style = "margin-top: 20px;"),
                  plotOutput(ns("time_series_plot")),
         
                  # Metrics table below the plot
@@ -132,13 +136,13 @@ fluidPage(
                  fluidRow(
                    column(12, 
                           h4("Seasonal Cycle Plot"),
-                             plotlyOutput(ns("seasonal_cycle_plot"), height = "400px")
+                             plotlyOutput(ns("seasonal_cycle_plot"), height = "280px")
                           )
                              ),
                    fluidRow(
                      column(12,
                             h4("Seasonal Trends by Year"),
-                            plotlyOutput(ns("seasonal_line_plot"), height = "400px")
+                            plotlyOutput(ns("seasonal_line_plot"), height = "250px")
                             )
                  ),
                  
@@ -543,12 +547,15 @@ time_series_server <- function(id, data) {
       ) +
       theme_minimal() +
       theme(
-        axis.text.x = element_text(angle = 0, hjust = 0.5),
+        plot.title = element_text(size = 18, face = "bold"),
+        plot.subtitle = element_text(size = 14),
+        axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "bottom",
         legend.text = element_text(size = 7),    
         legend.title = element_text(size = 10),
-        axis.title.x = element_text(size = 10),
-        axis.title.y = element_text(size = 10)
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt")
       )
     
     # ggplotly
