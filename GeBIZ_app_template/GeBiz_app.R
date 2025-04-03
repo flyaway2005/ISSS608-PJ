@@ -35,15 +35,15 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       id = "sidebar",
-      menuItem("Introduction", tabName = "introduction", icon = icon("file")),
-      menuItem("Procurement Analyser", tabName = "dashboard", icon = icon("table"),
-               menuSubItem("Supervised Learning", tabName = "supervised_learning"),
-               
-               menuSubItem("Unsupervised Learning", tabName = "unsupervised_learning")),
-      menuItem("Budget Flow", tabName = "temo_analysis", icon = icon("dashboard"),
+      menuItem("Tender Analysis", icon = icon("search"),
+               menuSubItem("Data Sampling", tabName = "data_sampling"),
+               menuSubItem("LDA Supervised", tabName = "lda_supervised"),
+               menuSubItem("LDA Clustering", tabName = "lda_clustering"),
+               menuSubItem("Market Insights", tabName = "market_analysis")
+               ),
+      menuItem("Procurement Trends", tabName = "temo_analysis", icon = icon("dashboard"),
                menuSubItem("Time Series", tabName = "time_series"),
-               menuSubItem("Agency Explorer", tabName = "agency_analysis"),
-               menuSubItem("Supplier Markets", tabName = "supplier_analysis")),
+               menuSubItem("Agency Explorer", tabName = "agency_analysis")),
       menuItem("Network Insights", tabName = "network_insights", icon = icon("project-diagram"),
                menuSubItem("Network Overview", tabName = "network"),
                menuSubItem("Community Detection", tabName = "community"))

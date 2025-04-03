@@ -989,8 +989,7 @@ network_analysis_server <- function(id, data = NULL) {
           arrange(desc(total_award_amount)) %>%
           slice_head(n = input$max_edges)
       }
-      
-      
+           
       # Get connected nodes
       connected_nodes <- unique(c(edges$agency, edges$supplier_name))
       nodes <- nodes %>%
