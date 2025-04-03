@@ -1048,7 +1048,7 @@ server <- function(input, output, session) {
       # Check if LDA has been run
       if (is.null(lda_results())) {
         showNotification(
-          "Please run LDA analysis first",
+          "Please select data andrun LDA analysis first",
           type = "warning"
         )
         return(NULL)
