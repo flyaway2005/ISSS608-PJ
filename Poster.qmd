@@ -1,8 +1,7 @@
 ---
 title: "Project Poster"
 format:
-  html:
-    lightbox: true
+  html
 ---
 
-![Image](images/ISSS608_AY2024-25Jan_Group04.jpg){fig-cap="Click to enlarge" fig-align="center"}
+![](images/ISSS608_AY2024-25Jan_Group04.jpg)

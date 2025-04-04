@@ -151,6 +151,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
     </ul>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../Poster.html"> 
+<span class="menu-text">Poster</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-meetings" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Meetings</span>
@@ -440,8 +444,8 @@ dbl (1): awarded_amt
 <span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
 <span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="grViz html-widget html-fill-item" id="htmlwidget-50534999888b628860d5" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-50534999888b628860d5">{"x":{"diagram":"\ndigraph LDA_Preparation {\n  graph [layout = dot, rankdir = TB]\n  node [shape = rect, style = filled, color = gray90, fontname = Helvetica]\n\n  Start [shape = circle, label = \"\", width = 0.3, color = black, fillcolor = black]\n  End [shape = circle, label = \"\", width = 0.3, color = black, fillcolor = black]\n\n  Start -> A1\n  A1 [label = \"Load raw data (CSV)\"]\n  A1 -> A2\n  A2 [label = \"Inspect structure using glimpse()\"]\n  A2 -> A3\n  A3 [label = \"Filter for awarded tenders only\"]\n  A3 -> A4\n  A4 [label = \"Lowercase tender_description\"]\n  A4 -> A5\n  A5 [label = \"Group by tender_no and check distinct descriptions\"]\n  A5 -> A6\n  A6 [label = \"Filter for distinct tender no. and tender description\"]\n  A6 -> A7\n  A7 [label = \"Clean special characters, symbols, punctuation\"]\n  A7 -> A8\n  A8 [label = \"Remove stop words and unnecessary text\"]\n  A8 -> A9\n  A9 [label = \"Tokenize and lemmatize description\"]\n  A9 -> A10\n  A10 [label = \"Recombine cleaned words into final string\"]\n  A10 -> A11\n  A11 [label = \"Write cleaned data to Cleaned_GP_LDA.csv\"]\n  A11 -> End\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-c68f45d524b2dcc0933c" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-c68f45d524b2dcc0933c">{"x":{"diagram":"\ndigraph LDA_Preparation {\n  graph [layout = dot, rankdir = TB]\n  node [shape = rect, style = filled, color = gray90, fontname = Helvetica]\n\n  Start [shape = circle, label = \"\", width = 0.3, color = black, fillcolor = black]\n  End [shape = circle, label = \"\", width = 0.3, color = black, fillcolor = black]\n\n  Start -> A1\n  A1 [label = \"Load raw data (CSV)\"]\n  A1 -> A2\n  A2 [label = \"Inspect structure using glimpse()\"]\n  A2 -> A3\n  A3 [label = \"Filter for awarded tenders only\"]\n  A3 -> A4\n  A4 [label = \"Lowercase tender_description\"]\n  A4 -> A5\n  A5 [label = \"Group by tender_no and check distinct descriptions\"]\n  A5 -> A6\n  A6 [label = \"Filter for distinct tender no. and tender description\"]\n  A6 -> A7\n  A7 [label = \"Clean special characters, symbols, punctuation\"]\n  A7 -> A8\n  A8 [label = \"Remove stop words and unnecessary text\"]\n  A8 -> A9\n  A9 [label = \"Tokenize and lemmatize description\"]\n  A9 -> A10\n  A10 [label = \"Recombine cleaned words into final string\"]\n  A10 -> A11\n  A11 [label = \"Write cleaned data to Cleaned_GP_LDA.csv\"]\n  A11 -> End\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 
