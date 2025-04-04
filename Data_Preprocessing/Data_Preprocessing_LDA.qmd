@@ -235,6 +235,6 @@ print(paste("After cleaning, remaining rows:", nrow(Cleaned_GP_LDA)))
 head(Cleaned_GP_LDA)
 ```
 
-### Data Preprocessing for LDA Topic Modeling Flow
+### Data Preparation for LDA Topic Modeling Flow
 
-![](images/paste-1.png)
+![](/images/flowchat_datapreparationforLDA.png)
