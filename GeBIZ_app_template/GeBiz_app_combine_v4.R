@@ -1,3 +1,5 @@
+# working well - only
+
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
@@ -8,6 +10,13 @@ library(DT)
 library(visNetwork)
 library(RColorBrewer)
 library(widyr)
+library(stopwords)
+library(topicmodels)
+library(tm)
+library(lubridate)
+library(text2vec)
+library(wordcloud)
+library(tidytext)
 
 
 # Load global settings and functions
@@ -26,10 +35,12 @@ source("R/module1_tender/mod_lda_clustering_server.R")
 source("R/module1_tender/mod_market_analysis_ui.R")
 source("R/module1_tender/mod_market_analysis_server.R")
 
-source("R/module2_tempo/module2_overview_git_0330_3_tooltip.R")
-source("R/module2_tempo/module2_agency_git.R")
-source("R/module3_network/module3-1_network_overview_git_0330_1_nodeshape.R")
-source("R/module3_network/module3-2_community_git_0329_3.R")
+source("R/module2_tempo/module2_overview_0404_1.R")
+#source("R/module2_tempo/module2_agency_git.R")
+source("R/module3_network/mod_network_overview_ui.R")
+source("R/module3_network/mod_network_overview_server_v3.R")
+
+source("R/module3_network/module3-2_community_0404_1.R")
 
 #-----------------------------------------------------
 # This is the app UI
@@ -51,8 +62,8 @@ ui <- dashboardPage(
                menuSubItem("Market Insights", tabName = "market_analysis")
                ),
       menuItem("Procurement Trends", tabName = "temo_analysis", icon = icon("dashboard"),
-               menuSubItem("Time Series", tabName = "time_series"),
-               menuSubItem("Agency Explorer", tabName = "agency_analysis")),
+               menuSubItem("Time Series", tabName = "time_series")),
+               #menuSubItem("Agency Explorer", tabName = "agency_analysis")),
       menuItem("Network Insights", tabName = "network_insights", icon = icon("project-diagram"),
                menuSubItem("Network Overview", tabName = "network"),
                menuSubItem("Community Detection", tabName = "community"))
@@ -215,7 +226,7 @@ tabItem(tabName = "time_series",
                       box(
                         plotOutput("plot"), 
                         width = NULL,
-                        title = "Data Visualization"
+                        title = "Data Visualisation"
                       ),
                       fluidRow(
                         valueBox(
@@ -377,5 +388,7 @@ server <- function(input, output, session) {
     round(sd(plot_data()[[input$var]]), 2)
   })
 }
+
+
 
 shinyApp(ui, server)

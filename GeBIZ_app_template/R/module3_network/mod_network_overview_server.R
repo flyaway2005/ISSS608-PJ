@@ -1,433 +1,39 @@
-### this version not working
-
-# app.R
-library(shiny)
-library(shinydashboard)
-library(dplyr)
-library(visNetwork)
-library(igraph)
-library(scales)
-library(DT)
-
-# Load preprocessed network data
-#network_data <- readRDS("data/m3_processed_network_data.rds")
-
-
-#-----------------------------
-# Network Analysis UI Module
-#-----------------------------
-network_analysis_ui <- function(id) {
-  ns <- NS(id)
-  
-  fluidPage(
-    # Use sidebarLayout to organize components
-    sidebarLayout(
-      # Left sidebar for controls
-      sidebarPanel(
-        h4("Control Panel", style = "margin-top: 5px; margin-bottom: 10px;"),
-        
-        # Collapsible panels for organization
-        div(class = "panel-group", id = ns("accordion"), role = "tablist", 
-            # Date range filter panel
-            div(class = "panel panel-default",
-                div(class = "panel-heading", role = "tab", id = ns("headingOne"),
-                    h5(class = "panel-title",
-                       tags$a(
-                         "Date Range Filter",
-                         style = "text-decoration: none; display: block;",
-                         `data-toggle` = "collapse",
-                         `data-parent` = "#accordion",
-                         href = paste0("#", ns("collapseOne"))
-                       )
-                    )
-                ),
-                div(id = ns("collapseOne"), class = "panel-collapse collapse in", role = "tabpanel",
-                    div(class = "panel-body", style = "padding: 5px;",
-                        # Start date - more compact layout
-                        fluidRow(style = "margin: 0px;",
-                                 column(2, h6("Start", style = "margin-top: 7px; text-align: right; font-size: 12px;")),
-                                 column(5, style = "padding: 0px 5px;",
-                                        selectInput(ns("start_year"), "Year", 
-                                                    choices = c("2019", "2020", "2021", "2022", "2023", "2024"),
-                                                    selected = "2019",
-                                                    width = "100%"
-                                        )
-                                 ),
-                                 column(5, style = "padding: 0px 5px;",
-                                        selectInput(ns("start_month"), "Month",
-                                                    choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
-                                                                "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
-                                                    selected = 1,
-                                                    width = "100%"
-                                        )
-                                 )
-                        ),
-                        # End date - more compact
-                        fluidRow(style = "margin: 0px;",
-                                 column(2, h6("End", style = "margin-top: 7px; text-align: right; font-size: 12px;")),
-                                 column(5, style = "padding: 0px 5px;",
-                                        selectInput(ns("end_year"), "", 
-                                                    choices = c("2019", "2020", "2021", "2022", "2023", "2024"),
-                                                    selected = "2024",
-                                                    width = "100%"
-                                        )
-                                 ),
-                                 column(5, style = "padding: 0px 5px;",
-                                        selectInput(ns("end_month"), "",
-                                                    choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
-                                                                "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
-                                                    selected = 12,
-                                                    width = "100%"
-                                        )
-                                 )
-                        )
-                    )
-                )
-            ),
-            
-            # Filters panel
-            div(class = "panel panel-default",
-                div(class = "panel-heading", role = "tab", id = ns("headingTwo"),
-                    h5(class = "panel-title",
-                       tags$a(
-                         "Filter Data Range",
-                         style = "text-decoration: none; display: block;",
-                         `data-toggle` = "collapse",
-                         `data-parent` = "#accordion",
-                         href = paste0("#", ns("collapseTwo"))
-                       )
-                    )
-                ),
-                div(id = ns("collapseTwo"), class = "panel-collapse collapse", role = "tabpanel",
-                    div(class = "panel-body", style = "padding: 5px;",
-                        # Agency Type filter
-                        div(style = "margin-bottom: 8px;",
-                            selectizeInput(ns("agency_type_filter"), "Agency Types", 
-                                           choices = NULL,
-                                           multiple = TRUE,
-                                           options = list(
-                                             placeholder = 'Select agency types',
-                                             plugins = list('remove_button')
-                                           ))
-                        ),
-                        
-                        # Agency filter
-                        div(style = "margin-bottom: 8px;",
-                            selectizeInput(ns("agency_filter"), "Agencies", 
-                                           choices = NULL,
-                                           multiple = TRUE,
-                                           options = list(
-                                             placeholder = 'Select agencies',
-                                             plugins = list('remove_button')
-                                           ))
-                        ),
-                        
-                        # Supplier filter
-                        div(style = "margin-bottom: 8px;",
-                            selectizeInput(ns("supplier_filter"), "Suppliers", 
-                                           choices = NULL,
-                                           multiple = TRUE,
-                                           options = list(
-                                             placeholder = 'Select suppliers',
-                                             plugins = list('remove_button')
-                                           ))
-                        ),
-                        
-                        # Tender Category filter
-                        div(style = "margin-bottom: 8px;",
-                            selectizeInput(ns("tender_cat_filter"), "Tender Categories", 
-                                           choices = NULL,
-                                           multiple = TRUE,
-                                           options = list(
-                                             placeholder = 'Select tender categories',
-                                             plugins = list('remove_button')
-                                           ))
-                        ),
-                        
-                        # Award amount range
-                        div(style = "margin-bottom: 8px;",
-                            sliderInput(ns("award_amount_range"), "Award Amount Range",
-                                        min = 0, 
-                                        max = 1,  
-                                        value = c(0, 1),
-                                        step = 1)
-                        ),
-                        
-                        # Min-Max inputs in a more compact layout
-                        fluidRow(style = "margin: -15px 0px 10px 0px;",
-                                 column(6, style = "padding: 0 5px 0 15px;",
-                                        numericInput(ns("min_award_manual"), NULL, 
-                                                     value = 100000,
-                                                     min = 0,
-                                                     max = 1500000000)
-                                 ),
-                                 column(6, style = "padding: 0 15px 0 5px;",
-                                        numericInput(ns("max_award_manual"), NULL, 
-                                                     value = 1000000,
-                                                     min = 0,
-                                                     max = 1500000000)
-                                 )
-                        ),
-                        fluidRow(style = "margin: -15px 0px 0px 0px;",
-                                 column(6, style = "text-align: center;", 
-                                        tags$small("Min", style = "font-size: 10px;")),
-                                 column(6, style = "text-align: center;", 
-                                        tags$small("Max", style = "font-size: 10px;"))
-                        )
-                    )
-                )
-            ),
-            
-            # Network Options panel
-            div(class = "panel panel-default",
-                div(class = "panel-heading", role = "tab", id = ns("headingThree"),
-                    h5(class = "panel-title",
-                       tags$a(
-                         "Network Options",
-                         style = "text-decoration: none; display: block;",
-                         `data-toggle` = "collapse",
-                         `data-parent` = "#accordion",
-                         href = paste0("#", ns("collapseThree"))
-                       )
-                    )
-                ),
-                div(id = ns("collapseThree"), class = "panel-collapse collapse", role = "tabpanel",
-                    div(class = "panel-body", style = "padding: 5px;",
-                        # Maximum edges
-                        div(style = "margin-bottom: 8px;",
-                            sliderInput(ns("max_edges"), "Maximum Edges",
-                                        min = 10, 
-                                        max = 10000,
-                                        value = 500,
-                                        step = 10)
-                        ),
-                        
-                        # Edge metric - more compact
-                        div(style = "margin-bottom: 8px;",
-                            radioButtons(ns("edge_metric"), "Edge Thickness Based On",
-                                         choices = c("Award Amount" = "total_award_amount", 
-                                                     "Contract Count" = "total_contracts"),
-                                         inline = TRUE)
-                        ),
-                        
-                        # Layout algorithm
-                        div(style = "margin-bottom: 8px;",
-                            selectInput(ns("layout_type"), "Network Layout",
-                                        choices = c("Force-Directed" = "force", 
-                                                    "Repulsion" = "repulsion",
-                                                    "Barnes-Hut" = "barnesHut"),
-                                        selected = "force")
-                        ),
-                        
-                        # Checkboxes in a single row
-                        fluidRow(style = "margin-bottom: 8px;",
-                                 column(6, style = "padding-right: 0px; padding-left: 20px;",
-                                        checkboxInput(ns("size_by_degree"), "Size by Degree", TRUE)
-                                 ),
-                                 column(6, style = "padding-right: 5px; padding-left: 2px;",
-                                        checkboxInput(ns("performance_mode"), "Performance Mode", TRUE)
-                                 )
-                        )
-                    )
-                )
-            )
-        ),
-        
-        # Fixed-position update button
-        div(style = "position: sticky; bottom: 10px; margin-top: 10px;",
-            actionButton(ns("update_network"), "Update Plot", 
-                         class = "btn-primary", 
-                         width = "100%")
-        ),
-        
-        width = 4  
-      ),
-      #----------------------------------
-      # Main panel for visualizations
-      #----------------------------------
-      mainPanel(  
-        width = 8,
-        tabsetPanel(
-          id = ns("network_tabs"),
-          
-          # Tab 1: Main Network Visualization
-          tabPanel(
-            title = "Network Overview",
-           # Main Network Visualization - Full Width
-            fluidRow(
-              column(
-                width = 12,
-                box(
-                  title = "Network Visualization",
-                  width = NULL,
-                  solidHeader = TRUE,
-                  status = "primary",
-                  visNetworkOutput(ns("network_plot"), height = "400px")
-                )
-              )
-            ),
-          #  Network Summary - Full Width
-            fluidRow(
-              column(
-                width = 12,
-                box(
-                  title = "Network Summary",
-                  width = NULL,
-                  solidHeader = TRUE,
-                  status = "info",
-                  verbatimTextOutput(ns("network_summary"))
-                )
-              )
-            )
-          ),
-          # NEW TAB 2: Network Metrics
-          tabPanel(
-            title = "Network Metrics",
-            # fluidRow(
-            #   column(
-            #     width = 12,
-            #     box(
-            #       title = "Network Summary",
-            #       width = NULL,
-            #       solidHeader = TRUE,
-            #       status = "info",
-            #       verbatimTextOutput(ns("network_summary"))
-            #     )
-            #   )
-            # ),
-            fluidRow(
-              column(
-                width = 12,
-                # Tabbed box for detailed metrics
-                tabBox(
-                  title = "Network Details",
-                  width = NULL,
-                  tabPanel(
-                    title = "Agencies",
-                    DTOutput(ns("agency_table"))
-                  ),
-                  tabPanel(
-                    title = "Suppliers",
-                    DTOutput(ns("supplier_table"))
-                  ),
-                  tabPanel(
-                    title = "Top Contracts",
-                    DTOutput(ns("contract_table"))
-                  )
-                )
-              )
-            )
-          ),
-        # Tab 3: Ego-centric
-        tabPanel(
-          title = "Ego Network",
-          tabPanel(
-            title = "Ego Network",
-            # First row: Ego Network Visualization
-            fluidRow(
-              column(
-                width = 12,  
-                box(
-                  title = "Ego Network",
-                  width = NULL,
-                  solidHeader = TRUE,
-                  visNetworkOutput(ns("ego_network_plot"), height = "390px")
-                )
-              )
-            ),
-            # Second row: Key Metrics
-            fluidRow(
-              column(
-                width = 12, 
-                box(
-                  title = "Ego Network Metrics",
-                  width = NULL,
-                  solidHeader = TRUE,
-                  status = "info",
-                  verbatimTextOutput(ns("ego_metrics"))
-                )
-              )
-            ),
-
-            # When no node is selected
-            uiOutput(ns("no_node_selected_message"))
-          )),
-        
-        # NEW TAB 4: Ego Network Metrics
-        tabPanel(
-          title = "Ego Metrics",
-          # fluidRow(
-          #   column(
-          #     width = 12, 
-          #     box(
-          #       title = "Ego Network Metrics",
-          #       width = NULL,
-          #       solidHeader = TRUE,
-          #       status = "info",
-          #       verbatimTextOutput(ns("ego_metrics"))
-          #     )
-          #   )
-          # ),
-          fluidRow(
-            column(
-              width = 12,
-              # Tabbed box for detailed ego metrics
-              tabBox(
-                title = "Ego Network Details",
-                width = NULL,
-                tabPanel(
-                  title = "Ego Agencies",
-                  DTOutput(ns("ego_agency_table"))
-                ),
-                tabPanel(
-                  title = "Ego Suppliers",
-                  DTOutput(ns("ego_supplier_table"))
-                ),
-                tabPanel(
-                  title = "Connections",
-                  DTOutput(ns("ego_connection_table"))
-                )
-              )
-            )
-          ),
-          # When no node is selected for ego metrics
-          uiOutput(ns("no_node_selected_metrics_message"))
-        )
-        )
-      )
-    )
-  )
-}
-  
 #--------------------------------
 # Network Analysis Server Module
 #--------------------------------
+
 network_analysis_server <- function(id, data = NULL) {
   moduleServer(id, function(input, output, session) {
-    # Create a reactive to store the data
+
+    #<---start    
+    raw_data <- readRDS("data/m3_processed_network_data.rds")
+    str(raw_data)
+    print("==== Contents of raw_data ====")
+    print(names(raw_data))
+    
+    # Create reactive list
     network_data <- reactive({
-      if (is.null(data)) {
-        # Load data from file as fallback
-        readRDS("data/m3_processed_network_data.rds")
-      } else if (is.reactive(data)) {
-        # Use the passed data parameter
-        data()
-      } else{
-        data
-      }
+      list(
+        edges = raw_data$monthly_edges,        
+        monthly_edges = raw_data$monthly_edges,
+        nodes = raw_data$nodes_df,
+        months = raw_data$months,
+        agency_types = raw_data$agency_types,
+        time_info = raw_data$time_info
+      )
     })
     
     #debug
     selected_node_tracker <- reactiveVal(NULL)
     
-    # Create reactive values to store visualization data at module level
+    # Create reactive values to store visualisation data at module level
     network_vis_data <- reactiveVal(NULL)
     
     # Create a reactive value to store filtered agencies
     filtered_agencies <- reactiveVal(NULL)
-
-#-----
-# Debug    
+    
+    #-----
+    # Debug    
     observe({
       req(network_data())
       
@@ -571,10 +177,10 @@ network_analysis_server <- function(id, data = NULL) {
         )
       }
     })
-
-#----------------------------------------------------------------        
+    
+    #----------------------------------------------------------------        
     # Observe agency type filter changes and update the filtered agencies list
-#----------------------------------------------------------------      
+    #----------------------------------------------------------------      
     observeEvent(input$agency_type_filter, {
       # Debug
       print("Selected agency types:")
@@ -591,6 +197,7 @@ network_analysis_server <- function(id, data = NULL) {
         
         # Check if there's a mapping in the nodes dataframe
         if ("agency_type" %in% names(network_data()$nodes)) {
+          
           # Filter nodes by agency type
           filtered_nodes <- network_data()$nodes %>%
             filter(tolower(agency_type) %in% tolower(input$agency_type_filter))
@@ -671,46 +278,50 @@ network_analysis_server <- function(id, data = NULL) {
     
     # Control date range
     observe({
-  # For Start Date - restrict months based on year
-  if (input$start_year == "2019") {
-    # If 2019 is selected, only allow April-December
-    updateSelectInput(session, "start_month",
-                     choices = c("04" = 4, "05" = 5, "06" = 6, "07" = 7, "08" = 8, 
-                                "09" = 9, "10" = 10, "11" = 11, "12" = 12),
-                     selected = ifelse(as.numeric(input$start_month) < 4, 4, input$start_month))
-  } else if (input$start_year == "2024") {
-    # If 2024 is selected, only allow January-March
-    updateSelectInput(session, "start_month",
-                     choices = c("01" = 1, "02" = 2, "03" = 3),
-                     selected = ifelse(as.numeric(input$start_month) > 3, 3, input$start_month))
-  } else {
-    # For years 2020-2023, all months are valid
-    updateSelectInput(session, "start_month",
-                     choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
-                                "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
-                     selected = input$start_month)
-  }
-  
-  # For End Date - restrict months based on year
-  if (input$end_year == "2019") {
-    # If 2019 is selected, only allow April-December
-    updateSelectInput(session, "end_month",
-                     choices = c("04" = 4, "05" = 5, "06" = 6, "07" = 7, "08" = 8, 
-                                "09" = 9, "10" = 10, "11" = 11, "12" = 12),
-                     selected = ifelse(as.numeric(input$end_month) < 4, 4, input$end_month))
-  } else if (input$end_year == "2024") {
-    # If 2024 is selected, only allow January-March
-    updateSelectInput(session, "end_month",
-                     choices = c("01" = 1, "02" = 2, "03" = 3),
-                     selected = ifelse(as.numeric(input$end_month) > 3, 3, input$end_month))
-  } else {
-    # For years 2020-2023, all months are valid
-    updateSelectInput(session, "end_month",
-                     choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
-                                "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
-                     selected = input$end_month)
-  }
-})
+      # Start Date
+      if (!is.null(input$start_year)) {
+        if (input$start_year == "2019") {
+          updateSelectInput(session, "start_month",
+                            choices = c("04" = 4, "05" = 5, "06" = 6, "07" = 7, "08" = 8, 
+                                        "09" = 9, "10" = 10, "11" = 11, "12" = 12),
+                            selected = if (!is.null(input$start_month) && as.numeric(input$start_month) < 4) 4 else input$start_month
+          )
+        } else if (input$start_year == "2024") {
+          updateSelectInput(session, "start_month",
+                            choices = c("01" = 1, "02" = 2, "03" = 3),
+                            selected = if (!is.null(input$start_month) && as.numeric(input$start_month) > 3) 3 else input$start_month
+          )
+        } else {
+          updateSelectInput(session, "start_month",
+                            choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
+                                        "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
+                            selected = input$start_month
+          )
+        }
+      }
+      
+      # End Date
+      if (!is.null(input$end_year)) {
+        if (input$end_year == "2019") {
+          updateSelectInput(session, "end_month",
+                            choices = c("04" = 4, "05" = 5, "06" = 6, "07" = 7, "08" = 8, 
+                                        "09" = 9, "10" = 10, "11" = 11, "12" = 12),
+                            selected = if (!is.null(input$end_month) && as.numeric(input$end_month) < 4) 4 else input$end_month
+          )
+        } else if (input$end_year == "2024") {
+          updateSelectInput(session, "end_month",
+                            choices = c("01" = 1, "02" = 2, "03" = 3),
+                            selected = if (!is.null(input$end_month) && as.numeric(input$end_month) > 3) 3 else input$end_month
+          )
+        } else {
+          updateSelectInput(session, "end_month",
+                            choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
+                                        "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
+                            selected = input$end_month
+          )
+        }
+      }
+    })
     
     # Populate supplier choices
     observe({
@@ -722,8 +333,8 @@ network_analysis_server <- function(id, data = NULL) {
         server = TRUE
       )
     })
-
-        
+    
+    
     # Populate tender category choices
     observe({
       if ("tender_cat" %in% names(network_data()$edges)) {
@@ -770,39 +381,24 @@ network_analysis_server <- function(id, data = NULL) {
     
     # When min manual input changes, update slider
     observeEvent(input$min_award_manual, {
-      if (!is.null(input$min_award_manual)) {
-        isolate({
-          current_range <- input$award_amount_range
-          if (input$min_award_manual != current_range[1]) {
-            # Ensure min doesn't exceed max
-            new_min <- min(input$min_award_manual, current_range[2])
-            # Only update if actually different to prevent recursion
-            if(new_min != current_range[1]) {
-              updateSliderInput(session, "award_amount_range", 
-                                value = c(new_min, current_range[2]))
-            }
-          }
-        })
+      req(!is.null(input$min_award_manual), !is.null(input$max_award_manual))  # Ensure both inputs exist
+      req(!is.na(input$min_award_manual), !is.na(input$max_award_manual))
+      
+      if (input$min_award_manual < input$max_award_manual) {
+        updateSliderInput(session, "award_amount_range",
+                          value = c(input$min_award_manual, input$max_award_manual))
       }
-    }, ignoreInit = TRUE)
+    })
     
-    # When max manual input changes, update slider
     observeEvent(input$max_award_manual, {
-      if (!is.null(input$max_award_manual)) {
-        isolate({
-          current_range <- input$award_amount_range
-          if (input$max_award_manual != current_range[2]) {
-            # Ensure max isn't less than min
-            new_max <- max(input$max_award_manual, current_range[1])
-            # Only update if actually different to prevent recursion
-            if(new_max != current_range[2]) {
-              updateSliderInput(session, "award_amount_range", 
-                                value = c(current_range[1], new_max))
-            }
-          }
-        })
+      req(!is.null(input$min_award_manual), !is.null(input$max_award_manual))  # Same check here too
+      req(!is.na(input$min_award_manual), !is.na(input$max_award_manual))
+      
+      if (input$min_award_manual < input$max_award_manual) {
+        updateSliderInput(session, "award_amount_range",
+                          value = c(input$min_award_manual, input$max_award_manual))
       }
-    }, ignoreInit = TRUE)
+    })
     
     #Observe the node click on main network
     observeEvent(input$switch_to_ego, {
@@ -813,7 +409,7 @@ network_analysis_server <- function(id, data = NULL) {
     #--------
     # Reactive filtered data
     #---------
- # debug---   
+    # debug---   
     observe({
       req(network_data())
       print("Checking data types in network_data()$edges:")
@@ -828,245 +424,82 @@ network_analysis_server <- function(id, data = NULL) {
         print(str(network_data()$monthly_edges))
       }
     })
-#---    
+    #---    
     filtered_data <- eventReactive(input$update_network, {
       tryCatch({
-        nodes <- network_data()$nodes
-        edges <- network_data()$edges  
-      
-      
-      # Month-based date range filtering
-      if (!is.null(input$start_year) && !is.null(input$start_month) && 
-          !is.null(input$end_year) && !is.null(input$end_month)) {
+        nodes_all <- network_data()$nodes          # original unfiltered node_df
+        monthly_edges <- network_data()$monthly_edges
         
-        # print("==== BEGINNING DATE RANGE FILTER DEBUGGING ====")
-        # print(paste("Start:", input$start_year, "Month:", input$start_month))
-        # print(paste("End:", input$end_year, "Month:", input$end_month))
+        # Filter by month range
+        start_idx <- as.numeric(input$start_year) * 12 + as.numeric(input$start_month)
+        end_idx   <- as.numeric(input$end_year) * 12 + as.numeric(input$end_month)
+        if (start_idx > end_idx) {
+          temp <- start_idx; start_idx <- end_idx; end_idx <- temp
+        }
         
-        if (!is.null(network_data()$monthly_edges)) {
-          print("monthly_edges data exists")
-          
-      # Ensure inputs are numeric
-      start_year <- as.numeric(input$start_year)
-      start_month <- as.numeric(input$start_month)
-      end_year <- as.numeric(input$end_year)
-      end_month <- as.numeric(input$end_month)
-          
-      # Validate inputs before calculating indices
-      if (!is.na(start_year) && !is.na(start_month) && 
-          !is.na(end_year) && !is.na(end_month)) {
-            
-      # Calculate start and end month indices
-          start_idx <- start_year * 12 + start_month
-          end_idx <- end_year * 12 + end_month
-          print(paste("Start index:", start_idx, "End index:", end_idx))
-            
-      # Ensure start isn't after end
-      if (start_idx > end_idx) {
-        temp <- start_idx
-        start_idx <- end_idx
-        end_idx <- temp
-        print("Swapped start and end indices to ensure proper order")
-            }
-            
-      # Check if month_index column exists in monthly_edges
-      if ("month_index" %in% names(network_data()$monthly_edges)) {
-        # Filter monthly edges
-        filtered_monthly_edges <- network_data()$monthly_edges %>%
+        filtered <- monthly_edges %>%
           filter(month_index >= start_idx & month_index <= end_idx)
-        print(paste("After filtering, monthly_edges has", nrow(filtered_monthly_edges), "rows"))
         
-        if (nrow(filtered_monthly_edges) > 0) {
-          
-          # Verify that total_contracts and total_award_amount columns exist
-          if (all(c("total_contracts", "total_award_amount") %in% names(filtered_monthly_edges))) {
-            monthly_filtered <- filtered_monthly_edges %>%
-              
-              print("Checking filtered_monthly_edges structure:")
-            print(names(filtered_monthly_edges))
-            print(paste("Does tender_cat exist?", "tender_cat" %in% names(filtered_monthly_edges)))
-            
-            # Then perform the operation
-            if ("tender_cat" %in% names(filtered_monthly_edges)) {
-              # If tender_cat exists, use it in the grouping
-              monthly_filtered <- filtered_monthly_edges %>%
-                group_by(agency, supplier_name, tender_cat) %>%
-                summarize(
-                  total_contracts = sum(total_contracts, na.rm = TRUE),
-                  total_award_amount = sum(total_award_amount, na.rm = TRUE),
-                  .groups = "drop"
-                )
-            } else {
-              # If tender_cat doesn't exist, group without it
-              monthly_filtered <- filtered_monthly_edges %>%
-                group_by(agency, supplier_name) %>%
-                summarize(
-                  total_contracts = sum(total_contracts, na.rm = TRUE),
-                  total_award_amount = sum(total_award_amount, na.rm = TRUE),
-                  .groups = "drop"
-                )
-              
-              # Add a temporary tender_cat column to maintain structure
-              monthly_filtered$tender_cat <- NA_character_
-            } 
-              
-            edges <- network_data()$edges %>%
-              semi_join(monthly_filtered, by = c("agency", "supplier_name", "tender_cat")) %>%
-              left_join(monthly_filtered, by = c("agency", "supplier_name", "tender_cat")) %>%
-              select(-total_contracts.x, -total_award_amount.x) %>%
-              rename(
-                total_contracts = total_contracts.y,
-                total_award_amount = total_award_amount.y
-              )
-            
-            # debug
-            print(paste("After aggregation, edges count:", nrow(edges)))
-            print(summary(edges$total_award_amount))
-            
-                } else {
-                  print("Missing required columns in monthly_edges data")
-                }
-              } else {
-                print("No monthly edges found in the selected date range")
-              }
-            } else {
-              print("month_index column missing in monthly_edges")
-            }
-          } else {
-            print("Invalid date inputs detected")
-          }
-        } else {
-          print("monthly_edges data is missing")
-        }
-      }
-
-      # Agency Type direct filtering
-      if(!("All" %in% input$agency_type_filter) && length(input$agency_type_filter) > 0) {
-        # Use the agency_types data frame to filter the edges
-        if (!is.null(network_data()$agency_types) && is.data.frame(network_data()$agency_types)) {
-          agency_col <- names(network_data()$agency_types)[1]
-          type_col <- names(network_data()$agency_types)[2]
+        print(glue::glue("After filtering by month, rows: {nrow(filtered)}"))
         
-          # Get agencies of the selected types - use proper data frame filtering
-          agencies_filtered <- network_data()$agency_types %>%
-            filter(.data[[type_col]] %in% input$agency_type_filter)
-          
-          agencies_of_type <- agencies_filtered[[agency_col]]
-          
-          # # Print debug info
-          # print("Selected agency types in filtered_data:")
-          # print(input$agency_type_filter)
-          # print("Filtered agencies in filtered_data:")
-          # print(head(agencies_of_type))
-          # print("Total agencies found in filtered_data:")
-          # print(length(agencies_of_type))
-          
-          # Filter edges to only include these agencies
-          if (length(agencies_of_type) > 0) {
-            edges <- edges %>%
-              filter(agency %in% agencies_of_type)
-            
-            print(paste("Filtered to", length(agencies_of_type), "agencies by agency type"))
-          } else {
-            # If no agencies match the selected types
-            edges <- edges[0,]
-            print("No agencies found for the selected agency types")
-          }
+        # Apply additional UI filters
+        if (!("All" %in% input$agency_type_filter)) {
+          filtered <- filtered %>% filter(agency_type %in% input$agency_type_filter)
         }
-      }      
-      print("Selected agency types:")
-      print(input$agency_type_filter)
-      
-      # Agency filtering
-      if(!("All" %in% input$agency_filter) && length(input$agency_filter) > 0) {
-        edges <- edges %>%
-          filter(agency %in% input$agency_filter)
-      }
-      
-      # Supplier filtering
-      if(!("All" %in% input$supplier_filter) && length(input$supplier_filter) > 0) {
-        edges <- edges %>%
-          filter(supplier_name %in% input$supplier_filter)
-      }
- 
-      # Tender Category filtering
-      if(!("All" %in% input$tender_cat_filter) && length(input$tender_cat_filter) > 0) {
-        if ("tender_cat" %in% names(edges)) {
-          # Create a vector to hold the filter results
-          include_rows <- logical(nrow(edges))
-          
-          # Check each row
-          for(i in 1:nrow(edges)) {
-            cat_string <- edges$tender_cat[i]
-            if (!is.na(cat_string) && cat_string != "") {
-              cat_list <- unlist(strsplit(cat_string, ", "))
-              include_rows[i] <- any(input$tender_cat_filter %in% cat_list)
-            } else {
-              include_rows[i] <- FALSE
-            }
-          }
-          
-          # Apply filter
-          edges <- edges[include_rows, ]
-          
-          print(paste("Filtered by tender categories:", 
-                      paste(input$tender_cat_filter, collapse=", ")))
-        } else {
-          print("WARNING: Could not apply tender_cat filter - column not found")
+        if (!("All" %in% input$agency_filter)) {
+          filtered <- filtered %>% filter(agency %in% input$agency_filter)
         }
-      }
-      
-      # Award amount range filtering
-      min_award <- input$award_amount_range[1]
-      max_award <- input$award_amount_range[2]
-      
-      edges <- edges %>%
-        filter(total_award_amount >= min_award & total_award_amount <= max_award)
-      
-      print("Top 10 award amounts after filtering:")
-      print(head(edges$total_award_amount, 10))
-      
-      print("Award amount summary AFTER filtering:")
-      print(summary(edges$total_award_amount))
-      
-      print("Number of edges remaining after filtering:")
-      print(nrow(edges))
-      
-      # Limit number of edges to improve performance
-      if(nrow(edges) > input$max_edges) {
-        edges <- edges %>%
-          arrange(desc(total_award_amount)) %>%
-          slice_head(n = input$max_edges)
-      }
-           
-      # Get connected nodes
-      connected_nodes <- unique(c(edges$agency, edges$supplier_name))
-      nodes <- nodes %>%
-        filter(name %in% connected_nodes)
-      
-      list(nodes = nodes, edges = edges)
-      
-    }, error = function(e) {
-      # Print the error for debugging
-      print(paste("Error in filtered_data:", e$message))
-      
-      # Return empty but valid data structure
-      return(list(
-        nodes = data.frame(
-          name = character(0),
-          type = character(0),
-          total_contracts = numeric(0),
-          total_award_amount = numeric(0)
-        ),
-        edges = data.frame(
-          agency = character(0),
-          supplier_name = character(0),
-          total_contracts = numeric(0),
-          total_award_amount = numeric(0)
-        )
-      ))
+        if (!("All" %in% input$supplier_filter)) {
+          filtered <- filtered %>% filter(supplier_name %in% input$supplier_filter)
+        }
+        if (!("All" %in% input$tender_cat_filter)) {
+          filtered <- filtered %>% filter(tender_cat %in% input$tender_cat_filter)
+        }
+        
+        # Filter by award amount
+        filtered <- filtered %>%
+          filter(total_award_amount >= input$award_amount_range[1],
+                 total_award_amount <= input$award_amount_range[2])
+        
+        print(glue::glue("Remaining after all filters: {nrow(filtered)}"))
+        #<------debug          
+        print("DEBUG: Names in filtered data:")
+        print(names(filtered))
+        #<--
+        
+        
+        # Build edge list
+        edges <- filtered %>%
+          group_by(agency, supplier_name, agency_id, supplier_id, tender_cat) %>%
+          summarise(
+            total_contracts = sum(total_contracts, na.rm = TRUE),
+            total_award_amount = sum(total_award_amount, na.rm = TRUE),
+            .groups = "drop"
+          ) %>%
+          mutate(from = agency_id, to = supplier_id) %>%
+          select(from, to, agency, supplier_name, tender_cat, total_contracts, total_award_amount)
+        
+        print(glue::glue("Final edge count: {nrow(edges)}"))
+        
+        # Get unique node IDs used in edges
+        valid_node_ids <- unique(c(edges$from, edges$to))
+        
+        # Keep only relevant nodes from node_df
+        nodes <- nodes_all %>%
+          filter(id %in% valid_node_ids)
+        
+        # Final safety check
+        if (nrow(edges) == 0 || nrow(nodes) == 0) {
+          print("WARNING: No edges or nodes left after filtering.")
+        }
+        
+        list(nodes = nodes, edges = edges)
+        
+      }, error = function(e) {
+        print(glue::glue("Error in filtered_data: {e$message}"))
+        list(nodes = data.frame(), edges = data.frame())
+      })
     })
-      }, ignoreNULL = FALSE)
     
     # Update network information
     output$network_info <- renderText({
@@ -1083,7 +516,7 @@ network_analysis_server <- function(id, data = NULL) {
       )
     })
     
-    # Prepare visualization data
+    # Prepare visualisation data
     prepare_vis_data <- reactive({
       data <- filtered_data()
       
@@ -1114,7 +547,7 @@ network_analysis_server <- function(id, data = NULL) {
           size = rescale(total_contracts, to = c(10, 30))
         )
       
-      # Prepare edges for visualization
+      # Prepare edges for visualisation
       edges_vis <- data$edges %>%
         mutate(
           from = agency,
@@ -1140,7 +573,7 @@ network_analysis_server <- function(id, data = NULL) {
     })
     
     #--------    
-    # Network Visualization - main render function
+    # Network Visualisation - main render function
     #--------
     output$network_plot <- renderVisNetwork({
       # Debug output
@@ -1157,7 +590,7 @@ network_analysis_server <- function(id, data = NULL) {
       
       vis_data <- prepare_vis_data()
       
-      print(paste("Visualization data has", 
+      print(paste("Visualisation data has", 
                   ifelse(is.null(vis_data), "0", nrow(vis_data$nodes)), "nodes and", 
                   ifelse(is.null(vis_data), "0", nrow(vis_data$edges)), "edges"))
       
@@ -1239,7 +672,7 @@ network_analysis_server <- function(id, data = NULL) {
         print("Node sizing by degree disabled - using uniform size")
       }
       
-      # Initial network visualization with base settings
+      # Initial network visualisation with base settings
       network <- visNetwork(vis_data$nodes, vis_data$edges, id = "network_plot") %>%
         visOptions(
           highlightNearest = list(enabled = TRUE, degree = 1, hover = TRUE),
@@ -1299,7 +732,7 @@ network_analysis_server <- function(id, data = NULL) {
       # Add remaining visualisation settings
       network %>%
         visNodes(
-        #  shape = "dot",
+          #  shape = "dot",
           color = list(
             background = "#666666",
             border = "#2B7CE9"
@@ -1324,9 +757,9 @@ network_analysis_server <- function(id, data = NULL) {
   }", session$ns("selected_node"), session$ns("switch_to_ego"))
         )
     })
-#-------------
-    # Ego Network Visualization
-#-------------
+    #-------------
+    # Ego Network Visualisation
+    #-------------
     
     # Ego Network
     ego_network_data <- reactive({
@@ -1342,12 +775,12 @@ network_analysis_server <- function(id, data = NULL) {
       selected_node <- input$selected_node
       print(paste("Processing ego network for node:", selected_node))
       
-      # Get the original visualization data (already prepared with from/to format)
+      # Get the original visualisation data (already prepared with from/to format)
       vis_data <- network_vis_data()
       
       # Make sure we have data to work with
       if(is.null(vis_data) || nrow(vis_data$edges) == 0) {
-        print("No visualization data available")
+        print("No visualisation data available")
         return(NULL)
       }
       
@@ -1419,7 +852,7 @@ network_analysis_server <- function(id, data = NULL) {
         mutate(
           # Mark the selected node
           is_focal = (id == selected_node),
-          # Enhanced styling for better visualization
+          # Enhanced styling for better visualisation
           color = case_when(
             is_focal ~ "#F3c623",  # Bright green for focal node
             type == "supplier" ~ "#E4003A", 
@@ -1433,7 +866,7 @@ network_analysis_server <- function(id, data = NULL) {
             TRUE ~ "dot"          
           )
         )          
-        
+      
       # Add safety check for empty results
       if(nrow(ego_nodes) == 0 || nrow(ego_edges) == 0) {
         print("No ego network data found")
@@ -1445,9 +878,9 @@ network_analysis_server <- function(id, data = NULL) {
       return(list(nodes = ego_nodes, edges = ego_edges))
     })
     
-#----
-# Network metrics tables (tab 1)
-#----    
+    #----
+    # Network metrics tables (tab 1)
+    #----    
     
     # Network Summary Statistics
     output$network_summary <- renderPrint({
@@ -1581,7 +1014,7 @@ network_analysis_server <- function(id, data = NULL) {
       req(nrow(ego_data$nodes) > 0 && nrow(ego_data$edges) > 0)
       
       print(paste("Rendering ego network with", nrow(ego_data$nodes), "nodes and", nrow(ego_data$edges), "edges"))
-
+      
       # Add degree info to tooltip if it exists
       if("degree" %in% names(ego_data$nodes)) {
         ego_data$nodes$title <- paste0(
@@ -1589,8 +1022,8 @@ network_analysis_server <- function(id, data = NULL) {
           "<br>Degree: ", ego_data$nodes$degree
         )
       }
-                  
-      # Create the visualization
+      
+      # Create the visualisation
       visNetwork(ego_data$nodes, ego_data$edges) %>%
         visEdges(
           arrows = "to",
@@ -1612,7 +1045,7 @@ network_analysis_server <- function(id, data = NULL) {
           solver = "forceAtlas2Based",
           stabilization = list(enabled = TRUE,
                                iterations = if(input$performance_mode) 100 else 1000
-                               ) 
+          ) 
         ) %>%
         visInteraction(
           navigationButtons = TRUE,
@@ -1665,10 +1098,10 @@ network_analysis_server <- function(id, data = NULL) {
       # Print the metrics in a nice format
       print(metrics_df, row.names = FALSE)
     })
-
-#----
+    
+    #----
     # Ego Network Agency Table
-#----
+    #----
     
     output$ego_agency_table <- renderDT({
       ego_data <- ego_network_data()
@@ -1783,11 +1216,11 @@ network_analysis_server <- function(id, data = NULL) {
       req(nrow(ego_data$edges) > 0)
       
       connections <- ego_data$edges
-
+      
       connections$total_award_amount <- paste0("$", format(connections$total_award_amount, big.mark = ",", scientific = FALSE))
       
       colnames(connections) <- c("From", "To", "Tender Category", "Contract Count", "Award Amount")
-
+      
       datatable(
         connections,
         options = list(
@@ -1797,7 +1230,7 @@ network_analysis_server <- function(id, data = NULL) {
         )
       )
     })
-        
+    
     output$no_node_selected_message <- renderUI({
       if(is.null(input$selected_node)) {
         div(
@@ -1808,67 +1241,8 @@ network_analysis_server <- function(id, data = NULL) {
       } else {
         return(NULL)  # Return nothing if a node is selected
       }
-    })
-})
+    })    
+    
+    #<--end
+  })
 }
-
-# UI
-ui <- dashboardPage(
-  dashboardHeader(title = "Procurement Network Analysis"),
-  dashboardSidebar(
-    sidebarMenu(
-      menuItem("Network Visualization", tabName = "network", icon = icon("project-diagram"))
-    )
-  ),
-  dashboardBody(
-    tags$style(HTML("
-        /* Main content area - increase max-width */
-        .content-wrapper {
-          max-width: 100% !important;
-        }
-        
-        /* Make the main container fluid */
-        .container-fluid {
-          width: 95% !important;
-          max-width: 2000px !important;
-          margin-left: auto;
-          margin-right: auto;
-        }
-        
-        /* Ensure boxes use full width */
-        .box {
-          width: 100% !important;
-        }
-        
-        /* Make tab content full width */
-        .tab-content, .tab-pane {
-          width: 100% !important;
-        }
-        
-        /* DataTables width fix */
-        .dataTables_wrapper {
-          width: 100% !important;
-        }
-        
-        /* Ensure network visualizations use full width */
-        .vis-network {
-          width: 100% !important;
-        }
-      ")),
-  tabItems(
-    tabItem(tabName = "network",
-            fluidRow(
-              column(width = 12, network_analysis_ui("network_module"))
-            )
-    )
-  )
-  )
-)
-
-# Server
-server <- function(input, output, session) {
-  network_analysis_server("network_module")
-}
-
-# Run the application 
-shinyApp(ui, server)

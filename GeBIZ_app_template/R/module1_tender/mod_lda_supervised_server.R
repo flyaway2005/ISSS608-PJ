@@ -2,20 +2,21 @@ mod_lda_supervised_server <- function(id, selected_data, lda_results, current_st
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    # Observe Run Supervised Button
     observeEvent(input$run_supervised, {
       req(selected_data())
-      data <- selected_data()
+      sample_data <- selected_data()
       
-      dtm <- data %>%
+      dtm <- sample_data %>%
         unnest_tokens(word, tender_clean) %>%
         count(tender_no, word) %>%
         cast_dtm(document = tender_no, term = word, value = n)
       
-      lda_model <- topicmodels::LDA(dtm, k = 7, control = list(seed = 1234))
+      lda_model <- LDA(dtm, k = 7, control = list(seed = 1234))
       
       lda_assignments <- tidy(lda_model, matrix = "gamma")
       
-      data <- data %>%
+      sample_data <- sample_data %>%
         left_join(lda_assignments %>% group_by(document) %>% top_n(1, gamma),
                   by = c("tender_no" = "document")) %>%
         mutate(
@@ -31,17 +32,26 @@ mod_lda_supervised_server <- function(id, selected_data, lda_results, current_st
           )
         )
       
-      lda_results(data %>% select(tender_no, LDA_Category, tender_clean))
-      updateSelectInput(session, "lda_category", choices = c("All", unique(data$LDA_Category)))
+      lda_results(sample_data %>% select(tender_no, LDA_Category, tender_clean))
+      updateSelectInput(session, "lda_category", choices = c("All", unique(sample_data$LDA_Category)))
     })
     
     observeEvent(input$reload_lda, {
       req(lda_results())
-      processed <- lda_results()
+      processed_data <- lda_results() %>%
+        mutate(
+          tender_clean = tender_clean %>%
+            tolower() %>%
+            removePunctuation() %>%
+            removeNumbers() %>%
+            stripWhitespace() %>%
+            removeWords(current_stopwords())
+        )
       
-      word_tf_idf <- processed %>%
+      word_tf_idf <- processed_data %>%
         unnest_tokens(word, tender_clean) %>%
         count(LDA_Category, tender_no, word) %>%
+        distinct(LDA_Category, tender_no, word, .keep_all = TRUE) %>%
         bind_tf_idf(word, LDA_Category, n) %>%
         filter(tf_idf > quantile(tf_idf, 0.25) & tf_idf < quantile(tf_idf, 0.95)) %>%
         mutate(tf_idf = ifelse(tf_idf < 0, 0, tf_idf))
@@ -54,36 +64,79 @@ mod_lda_supervised_server <- function(id, selected_data, lda_results, current_st
         }
       })
       
-      output$lda_category_plot <- plotly::renderPlotly({
-        plot_data <- lda_results() %>% count(LDA_Category)
-        p <- ggplot(plot_data, aes(x = reorder(LDA_Category, n), y = n, fill = LDA_Category)) +
+      output$lda_category_plot <- renderPlotly({
+        lda_counts <- lda_results() %>%
+          count(LDA_Category) %>%
+          arrange(desc(n))
+        
+        p <- ggplot(lda_counts, aes(x = reorder(LDA_Category, n), y = n, fill = LDA_Category)) +
           geom_bar(stat = "identity") +
           coord_flip() +
-          theme_minimal()
-        plotly::ggplotly(p) %>% layout(showlegend = FALSE)
+          theme_minimal() +
+          labs(title = "LDA Distribution", x = "LDA Category", y = "Number of Tenders")
+        
+        ggplotly(p) %>% layout(showlegend = FALSE)
       })
       
-      output$tfidf_table <- DT::renderDT({
+      output$tfidf_table <- renderDT({
         req(filtered_data())
-        DT::datatable(filtered_data() %>% arrange(desc(tf_idf)))
+        datatable(filtered_data() %>% arrange(desc(tf_idf)),
+                  options = list(pageLength = 10, scrollX = TRUE, scrollY = "500px"), rownames = FALSE)
       })
       
       output$wordcloud <- renderPlot({
         req(filtered_data())
-        wc_data <- filtered_data() %>% slice_head(n = input$num_words)
-        color_palette <- RColorBrewer::brewer.pal(8, "Dark2")
-        with(wc_data, wordcloud::wordcloud(word, tf_idf, colors = color_palette))
+        data <- filtered_data() %>% slice_head(n = input$num_words)
+        color_palette <- colorRampPalette(brewer.pal(8, "Dark2"))(input$num_words)
+        with(data, wordcloud(word, tf_idf, max.words = input$num_words, random.order = FALSE, colors = color_palette))
       })
       
-      output$tfidf_plot <- plotly::renderPlotly({
+      output$tfidf_plot <- renderPlotly({
         req(filtered_data())
-        p <- filtered_data() %>% 
-          slice_head(n = input$num_words) %>%
-          ggplot(aes(x = reorder(word, tf_idf), y = tf_idf, fill = LDA_Category)) +
-          geom_col() +
+        data <- filtered_data() %>% filter(tf_idf > 0) %>% slice_head(n = input$num_words)
+        p <- ggplot(data, aes(x = reorder(word, tf_idf), y = tf_idf, fill = LDA_Category, text = paste0(
+          "Word: ", word, "<br>", "TF-IDF: ", round(tf_idf, 6), "<br>", "Category: ", LDA_Category))) +
+          geom_col(show.legend = FALSE) +
           coord_flip() +
-          theme_minimal()
-        plotly::ggplotly(p)
+          theme_minimal() +
+          labs(title = "Top TF-IDF Words", x = "Word", y = "TF-IDF Score")
+        
+        ggplotly(p, tooltip = "text") %>% layout(hoverlabel = list(bgcolor = "lightblue"), showlegend = FALSE)
+      })
+      
+      output$tfidf_network_plot <- renderPlot({
+        req(filtered_data())
+        set.seed(1234)
+        top_words <- filtered_data() %>%
+          group_by(word) %>%
+          summarise(avg_tfidf = mean(tf_idf)) %>%
+          arrange(desc(avg_tfidf)) %>%
+          slice_head(n = input$top_n_words_network) %>%
+          pull(word)
+        
+        word_doc_pairs <- filtered_data() %>%
+          filter(word %in% top_words) %>%
+          select(tender_no, word) %>%
+          distinct()
+        
+        word_cor <- word_doc_pairs %>% pairwise_cor(item = word, feature = tender_no, sort = TRUE, upper = FALSE)
+        word_cor_filtered <- word_cor %>% filter(correlation > input$cor_threshold)
+        
+        if (nrow(word_cor_filtered) == 0) {
+          plot.new()
+          text(0.5, 0.5, "No strong word correlations found.")
+          return()
+        }
+        
+        g <- graph_from_data_frame(word_cor_filtered)
+        
+        ggraph(g, layout = "fr") +
+          geom_edge_link(aes(alpha = correlation, width = correlation), color = "gray40") +
+          geom_node_point(size = 6, color = "lightblue") +
+          geom_node_text(aes(label = name), color = "red", repel = TRUE) +
+          scale_edge_width(range = c(0.5, 3)) +
+          scale_edge_alpha(range = c(0.3, 1)) +
+          theme_void()
       })
     })
   })

@@ -8,6 +8,7 @@ library(DT)
 library(visNetwork)
 library(RColorBrewer)
 library(widyr)
+library(stopwords)
 
 
 # Load global settings and functions
@@ -28,7 +29,9 @@ source("R/module1_tender/mod_market_analysis_server.R")
 
 source("R/module2_tempo/module2_overview_git_0330_3_tooltip.R")
 source("R/module2_tempo/module2_agency_git.R")
-source("R/module3_network/module3-1_network_overview_git_0330_1_nodeshape.R")
+source("R/module3_network/mod_network_overview_ui.R")
+source("R/module3_network/mod_network_overview_server_v3.R")
+
 source("R/module3_network/module3-2_community_git_0329_3.R")
 
 #-----------------------------------------------------
@@ -215,7 +218,7 @@ tabItem(tabName = "time_series",
                       box(
                         plotOutput("plot"), 
                         width = NULL,
-                        title = "Data Visualization"
+                        title = "Data Visualisation"
                       ),
                       fluidRow(
                         valueBox(
@@ -377,5 +380,7 @@ server <- function(input, output, session) {
     round(sd(plot_data()[[input$var]]), 2)
   })
 }
+
+
 
 shinyApp(ui, server)

@@ -1,6 +1,4 @@
-### this version not working
-
-# app.R
+# this version not working
 library(shiny)
 library(shinydashboard)
 library(dplyr)
@@ -148,9 +146,9 @@ network_analysis_ui <- function(id) {
                         div(style = "margin-bottom: 8px;",
                             sliderInput(ns("award_amount_range"), "Award Amount Range",
                                         min = 0, 
-                                        max = 1,  
-                                        value = c(0, 1),
-                                        step = 1)
+                                        max = 1500000000,  
+                                        value = c(0, 50000),
+                                        step = 50000)
                         ),
                         
                         # Min-Max inputs in a more compact layout
@@ -429,22 +427,17 @@ network_analysis_server <- function(id, data = NULL) {
 #-----
 # Debug    
     observe({
+      # Ensure network_data() is available
       req(network_data())
       
-      all_awards <- network_data()$edges$total_award_amount
-      all_awards <- all_awards[!is.na(all_awards)]
-      
-      min_award <- floor(min(all_awards))
-      max_award <- ceiling(max(all_awards))
-      
-      updateSliderInput(session, "award_amount_range",
-                        min = min_award,
-                        max = max_award,
-                        value = c(min_award, max_award),
-                        step = round((max_award - min_award) / 50))
-      
-      updateNumericInput(session, "min_award_manual", value = min_award, min = min_award, max = max_award)
-      updateNumericInput(session, "max_award_manual", value = max_award, min = min_award, max = max_award)
+      # Debug output
+      print("Network data summary:")
+      print(paste("Nodes:", nrow(network_data()$nodes)))
+      print(paste("Edges:", nrow(network_data()$edges)))
+      print("Node columns:")
+      print(names(network_data()$nodes))
+      print("Edge columns:")
+      print(names(network_data()$edges))
     })
     
     
@@ -813,260 +806,161 @@ network_analysis_server <- function(id, data = NULL) {
     #--------
     # Reactive filtered data
     #---------
- # debug---   
-    observe({
-      req(network_data())
-      print("Checking data types in network_data()$edges:")
-      print(str(network_data()$edges))
-      
-      print("Checking award amounts:")
-      print(class(network_data()$edges$total_award_amount))
-      print(head(network_data()$edges$total_award_amount, 10))
-      
-      if (!is.null(network_data()$monthly_edges)) {
-        print("Checking monthly_edges data types:")
-        print(str(network_data()$monthly_edges))
-      }
-    })
-#---    
     filtered_data <- eventReactive(input$update_network, {
-      tryCatch({
-        nodes <- network_data()$nodes
-        edges <- network_data()$edges  
-      
+      nodes <- network_data()$nodes
+      edges <- network_data()$edges
       
       # Month-based date range filtering
       if (!is.null(input$start_year) && !is.null(input$start_month) && 
           !is.null(input$end_year) && !is.null(input$end_month)) {
         
-        # print("==== BEGINNING DATE RANGE FILTER DEBUGGING ====")
-        # print(paste("Start:", input$start_year, "Month:", input$start_month))
-        # print(paste("End:", input$end_year, "Month:", input$end_month))
+        print("==== BEGINNING DATE RANGE FILTER DEBUGGING ====")
+        print(paste("Start:", input$start_year, "Month:", input$start_month))
+        print(paste("End:", input$end_year, "Month:", input$end_month))
         
         if (!is.null(network_data()$monthly_edges)) {
           print("monthly_edges data exists")
           
-      # Ensure inputs are numeric
-      start_year <- as.numeric(input$start_year)
-      start_month <- as.numeric(input$start_month)
-      end_year <- as.numeric(input$end_year)
-      end_month <- as.numeric(input$end_month)
+          # Ensure inputs are numeric
+          start_year <- as.numeric(input$start_year)
+          start_month <- as.numeric(input$start_month)
+          end_year <- as.numeric(input$end_year)
+          end_month <- as.numeric(input$end_month)
           
-      # Validate inputs before calculating indices
-      if (!is.na(start_year) && !is.na(start_month) && 
-          !is.na(end_year) && !is.na(end_month)) {
+          if (!is.na(start_year) && !is.na(start_month) && 
+              !is.na(end_year) && !is.na(end_month)) {
             
-      # Calculate start and end month indices
-          start_idx <- start_year * 12 + start_month
-          end_idx <- end_year * 12 + end_month
-          print(paste("Start index:", start_idx, "End index:", end_idx))
+            start_idx <- start_year * 12 + start_month
+            end_idx <- end_year * 12 + end_month
             
-      # Ensure start isn't after end
-      if (start_idx > end_idx) {
-        temp <- start_idx
-        start_idx <- end_idx
-        end_idx <- temp
-        print("Swapped start and end indices to ensure proper order")
+            if (start_idx > end_idx) {
+              temp <- start_idx
+              start_idx <- end_idx
+              end_idx <- temp
             }
             
-      # Check if month_index column exists in monthly_edges
-      if ("month_index" %in% names(network_data()$monthly_edges)) {
-        # Filter monthly edges
-        filtered_monthly_edges <- network_data()$monthly_edges %>%
-          filter(month_index >= start_idx & month_index <= end_idx)
-        print(paste("After filtering, monthly_edges has", nrow(filtered_monthly_edges), "rows"))
-        
-        if (nrow(filtered_monthly_edges) > 0) {
-          
-          # Verify that total_contracts and total_award_amount columns exist
-          if (all(c("total_contracts", "total_award_amount") %in% names(filtered_monthly_edges))) {
-            monthly_filtered <- filtered_monthly_edges %>%
+            if ("month_index" %in% names(network_data()$monthly_edges)) {
+              filtered_monthly_edges <- network_data()$monthly_edges %>%
+                filter(month_index >= start_idx & month_index <= end_idx)
               
-              print("Checking filtered_monthly_edges structure:")
-            print(names(filtered_monthly_edges))
-            print(paste("Does tender_cat exist?", "tender_cat" %in% names(filtered_monthly_edges)))
-            
-            # Then perform the operation
-            if ("tender_cat" %in% names(filtered_monthly_edges)) {
-              # If tender_cat exists, use it in the grouping
-              monthly_filtered <- filtered_monthly_edges %>%
-                group_by(agency, supplier_name, tender_cat) %>%
-                summarize(
-                  total_contracts = sum(total_contracts, na.rm = TRUE),
-                  total_award_amount = sum(total_award_amount, na.rm = TRUE),
-                  .groups = "drop"
-                )
-            } else {
-              # If tender_cat doesn't exist, group without it
-              monthly_filtered <- filtered_monthly_edges %>%
-                group_by(agency, supplier_name) %>%
-                summarize(
-                  total_contracts = sum(total_contracts, na.rm = TRUE),
-                  total_award_amount = sum(total_award_amount, na.rm = TRUE),
-                  .groups = "drop"
-                )
-              
-              # Add a temporary tender_cat column to maintain structure
-              monthly_filtered$tender_cat <- NA_character_
-            } 
-              
-            edges <- network_data()$edges %>%
-              semi_join(monthly_filtered, by = c("agency", "supplier_name", "tender_cat")) %>%
-              left_join(monthly_filtered, by = c("agency", "supplier_name", "tender_cat")) %>%
-              select(-total_contracts.x, -total_award_amount.x) %>%
-              rename(
-                total_contracts = total_contracts.y,
-                total_award_amount = total_award_amount.y
-              )
-            
-            # debug
-            print(paste("After aggregation, edges count:", nrow(edges)))
-            print(summary(edges$total_award_amount))
-            
+              if (nrow(filtered_monthly_edges) > 0) {
+                if (all(c("total_contracts", "total_award_amount") %in% names(filtered_monthly_edges))) {
+                  
+                  # Aggregate by agency and supplier
+                  monthly_filtered <- filtered_monthly_edges %>%
+                    group_by(agency, supplier_name) %>%
+                    summarize(
+                      total_contracts = sum(total_contracts, na.rm = TRUE),
+                      total_award_amount = sum(total_award_amount, na.rm = TRUE),
+                      .groups = "drop"
+                    )
+                  
+                  print(paste("Aggregated", nrow(monthly_filtered), "monthly edges"))
+                  
+                  # Attach node IDs to monthly_filtered (so we can join safely)
+                  monthly_filtered <- monthly_filtered %>%
+                    left_join(
+                      nodes %>% filter(type == "agency") %>% select(agency = name, from_id = id),
+                      by = "agency"
+                    ) %>%
+                    left_join(
+                      nodes %>% filter(type == "supplier") %>% select(supplier_name = name, to_id = id),
+                      by = "supplier_name"
+                    )
+                  
+                  # Safe join using from_id and to_id
+                  edges <- edges %>%
+                    left_join(
+                      monthly_filtered %>% select(from_id, to_id, total_contracts, total_award_amount),
+                      by = c("from_id", "to_id"),
+                      suffix = c("", "_filtered")
+                    ) %>%
+                    mutate(
+                      total_contracts = coalesce(total_contracts_filtered, total_contracts),
+                      total_award_amount = coalesce(total_award_amount_filtered, total_award_amount)
+                    ) %>%
+                    select(-ends_with("_filtered"))
+                  
                 } else {
-                  print("Missing required columns in monthly_edges data")
+                  print("Missing total_contracts or total_award_amount in monthly_edges")
+                } 
+                  
+                  print(paste("Edges after date range update:", nrow(edges)))
+                } else {
+                  print("Missing total_contracts or total_award_amount in monthly_edges")
                 }
               } else {
-                print("No monthly edges found in the selected date range")
+                print("No monthly edges found in selected date range")
               }
             } else {
-              print("month_index column missing in monthly_edges")
+              print("month_index column missing")
             }
           } else {
-            print("Invalid date inputs detected")
+            print("Invalid year/month input")
           }
         } else {
           print("monthly_edges data is missing")
         }
       }
-
-      # Agency Type direct filtering
-      if(!("All" %in% input$agency_type_filter) && length(input$agency_type_filter) > 0) {
-        # Use the agency_types data frame to filter the edges
-        if (!is.null(network_data()$agency_types) && is.data.frame(network_data()$agency_types)) {
-          agency_col <- names(network_data()$agency_types)[1]
-          type_col <- names(network_data()$agency_types)[2]
+      
+      # --- Filter by Agency Type ---
+      if (!("All" %in% input$agency_type_filter) && length(input$agency_type_filter) > 0 &&
+          !is.null(network_data()$agency_types)) {
         
-          # Get agencies of the selected types - use proper data frame filtering
-          agencies_filtered <- network_data()$agency_types %>%
-            filter(.data[[type_col]] %in% input$agency_type_filter)
-          
-          agencies_of_type <- agencies_filtered[[agency_col]]
-          
-          # # Print debug info
-          # print("Selected agency types in filtered_data:")
-          # print(input$agency_type_filter)
-          # print("Filtered agencies in filtered_data:")
-          # print(head(agencies_of_type))
-          # print("Total agencies found in filtered_data:")
-          # print(length(agencies_of_type))
-          
-          # Filter edges to only include these agencies
-          if (length(agencies_of_type) > 0) {
-            edges <- edges %>%
-              filter(agency %in% agencies_of_type)
-            
-            print(paste("Filtered to", length(agencies_of_type), "agencies by agency type"))
-          } else {
-            # If no agencies match the selected types
-            edges <- edges[0,]
-            print("No agencies found for the selected agency types")
+        agency_col <- names(network_data()$agency_types)[1]
+        type_col <- names(network_data()$agency_types)[2]
+        
+        agencies_filtered <- network_data()$agency_types %>%
+          filter(.data[[type_col]] %in% input$agency_type_filter)
+        
+        agencies_of_type <- agencies_filtered[[agency_col]]
+        edges <- edges %>% filter(agency %in% agencies_of_type)
+      }
+      
+      # --- Filter by Agency ---
+      if (!("All" %in% input$agency_filter) && length(input$agency_filter) > 0) {
+        edges <- edges %>% filter(agency %in% input$agency_filter)
+      }
+      
+      # --- Filter by Supplier ---
+      if (!("All" %in% input$supplier_filter) && length(input$supplier_filter) > 0) {
+        edges <- edges %>% filter(supplier_name %in% input$supplier_filter)
+      }
+      
+      # --- Filter by Tender Category ---
+      if (!("All" %in% input$tender_cat_filter) && length(input$tender_cat_filter) > 0 &&
+          "tender_cat" %in% names(edges)) {
+        
+        include_rows <- sapply(edges$tender_cat, function(cat_string) {
+          if (!is.na(cat_string) && cat_string != "") {
+            cat_list <- unlist(strsplit(cat_string, ", "))
+            return(any(input$tender_cat_filter %in% cat_list))
           }
-        }
-      }      
-      print("Selected agency types:")
-      print(input$agency_type_filter)
-      
-      # Agency filtering
-      if(!("All" %in% input$agency_filter) && length(input$agency_filter) > 0) {
-        edges <- edges %>%
-          filter(agency %in% input$agency_filter)
+          FALSE
+        })
+        edges <- edges[include_rows, ]
       }
       
-      # Supplier filtering
-      if(!("All" %in% input$supplier_filter) && length(input$supplier_filter) > 0) {
-        edges <- edges %>%
-          filter(supplier_name %in% input$supplier_filter)
-      }
- 
-      # Tender Category filtering
-      if(!("All" %in% input$tender_cat_filter) && length(input$tender_cat_filter) > 0) {
-        if ("tender_cat" %in% names(edges)) {
-          # Create a vector to hold the filter results
-          include_rows <- logical(nrow(edges))
-          
-          # Check each row
-          for(i in 1:nrow(edges)) {
-            cat_string <- edges$tender_cat[i]
-            if (!is.na(cat_string) && cat_string != "") {
-              cat_list <- unlist(strsplit(cat_string, ", "))
-              include_rows[i] <- any(input$tender_cat_filter %in% cat_list)
-            } else {
-              include_rows[i] <- FALSE
-            }
-          }
-          
-          # Apply filter
-          edges <- edges[include_rows, ]
-          
-          print(paste("Filtered by tender categories:", 
-                      paste(input$tender_cat_filter, collapse=", ")))
-        } else {
-          print("WARNING: Could not apply tender_cat filter - column not found")
-        }
-      }
-      
-      # Award amount range filtering
-      min_award <- input$award_amount_range[1]
-      max_award <- input$award_amount_range[2]
-      
+      # --- Filter by Award Amount Range ---
       edges <- edges %>%
-        filter(total_award_amount >= min_award & total_award_amount <= max_award)
+        filter(
+          total_award_amount >= input$award_amount_range[1],
+          total_award_amount <= input$award_amount_range[2]
+        )
       
-      print("Top 10 award amounts after filtering:")
-      print(head(edges$total_award_amount, 10))
-      
-      print("Award amount summary AFTER filtering:")
-      print(summary(edges$total_award_amount))
-      
-      print("Number of edges remaining after filtering:")
-      print(nrow(edges))
-      
-      # Limit number of edges to improve performance
-      if(nrow(edges) > input$max_edges) {
+      # --- Limit Max Edges ---
+      if (nrow(edges) > input$max_edges) {
         edges <- edges %>%
           arrange(desc(total_award_amount)) %>%
           slice_head(n = input$max_edges)
       }
-           
-      # Get connected nodes
+      
+      # --- Filter Nodes by Connected Edges ---
       connected_nodes <- unique(c(edges$agency, edges$supplier_name))
       nodes <- nodes %>%
-        filter(name %in% connected_nodes)
-      
+        mutate(connected = name %in% connected_nodes)
       list(nodes = nodes, edges = edges)
-      
-    }, error = function(e) {
-      # Print the error for debugging
-      print(paste("Error in filtered_data:", e$message))
-      
-      # Return empty but valid data structure
-      return(list(
-        nodes = data.frame(
-          name = character(0),
-          type = character(0),
-          total_contracts = numeric(0),
-          total_award_amount = numeric(0)
-        ),
-        edges = data.frame(
-          agency = character(0),
-          supplier_name = character(0),
-          total_contracts = numeric(0),
-          total_award_amount = numeric(0)
-        )
-      ))
     })
-      }, ignoreNULL = FALSE)
     
     # Update network information
     output$network_info <- renderText({
@@ -1099,6 +993,7 @@ network_analysis_server <- function(id, data = NULL) {
       
       # Prepare nodes for visualisation
       nodes_vis <- data$nodes %>%
+        filter(connected) %>%
         mutate(
           id = name,
           label = name,
@@ -1296,7 +1191,7 @@ network_analysis_server <- function(id, data = NULL) {
           )
       } 
       
-      # Add remaining visualisation settings
+      # Add remaining visualization settings
       network %>%
         visNodes(
         #  shape = "dot",
