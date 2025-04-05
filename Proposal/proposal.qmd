@@ -11,6 +11,8 @@ execute:
 
 # Lets’ Track Public Dollars! Unveiling the G2B Network from GeBiz
 
+[**Project Github**](https://github.com/flyaway2005/ISSS608-PJ)
+
 ## Motivation
 
 Government procurement represents billions in public spending annually, directly impacting taxpayers and the business ecosystem. Despite initiatives like GeBIZ that ostensibly promote transparency, meaningful public oversight remains challenging. Our team's experience attempting to analyze this data revealed significant barriers to understanding: scattered information across thousands of entries, complex relationships between agencies and suppliers, and limited tools to identify patterns or anomalies in spending.
