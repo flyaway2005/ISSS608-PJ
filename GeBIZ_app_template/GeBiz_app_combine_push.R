@@ -54,7 +54,7 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       id = "sidebar",
-      menuItem("Introduction", icon = icon("file-alt")),
+      # menuItem("Introduction", icon = icon("file-alt")),
       menuItem("Tender Analysis", icon = icon("search"),
                menuSubItem("Data Sampling", tabName = "data_sampling"),
                menuSubItem("LDA Supervised ML", tabName = "lda_supervised"),
@@ -293,17 +293,15 @@ tabItem(tabName = "introduction",
 #-------------------------
 server <- function(input, output, session) {
   selected_data <- reactiveVal(NULL)
+  # Shared reactive values
+  selected_data <- reactiveVal(NULL)
   lda_results <- reactiveVal(NULL)
+  default_stopwords <- c(stopwords("en"), "please", "refer", "another", "one", "two", "three", 
+                         "framework", "edition", "related", "whole", "period", "government", 
+                         "entities", "various", "including", "requirement", "provide", "supply", 
+                         "service", "procurement", "year", "option", "extend", "agreement", 
+                         "singapore", "Singapore")
   current_stopwords <- reactiveVal(default_stopwords)
-  
-  # Call the module server function
-  mod_lda_supervised_server(
-    "lda_supervised", 
-    selected_data, 
-    lda_results, 
-    current_stopwords
-  )
-}
   
   # Load cleaned LDA dataset for sampling
   Cleaned_GP_LDA <- readr::read_csv("data/Cleaned_GP_LDA.csv")
@@ -314,10 +312,10 @@ server <- function(input, output, session) {
   community_data_global <- read_csv("data/network_community_data.csv")
   network_data <- readRDS("data/m3_processed_network_data.rds")
   
-  # # Reactive value for plot data
-  # plot_data <- reactive({
-  #   mtcars
-  # })
+  # Reactive value for plot data
+  plot_data <- reactive({
+    mtcars
+  })
   
   # Main plot
   output$plot <- renderPlot({
@@ -389,7 +387,7 @@ server <- function(input, output, session) {
   output$sd_value <- renderText({
     round(sd(plot_data()[[input$var]]), 2)
   })
-
+}
 
 
 

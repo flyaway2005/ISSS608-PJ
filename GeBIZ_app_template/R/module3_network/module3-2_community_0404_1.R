@@ -93,12 +93,7 @@ network_community_ui <- function(id) {
                        selectizeInput(ns("selected_suppliers"), "Select Suppliers", 
                                       choices = c("All" = "All"), 
                                       selected = "All",
-                                      multiple = TRUE),
-                       
-                       selectInput(ns("tender_type"), "Tender Category", 
-                                   choices = c("All" = "All"), 
-                                   selected = "All",
-                                   multiple = TRUE)
+                                      multiple = TRUE)
                      )
                    )
                  ),

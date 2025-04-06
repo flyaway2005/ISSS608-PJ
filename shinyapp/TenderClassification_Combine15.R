@@ -359,51 +359,34 @@ server <- function(input, output, session) {
     
     # Monthly Analysis Plot
     output$monthly_analysis_plot <- renderPlotly({
-      req(input$time_unit)
+      req(market_data())
+      df <- market_data()
+      time_unit <- input$time_unit
       
-      # Group by selected time unit
-      time_data <- market_data %>%
-        mutate(
-          time_point = case_when(
-            input$time_unit == "month" ~ floor_date(tender_date, "month"),
-            input$time_unit == "quarter" ~ floor_date(tender_date, "quarter"),
-            input$time_unit == "year" ~ floor_date(tender_date, "year")
-          )
-        ) %>%
+      df <- df %>%
+        mutate(time_point = case_when(
+          time_unit == "month" ~ floor_date(tender_date, "month"),
+          time_unit == "quarter" ~ floor_date(tender_date, "quarter"),
+          time_unit == "year" ~ floor_date(tender_date, "year")
+        )) %>%
         group_by(time_point) %>%
-        summarise(
-          count = n(),
-          total_value = sum(tender_value, na.rm = TRUE)
-        )
-      
-      # Set date format and interval based on time unit
-      date_format <- case_when(
-        input$time_unit == "month" ~ "%Y-%m",
-        input$time_unit == "quarter" ~ "%Y-Q%q",
-        input$time_unit == "year" ~ "%Y"
-      )
-      
-      date_breaks <- case_when(
-        input$time_unit == "month" ~ "3 months",
-        input$time_unit == "quarter" ~ "3 months",
-        input$time_unit == "year" ~ "1 year"
-      )
-      
-      # Set title
-      plot_title <- case_when(
-        input$time_unit == "month" ~ "Monthly Analysis",
-        input$time_unit == "quarter" ~ "Quarterly Analysis",
-        input$time_unit == "year" ~ "Yearly Analysis"
-      )
+        summarise(count = n(), total_value = sum(tender_value, na.rm = TRUE), .groups = "drop")
       
       # Calculate Y-axis range
-      y_max <- max(time_data$count)
+      y_max <- max(df$count)
       y_breaks <- pretty(c(0, y_max), n = 5)
       
-      p <- ggplot(time_data, aes(x = time_point,
-                                 text = paste("Date:", format(time_point, date_format),
-                                              "<br>Number of Tenders:", count,
-                                              "<br>Total Value:", sprintf("$%.2fK", total_value/1000)))) +
+      # Set date format based on time unit
+      date_format <- case_when(
+        time_unit == "month" ~ "%Y-%m",
+        time_unit == "quarter" ~ "%Y-Q%q",
+        time_unit == "year" ~ "%Y"
+      )
+      
+      p <- ggplot(df, aes(x = time_point,
+                          text = paste("Date:", format(time_point, date_format),
+                                       "<br>Number of Tenders:", count,
+                                       "<br>Total Value:", sprintf("$%.2fK", total_value/1000)))) +
         geom_bar(aes(y = count), stat = "identity", fill = "steelblue", alpha = 0.7) +
         geom_line(aes(y = total_value/1000), color = "red", size = 1, alpha = 0.8) +
         geom_point(aes(y = total_value/1000), color = "red", size = 3, alpha = 0.8) +
@@ -411,14 +394,15 @@ server <- function(input, output, session) {
           name = "Number of Tenders",
           breaks = y_breaks,
           sec.axis = sec_axis(~.*1000, 
-                            name = "Total Value",
-                            labels = scales::label_number(scale_cut = cut_short_scale()))
+                              name = "Total Value",
+                              labels = scales::label_number(scale_cut = cut_short_scale()))
         ) +
-        scale_x_date(
-          date_breaks = date_breaks,
-          date_labels = date_format,
-          expand = c(0.05, 0.05)
-        ) +
+        labs(title = paste(tools::toTitleCase(time_unit), "Analysis"),
+             x = case_when(
+               time_unit == "month" ~ "Month",
+               time_unit == "quarter" ~ "Quarter",
+               time_unit == "year" ~ "Year"
+             )) +
         theme_minimal() +
         theme(
           panel.grid.major = element_line(color = "gray90"),
@@ -427,13 +411,7 @@ server <- function(input, output, session) {
           axis.title = element_text(size = 12, face = "bold"),
           axis.text = element_text(size = 10),
           axis.text.x = element_text(angle = 45, hjust = 1)
-        ) +
-        labs(title = plot_title,
-             x = case_when(
-               input$time_unit == "month" ~ "Month",
-               input$time_unit == "quarter" ~ "Quarter",
-               input$time_unit == "year" ~ "Year"
-             ))
+        )
       
       ggplotly(p, tooltip = "text") %>%
         layout(

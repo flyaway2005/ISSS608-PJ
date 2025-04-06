@@ -523,3 +523,15 @@ log_message <- function(message, level = "INFO") {
     message(paste0("[", level, " ", timestamp, "] ", message))
   }
 }
+
+#--------------------
+# Define default stopwords
+default_stopwords <- c(stopwords("en"), "please", "refer", "another", "one", "two", "three", 
+                       "framework", "edition", "related", "whole", "period", "government", 
+                       "entities", "various", "including", "requirement", "provide", "supply", 
+                       "service", "procurement", "year", "option", "extend", "agreement", 
+                       "singapore", "Singapore")
+
+# Create reactive values for shared data across modules
+current_stopwords <- reactiveVal(default_stopwords)
+lda_results <- reactiveVal(NULL)

@@ -12,6 +12,9 @@ mod_lda_supervised_ui <- function(id) {
                 actionButton(ns("reload_lda"), "Reload"),
                 hr(),
                 h4("Stopwords Management"),
+                tags$div(
+                  class = "alert alert-info",
+                  HTML("<strong>Note:</strong> Default stopwords (marked in blue) cannot be permanently removed.")),
                 DTOutput(ns("stopwords_table")),
                 textInput(ns("new_stopword"), "Add New Stopword:"),
                 actionButton(ns("add_stopword"), "Add Stopword"),

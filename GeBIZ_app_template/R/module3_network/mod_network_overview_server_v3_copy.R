@@ -450,38 +450,38 @@ network_analysis_server <- function(id, data = NULL) {
     # Update the renderVisNetwork function to use the correct edge data
     # Replace the beginning of the renderVisNetwork function with:
     
-    # output$network_plot <- renderVisNetwork({
-    #   print("Rendering visNetwork...")
-    #   
-    #   vis_data <- network_vis_data()
-    #   
-    #   # Check if we have data at all
-    #   if (is.null(vis_data)) {
-    #     print("WARNING: network_vis_data() returned NULL")
-    #     # Return a simple message instead of crashing
-    #     return(visNetwork(
-    #       data.frame(id = 1, label = "No data to display with current filters"),
-    #       data.frame(from = integer(0), to = integer(0))
-    #     ))
-    #   }
-    #   
-    #   # Check if data has the right structure (nodes and edges components)
-    #   if (!all(c("nodes", "edges") %in% names(vis_data))) {
-    #     print("ERROR: vis_data missing nodes or edges component")
-    #     return(visNetwork(
-    #       data.frame(id = 1, label = "Invalid data structure"),
-    #       data.frame(from = integer(0), to = integer(0))
-    #     ))
-    #   }
-    #   
-    #   # Check if there's actually data in the structure
-    #   if (nrow(vis_data$nodes) == 0 || nrow(vis_data$edges) == 0) {
-    #     print("WARNING: Empty nodes or edges in vis_data")
-    #     return(visNetwork(
-    #       data.frame(id = 1, label = "No data to display with current filters"),
-    #       data.frame(from = integer(0), to = integer(0))
-    #     ))
-    #   }
+    output$network_plot <- renderVisNetwork({
+      print("Rendering visNetwork...")
+      
+      vis_data <- network_vis_data()
+      
+      # Check if we have data at all
+      if (is.null(vis_data)) {
+        print("WARNING: network_vis_data() returned NULL")
+        # Return a simple message instead of crashing
+        return(visNetwork(
+          data.frame(id = 1, label = "No data to display with current filters"),
+          data.frame(from = integer(0), to = integer(0))
+        ))
+      }
+      
+      # Check if data has the right structure (nodes and edges components)
+      if (!all(c("nodes", "edges") %in% names(vis_data))) {
+        print("ERROR: vis_data missing nodes or edges component")
+        return(visNetwork(
+          data.frame(id = 1, label = "Invalid data structure"),
+          data.frame(from = integer(0), to = integer(0))
+        ))
+      }
+      
+      # Check if there's actually data in the structure
+      if (nrow(vis_data$nodes) == 0 || nrow(vis_data$edges) == 0) {
+        print("WARNING: Empty nodes or edges in vis_data")
+        return(visNetwork(
+          data.frame(id = 1, label = "No data to display with current filters"),
+          data.frame(from = integer(0), to = integer(0))
+        ))
+      }
     
     # Add an output to display information about edge limiting
       # Update edge_limit_info to include node info
@@ -1129,6 +1129,6 @@ network_analysis_server <- function(id, data = NULL) {
       }
     })
 })
-  }
-
+  })
+}
     
