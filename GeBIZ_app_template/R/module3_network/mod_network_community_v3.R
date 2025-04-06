@@ -37,7 +37,7 @@ network_community_ui <- function(id) {
       # Left sidebar with controls
       column(width = 3,
              div(class = "control-panel",
-                 h4("Procurement Profile"),
+                 h3("Community Detection"),
                  
                  # Always visible core filters
                  dateRangeInput(ns("date_range"), "Date Range:",
@@ -80,20 +80,29 @@ network_community_ui <- function(id) {
                      class = "panel-collapse collapse",
                      div(
                        class = "panel-body",
-                       selectInput(ns("agency_type"), "Agency Type", 
+                       selectizeInput(ns("agency_type"), "Agency Type", 
                                    choices = c("All" = "All"), 
                                    selected = "All",
-                                   multiple = TRUE),
+                                   multiple = TRUE,
+                                   options = list(plugins = list("remove_button"))),
                        
                        selectizeInput(ns("selected_agencies"), "Select Agencies", 
                                       choices = c("All" = "All"), 
                                       selected = "All",
-                                      multiple = TRUE),
+                                      multiple = TRUE,
+                                      options = list(plugins = list("remove_button"))),
                        
                        selectizeInput(ns("selected_suppliers"), "Select Suppliers", 
                                       choices = c("All" = "All"), 
                                       selected = "All",
-                                      multiple = TRUE)
+                                      multiple = TRUE,
+                                      options = list(plugins = list("remove_button"))),
+                       
+                       selectizeInput(ns("tender_cat"), "Select Tender Category", 
+                                      choices = c("All" = "All"), 
+                                      selected = "All",
+                                      multiple = TRUE,
+                                      options = list(plugins = list("remove_button")))
                      )
                    )
                  ),
@@ -262,7 +271,9 @@ network_community_server <- function(id, dataset) {
       agency_type_choices <- c("All" = "All", unique(dataset$agency_type))
       agency_choices <- c("All" = "All", unique(dataset$agency))
       supplier_choices <- c("All" = "All", unique(dataset$supplier_name))
-      tender_type_choices <- c("All" = "All", unique(dataset$tender_cat))      
+      
+      # Get tender category choices from tender_cat column
+      tender_cat_choices <- c("All" = "All", unique(dataset$tender_cat))
       
       updateSelectInput(session, "agency_type", 
                         choices = agency_type_choices,
@@ -278,8 +289,13 @@ network_community_server <- function(id, dataset) {
                            selected = "All",
                            server = TRUE)
       
+      updateSelectizeInput(session, "tender_cat", 
+                           choices = tender_cat_choices,
+                           selected = "All",
+                           server = TRUE)
+      
       updateSelectInput(session, "tender_type", 
-                        choices = tender_type_choices,
+                        choices = tender_cat_choices,
                         selected = "All")
       updateSliderInput(session, "max_edges",
                         value = 500)
@@ -364,8 +380,8 @@ network_community_server <- function(id, dataset) {
         filtered_data <- filtered_data %>% filter(agency_type %in% input$agency_type)
       }
       
-      if (!is.null(input$tender_type) && length(input$tender_type) > 0 && !("All" %in% input$tender_type)) {
-        filtered_data <- filtered_data %>% filter(tender_type %in% input$tender_type)
+      if (!is.null(input$tender_cat) && length(input$tender_cat) > 0 && !("All" %in% input$tender_cat)) {
+        filtered_data <- filtered_data %>% filter(tender_cat %in% input$tender_cat)
       }
       # Apply date range filter
       if (!is.null(input$date_range)) {

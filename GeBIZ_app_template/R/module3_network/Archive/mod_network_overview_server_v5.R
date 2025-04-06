@@ -11,6 +11,16 @@ network_analysis_server <- function(id, data = NULL) {
     print("==== Contents of raw_data ====")
     print(names(raw_data))
     
+    # Debug output for tender_cat column
+    if ("monthly_edges" %in% names(raw_data)) {
+      print("==== Checking for tender_cat column ====")
+      print(paste("tender_cat column exists:", "tender_cat" %in% names(raw_data$monthly_edges)))
+      if ("tender_cat" %in% names(raw_data$monthly_edges)) {
+        print("Unique tender categories:")
+        print(sort(unique(raw_data$monthly_edges$tender_cat)))
+      }
+    }
+    
     # Create reactive list
     network_data <- reactive({
       list(
@@ -28,6 +38,12 @@ network_analysis_server <- function(id, data = NULL) {
       if (is.null(input$max_edges)) {
         updateSliderInput(session, "max_edges", value = 100)
       }
+      
+      # Set default date range to April 2019 - March 2024
+      updateSelectInput(session, "start_year", selected = "2019")
+      updateSelectInput(session, "start_month", selected = 4)
+      updateSelectInput(session, "end_year", selected = "2024")
+      updateSelectInput(session, "end_month", selected = 3)
     })
     
     # Initialize filters when the module loads
@@ -47,9 +63,14 @@ network_analysis_server <- function(id, data = NULL) {
       updateSelectizeInput(session, "supplier_filter", choices = suppliers, selected = "All")
       
       # Update tender category filter
+      print("==== Initializing tender category filter ====")
+      print(paste("tender_cat column exists:", "tender_cat" %in% names(network_data()$edges)))
       if ("tender_cat" %in% names(network_data()$edges)) {
         tender_cats <- c("All", sort(unique(network_data()$edges$tender_cat)))
+        print(paste("Tender categories:", paste(tender_cats, collapse=", ")))
         updateSelectizeInput(session, "tender_cat_filter", choices = tender_cats, selected = "All")
+      } else {
+        print("tender_cat column not found in edges data")
       }
       
       # Update award amount range
@@ -104,30 +125,91 @@ network_analysis_server <- function(id, data = NULL) {
       }
     }, ignoreInit = TRUE)
     
+    # Enforce date range restrictions
+    observe({
+      # Start date restrictions
+      if (input$start_year == "2019") {
+        # If 2019 is selected, only allow April-December
+        updateSelectInput(session, "start_month",
+                         choices = c("04" = 4, "05" = 5, "06" = 6, "07" = 7, "08" = 8, 
+                                    "09" = 9, "10" = 10, "11" = 11, "12" = 12),
+                         selected = ifelse(as.numeric(input$start_month) < 4, 4, input$start_month))
+      } else if (input$start_year == "2024") {
+        # If 2024 is selected, only allow Jan-Mar
+        updateSelectInput(session, "start_month",
+                         choices = c("01" = 1, "02" = 2, "03" = 3),
+                         selected = ifelse(as.numeric(input$start_month) > 3, 3, input$start_month))
+      } else if (as.numeric(input$start_year) < 2019 || (as.numeric(input$start_year) == 2019 && as.numeric(input$start_month) < 4)) {
+        # If before Apr 2019, set to Apr 2019
+        updateSelectInput(session, "start_year", selected = "2019")
+        updateSelectInput(session, "start_month", selected = 4)
+      } else if (as.numeric(input$start_year) > 2024 || (as.numeric(input$start_year) == 2024 && as.numeric(input$start_month) > 3)) {
+        # If after Mar 2024, set to Mar 2024
+        updateSelectInput(session, "start_year", selected = "2024")
+        updateSelectInput(session, "start_month", selected = 3)
+      } else {
+       
+        updateSelectInput(session, "start_month",
+                         choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
+                                    "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
+                         selected = input$start_month)
+      }
+      
+      # End date restrictions
+      if (input$end_year == "2019") {
+        # If 2019 is selected, only allow April-December
+        updateSelectInput(session, "end_month",
+                         choices = c("04" = 4, "05" = 5, "06" = 6, "07" = 7, "08" = 8, 
+                                    "09" = 9, "10" = 10, "11" = 11, "12" = 12),
+                         selected = ifelse(as.numeric(input$end_month) < 4, 4, input$end_month))
+      } else if (input$end_year == "2024") {
+        # If 2024 is selected, only allow Jan-Mar
+        updateSelectInput(session, "end_month",
+                         choices = c("01" = 1, "02" = 2, "03" = 3),
+                         selected = ifelse(as.numeric(input$end_month) > 3, 3, input$end_month))
+      } else if (as.numeric(input$end_year) < 2019 || (as.numeric(input$end_year) == 2019 && as.numeric(input$end_month) < 4)) {
+        # If before Apr 2019, set to Apr 2019
+        updateSelectInput(session, "end_year", selected = "2019")
+        updateSelectInput(session, "end_month", selected = 4)
+      } else if (as.numeric(input$end_year) > 2024 || (as.numeric(input$end_year) == 2024 && as.numeric(input$end_month) > 3)) {
+        # If after Mar 2024, set to Mar 2024
+        updateSelectInput(session, "end_year", selected = "2024")
+        updateSelectInput(session, "end_month", selected = 3)
+      } else {
+        # For years 2020-2023, all months are valid
+        updateSelectInput(session, "end_month",
+                         choices = c("01" = 1, "02" = 2, "03" = 3, "04" = 4, "05" = 5, "06" = 6,
+                                    "07" = 7, "08" = 8, "09" = 9, "10" = 10, "11" = 11, "12" = 12),
+                         selected = input$end_month)
+      }
+      
+      # Ensure start date is not after end date
+      start_idx <- as.numeric(input$start_year) * 12 + as.numeric(input$start_month)
+      end_idx <- as.numeric(input$end_year) * 12 + as.numeric(input$end_month)
+      
+      if (start_idx > end_idx) {
+        # If start date is after end date, adjust the end date to match start date
+        updateSelectInput(session, "end_year", selected = input$start_year)
+        updateSelectInput(session, "end_month", selected = input$start_month)
+      }
+    })
+    
     # Define filtered_edges once - consolidated version
     filtered_edges <- eventReactive(input$update_network, {
       tryCatch({
         req(network_data())
         edges <- network_data()$edges
         
-        # Build month index with default values if inputs dont exist
-        start_year <- if(is.null(input$start_year)) min(network_data()$time_info$years) else as.numeric(input$start_year)
-        start_month <- if(is.null(input$start_month)) 1 else as.numeric(input$start_month)
-        end_year <- if(is.null(input$end_year)) max(network_data()$time_info$years) else as.numeric(input$end_year)
-        end_month <- if(is.null(input$end_month)) 12 else as.numeric(input$end_month)
+        # Enforce date range restriction (April 2019 to March 2024)
+        start_idx <- 2019 * 12 + 4  # April 2019
+        end_idx <- 2024 * 12 + 3    # March 2024
         
-        # Build month index
-        start_idx <- start_year * 12 + start_month
-        end_idx <- end_year * 12 + end_month
-        if (start_idx > end_idx) {
-          tmp <- start_idx; start_idx <- end_idx; end_idx <- tmp
-        }
-#----debug        
-        # CHECK IF MONTH_INDEX EXISTS
-        if (!"month_index" %in% colnames(edges)) {
-          print("ERROR: month_index column missing from edges")
-          return(edges)  # RETURN UNFILTERED DATA IF CAN'T FILTER BY DATE
-        }
+        # Build month index with default values if inputs dont exist
+        # Override user inputs with the enforced date range
+        start_year <- 2019
+        start_month <- 4
+        end_year <- 2024
+        end_month <- 3
         
         # Filter by time
         filtered <- edges %>%
@@ -148,8 +230,18 @@ network_analysis_server <- function(id, data = NULL) {
         if (!"All" %in% input$supplier_filter) {
           filtered <- filtered %>% filter(supplier_name %in% input$supplier_filter)
         }
+        
+        # Debug output for tender category filter
+        print("==== Applying tender category filter ====")
+        print(paste("tender_cat column exists:", "tender_cat" %in% names(filtered)))
+        print(paste("tender_cat_filter value:", paste(input$tender_cat_filter, collapse=", ")))
+        
         if ("tender_cat" %in% names(filtered) && !"All" %in% input$tender_cat_filter) {
+          print(paste("Filtering by tender categories:", paste(input$tender_cat_filter, collapse=", ")))
           filtered <- filtered %>% filter(tender_cat %in% input$tender_cat_filter)
+          print(paste("After tender category filter:", nrow(filtered), "rows"))
+        } else {
+          print("Not applying tender category filter")
         }
         
         # Filter by award amount range
@@ -200,14 +292,14 @@ network_analysis_server <- function(id, data = NULL) {
           summarise(
             total_contracts = sum(total_contracts, na.rm = TRUE),
             total_award_amount = sum(total_award_amount, na.rm = TRUE),
-            # This line problematic now
-#            tender_cat = if(has_tender_cat) first(tender_cat) else NA_character_,
+            # Include tender_cat if it exists
+            tender_cat = if("tender_cat" %in% colnames(edges)) first(tender_cat) else NA_character_,
             .groups = "drop"
           ) %>%
           mutate(from = agency_id, to = supplier_id) %>%
           select(from, to, agency, supplier_name, 
-                 # CONDITIONAL COLUMN SELECTION
-#                 if(has_tender_cat) tender_cat else NULL, 
+                 # Include tender_cat if it exists
+                 if("tender_cat" %in% colnames(edges)) tender_cat else NULL, 
                  total_contracts, total_award_amount)
       }, error = function(e) {
         print(paste("Error creating final edges:", e$message))
@@ -426,7 +518,8 @@ network_analysis_server <- function(id, data = NULL) {
             "Supplier: ", supplier_name, "<br>",
             "Total Contracts: ", total_contracts, "<br>",
             "Total Award Amount: $",
-            format(total_award_amount, big.mark = ",", scientific = FALSE)
+            format(total_award_amount, big.mark = ",", scientific = FALSE),
+            if("tender_cat" %in% colnames(limited_edges)) paste0("<br>Tender Category: ", tender_cat) else ""
           )
         )
       
@@ -786,9 +879,19 @@ network_analysis_server <- function(id, data = NULL) {
       
       # Get top contracts by award amount
       top_contracts <- tryCatch({
-        vis_data$edges %>%
-          select(agency, supplier_name, total_contracts, total_award_amount) %>%
-          arrange(desc(total_award_amount))
+        # Check if tender_cat exists in the data
+        has_tender_cat <- "tender_cat" %in% colnames(vis_data$edges)
+        
+        # Select columns including tender_cat if it exists
+        if (has_tender_cat) {
+          vis_data$edges %>%
+            select(agency, supplier_name, tender_cat, total_contracts, total_award_amount) %>%
+            arrange(desc(total_award_amount))
+        } else {
+          vis_data$edges %>%
+            select(agency, supplier_name, total_contracts, total_award_amount) %>%
+            arrange(desc(total_award_amount))
+        }
       }, error = function(e) {
         print(paste("Error processing contract table:", e$message))
         return(data.frame(
@@ -811,7 +914,11 @@ network_analysis_server <- function(id, data = NULL) {
       top_contracts$total_award_amount <- paste0("$", format(top_contracts$total_award_amount, big.mark = ",", scientific = FALSE))
       
       # Rename columns for better presentation
-      colnames(top_contracts) <- c("Agency", "Supplier", "Contract Count", "Award Amount")
+      if ("tender_cat" %in% colnames(top_contracts)) {
+        colnames(top_contracts) <- c("Agency", "Supplier", "Tender Category", "Contract Count", "Award Amount")
+      } else {
+        colnames(top_contracts) <- c("Agency", "Supplier", "Contract Count", "Award Amount")
+      }
       
       datatable(
         top_contracts,
@@ -1106,12 +1213,28 @@ network_analysis_server <- function(id, data = NULL) {
         return(datatable(data.frame(Message = "No connections found"), options = list(dom = 't')))
       }
       
-      connections <- ego_data$edges %>%
-        select(agency, supplier_name, total_contracts, total_award_amount) %>%
-        arrange(desc(total_award_amount))
+      # Check if tender_cat exists in the data
+      has_tender_cat <- "tender_cat" %in% colnames(ego_data$edges)
+      
+      # Select columns including tender_cat if it exists
+      if (has_tender_cat) {
+        connections <- ego_data$edges %>%
+          select(agency, supplier_name, tender_cat, total_contracts, total_award_amount) %>%
+          arrange(desc(total_award_amount))
+      } else {
+        connections <- ego_data$edges %>%
+          select(agency, supplier_name, total_contracts, total_award_amount) %>%
+          arrange(desc(total_award_amount))
+      }
       
       connections$total_award_amount <- paste0("$", format(connections$total_award_amount, big.mark = ",", scientific = FALSE))
-      colnames(connections) <- c("Agency", "Supplier", "Contract Count", "Award Amount")
+      
+      # Rename columns for better presentation
+      if (has_tender_cat) {
+        colnames(connections) <- c("Agency", "Supplier", "Tender Category", "Contract Count", "Award Amount")
+      } else {
+        colnames(connections) <- c("Agency", "Supplier", "Contract Count", "Award Amount")
+      }
       
       datatable(connections, options = list(pageLength = 5, scrollX = TRUE))
     })
