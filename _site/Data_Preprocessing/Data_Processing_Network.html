@@ -140,6 +140,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../Data_Preprocessing/Data_Preprocessing_LDA.html">
  <span class="dropdown-text">For LDA</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../Data_Preprocessing/Data_Processing_Network.html">
+ <span class="dropdown-text">Network Insights</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
@@ -197,7 +201,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#data-cleaning" id="toc-data-cleaning" class="nav-link" data-scroll-target="#data-cleaning">Data Cleaning</a></li>
   <li><a href="#data-joining" id="toc-data-joining" class="nav-link" data-scroll-target="#data-joining">Data Joining</a></li>
   <li><a href="#network-data-preparation" id="toc-network-data-preparation" class="nav-link" data-scroll-target="#network-data-preparation">Network Data Preparation</a></li>
-  <li><a href="#create-network-dataset" id="toc-create-network-dataset" class="nav-link" data-scroll-target="#create-network-dataset">4 Create Network Dataset</a></li>
+  <li><a href="#create-network-dataset" id="toc-create-network-dataset" class="nav-link" data-scroll-target="#create-network-dataset">Create Network Dataset</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -686,9 +690,9 @@ $ LDA_Category         &lt;chr&gt; "General Procurement - Goods", "General Procu
 </section>
 </section>
 <section id="create-network-dataset" class="level3">
-<h3 class="anchored" data-anchor-id="create-network-dataset">4 Create Network Dataset</h3>
+<h3 class="anchored" data-anchor-id="create-network-dataset">Create Network Dataset</h3>
 <section id="create-node-dataset" class="level4">
-<h4 class="anchored" data-anchor-id="create-node-dataset">Create Node Dataset</h4>
+<h4 class="anchored" data-anchor-id="create-node-dataset">1 Create Node Dataset</h4>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -803,7 +807,7 @@ $ LDA_Category         &lt;chr&gt; "General Procurement - Goods", "General Procu
 </div>
 </section>
 <section id="create-edge-dataset" class="level4">
-<h4 class="anchored" data-anchor-id="create-edge-dataset">Create Edge Dataset</h4>
+<h4 class="anchored" data-anchor-id="create-edge-dataset">2 Create Edge Dataset</h4>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -910,7 +914,7 @@ $ LDA_Category         &lt;chr&gt; "General Procurement - Goods", "General Procu
 </div>
 </section>
 <section id="create-monthly-edges-dataset" class="level4">
-<h4 class="anchored" data-anchor-id="create-monthly-edges-dataset">Create Monthly Edges Dataset</h4>
+<h4 class="anchored" data-anchor-id="create-monthly-edges-dataset">3 Create Monthly Edges Dataset</h4>
 <p>The monthly edges dataset is created for Network Overview to compute fast as date range is selected.</p>
 <div class="cell">
 <details class="code-fold">
@@ -1007,7 +1011,7 @@ $ LDA_Category         &lt;chr&gt; "General Procurement - Goods", "General Procu
 </div>
 </section>
 <section id="create-month-reference-table" class="level4">
-<h4 class="anchored" data-anchor-id="create-month-reference-table">Create Month Reference Table</h4>
+<h4 class="anchored" data-anchor-id="create-month-reference-table">4 Create Month Reference Table</h4>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -1045,7 +1049,7 @@ $ LDA_Category         &lt;chr&gt; "General Procurement - Goods", "General Procu
 </div>
 </section>
 <section id="save-to-rds-file-for-use" class="level4">
-<h4 class="anchored" data-anchor-id="save-to-rds-file-for-use">Save to RDS file for use</h4>
+<h4 class="anchored" data-anchor-id="save-to-rds-file-for-use">5 Save to RDS file for use</h4>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>

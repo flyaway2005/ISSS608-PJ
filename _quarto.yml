@@ -13,6 +13,8 @@ website:
         menu:
         - text: "For LDA"
           href: Data_Preprocessing/Data_Preprocessing_LDA.qmd
+        - text: "Network Insights"
+          href: Data_Preprocessing/Data_Processing_Network.qmd
       - text: "Poster"
         href: Poster.qmd
       - text: "Meetings"

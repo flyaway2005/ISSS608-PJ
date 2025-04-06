@@ -184,9 +184,9 @@ network_labeled <- GeBiz_enhanced %>%
   )
 ```
 
-### 4 Create Network Dataset
+### Create Network Dataset
 
-#### Create Node Dataset
+#### 1 Create Node Dataset
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -241,7 +241,7 @@ supplier_lookup <- supplier_nodes %>% select(supplier_name = name, supplier_id =
 kable(head(nodes_df,3))
 ```
 
-#### Create Edge Dataset
+#### 2 Create Edge Dataset
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -268,7 +268,7 @@ edges_df <- network_labeled %>%
 kable(head(edges_df,3))
 ```
 
-#### Create Monthly Edges Dataset
+#### 3 Create Monthly Edges Dataset
 The monthly edges dataset is created for Network Overview to compute fast as date range is selected.
 ```{r}
 #| code-fold: true
@@ -290,7 +290,7 @@ monthly_edges_df <- network_labeled %>%
 kable(head(monthly_edges_df,3))
 ```
 
-#### Create Month Reference Table
+#### 4 Create Month Reference Table
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -326,7 +326,7 @@ network_data <- list(
 )
 ```
 
-#### Save to RDS file for use
+#### 5 Save to RDS file for use
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
