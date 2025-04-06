@@ -1,5 +1,5 @@
 ---
-title: "Data Preprocessing for Network Module"
+title: "Data Preprocessing for Network Insights Module"
 author: "Cathy Chu"
 date-modified: "last-modified" 
 execute:
@@ -12,6 +12,23 @@ execute:
 ## Overview
 
 This document outlines the data preprocessing steps for the Network Insights module. The process involves cleaning and transforming government procurement data from GeBIZ, incorporating tender categories from Tender Analysis Module, and preparing the data for network visualisation.
+
+## Data Dictionary
+
+### Temporal Variables
+- `award_date`: Date of tender award (format: YYYY-MM-DD)
+- `award_year`: Year of award (numeric)
+- `month_num`: Month number (1-12)
+- `month_index`: Sequential month index for filtering (YYYYMM format)
+- `year_month`: Year and month in YYYY-MM format
+- `quarter`: Quarter of the year (Q1-Q4)
+
+### Network Variables
+- `agency`: Government agency name
+- `supplier_name`: Supplier company name
+- `tender_cat`: Category of tender from text analysis
+- `agency_type`: Type of government agency
+- `awarded_amt`: Amount awarded in the tender
 
 ## Data Import and Exploration
 
@@ -44,6 +61,33 @@ The dataset derived from Text Analysis module has 24,438 rows and 15 columns. We
 glimpse(label_data)
 ```
 
+### Data Quality Check
+
+#### Temporal Coverage
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+# Check date range
+date_range <- GeBiz_csv %>%
+  mutate(award_date = as.Date(award_date, format = "%d/%m/%Y")) %>%
+  summarise(
+    min_date = min(award_date, na.rm = TRUE),
+    max_date = max(award_date, na.rm = TRUE),
+    total_days = as.numeric(max_date - min_date)
+  )
+kable(date_range)
+
+# Check for missing months
+monthly_counts <- GeBiz_csv %>%
+  mutate(
+    award_date = as.Date(award_date, format = "%d/%m/%Y"),
+    year_month = format(award_date, "%Y-%m")
+  ) %>%
+  count(year_month) %>%
+  arrange(year_month)
+kable(head(monthly_counts, 5))
+```
+
 ## Data Processing
 
 ### Data Cleaning
@@ -55,9 +99,7 @@ Our analysis revealed that some entries have "unknown" listed as the supplier_na
 During data wrangling, we will:
 
 -   Convert dates to proper date type format
-
 -   Filter out entries with no awarded tenders
-
 -   Add columns for Year, Month, and Quarter to facilitate date range selection and temporal analysis
 
 Our EDA found no missing values, so no additional handling is needed for null values.
@@ -84,21 +126,8 @@ GeBiz_addtime <- GeBiz_full %>%
          month = format(award_date, "%m"),
          year_month = format(award_date, "%Y-%m"),
          quarter = quarters(award_date))
-#write_csv(GeBiz_addtime, "GeBiz_add_y_m.csv")
 kable(head(GeBiz_addtime))
 ```
-
-::::: goals
-::: goals-header
-Note
-:::
-
-::: goals-container
--   The data now has 17,855 rows and 11 columns. Less rows from the original dataset because the unknown entries have been removed.
--   Now *award_date* has been converted to *date* type, and the year, month, and quarter have been added to the dataset.
--   In the code above, we managed to save the data as a csv file *eBiz_add_y_m.csv.* This is so when we need further processing during app development, the process is quicker and less computation heavy.
-:::
-:::::
 
 ### Data Joining
 
@@ -109,7 +138,6 @@ In this step, we will join the datasets to incorporate derived columns such as t
 #| code-summary: "Show the code"
 # Match LDA & agency type
 network_w_type_data <- GeBiz_addtime %>%
-
   mutate(row_id = row_number()) %>%
   mutate(tender_cat = label_data$LDA_Category[match(tender_description,
                                                     label_data$tender_description)]) %>%
@@ -120,50 +148,63 @@ network_w_type_data <- GeBiz_addtime %>%
 kable(head(network_w_type_data))
 ```
 
+### Temporal Summary Statistics
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+# Yearly summary
+yearly_summary <- network_w_type_data %>%
+  group_by(award_year) %>%
+  summarise(
+    total_contracts = n(),
+    total_amount = sum(awarded_amt, na.rm = TRUE),
+    avg_amount = mean(awarded_amt, na.rm = TRUE),
+    .groups = "drop"
+  )
+kable(yearly_summary)
+
+# Quarterly summary
+quarterly_summary <- network_w_type_data %>%
+  group_by(award_year, quarter) %>%
+  summarise(
+    total_contracts = n(),
+    total_amount = sum(awarded_amt, na.rm = TRUE),
+    .groups = "drop"
+  )
+kable(head(quarterly_summary, 5))
+```
+
 ### Network Data Preparation
 
 Now, we will create an RDS file for use in the Network module. In the code below, we convert relevant time fields to date or numeric types. We assign unique IDs and types to both agencies and suppliers. We then create edges to define the relationships between agencies and suppliers, aggregating multiple tenders into single connections.
 
-#### 1 Clean and Format Data
+#### 1. Base Data Preparation
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-# remove unknown suppliers and whitespace
+# Clean and format base data
 GeBiz_clean <- GeBiz_csv %>%
   filter(supplier_name != "Unknown") %>%
   mutate(
-    # Proper date conversion with error handling
     award_date = as.Date(award_date, format = "%d/%m/%Y"),
-    # Clean whitespace
     agency = trimws(agency),
     supplier_name = trimws(supplier_name)
   ) 
-```
 
-#### 2 Add Time Components
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
+# Add time components
 GeBiz_enhanced <- GeBiz_clean %>%
   mutate(
-    # Add time components as numeric values from the start
     award_year = as.numeric(format(award_date, "%Y")),
     month_num = as.numeric(format(award_date, "%m")),
-    # Create month_index for filtering (YYYYMM format)
     month_index = award_year * 12 + month_num,
-    # Create display formats
     month_name = month.name[month_num],
     year_month = paste0(award_year, "-", sprintf("%02d", month_num)),
     quarter = quarters(award_date)
   )
-```
 
-#### 3 Add Categories and Labels
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
+# Add categories and labels
 network_labeled <- GeBiz_enhanced %>%
-  # Add tender categories and agency types
   left_join(
     label_data %>% select(tender_description, LDA_Category),
     by = "tender_description"
@@ -172,12 +213,10 @@ network_labeled <- GeBiz_enhanced %>%
     label_data %>% select(agency, SUBCAT) %>% distinct(),
     by = "agency"
   ) %>%
-  # Rename for clarity
   rename(
     tender_cat = LDA_Category,
     agency_type = SUBCAT
   ) %>%
-  # Handle potential NAs for categories
   mutate(
     tender_cat = if_else(is.na(tender_cat), "Uncategorized", tender_cat),
     agency_type = if_else(is.na(agency_type), "Unspecified", agency_type)
@@ -186,7 +225,7 @@ network_labeled <- GeBiz_enhanced %>%
 
 ### Create Network Dataset
 
-#### 1 Create Node Dataset
+#### 1. Node Dataset Creation
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -234,51 +273,44 @@ supplier_nodes <- supplier_metrics %>%
 # Combine nodes
 nodes_df <- bind_rows(agency_nodes, supplier_nodes)
 
-# Create a lookup table for IDs
+# Create lookup tables
 agency_lookup <- agency_nodes %>% select(agency = name, agency_id = id)
 supplier_lookup <- supplier_nodes %>% select(supplier_name = name, supplier_id = id)
 
 kable(head(nodes_df,3))
 ```
 
-#### 2 Create Edge Dataset
+#### 2. Edge Dataset Creation
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
 # Create Edge Dataset -----
 edges_df <- network_labeled %>%
-  # Join with lookup tables to get IDs
   left_join(agency_lookup, by = "agency") %>%
   left_join(supplier_lookup, by = "supplier_name") %>%
   mutate(
     from_id = agency_id,
-    to_id = supplier_id
-  ) %>%
-  # Each row is one contract
-  mutate(
+    to_id = supplier_id,
     total_contracts = 1,
     total_award_amount = awarded_amt
   ) %>%
-  # Select final fields for edges
   select(
     agency, supplier_name, from_id, to_id, tender_cat, agency_type,
     total_contracts, total_award_amount, award_date, award_year, 
     month_num, month_index
   )
+
 kable(head(edges_df,3))
 ```
 
-#### 3 Create Monthly Edges Dataset
-The monthly edges dataset is created for Network Overview to compute fast as date range is selected.
+#### 3. Monthly Aggregation
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-# monthly aggregated edges
+# Create monthly edges dataset
 monthly_edges_df <- network_labeled %>%
-  # Add IDs
   left_join(agency_lookup, by = "agency") %>%
   left_join(supplier_lookup, by = "supplier_name") %>%
-  # Group by agency, supplier and month
   group_by(agency, supplier_name, agency_id, supplier_id, tender_cat, agency_type, month_index) %>%
   summarise(
     total_contracts = n(),
@@ -287,14 +319,15 @@ monthly_edges_df <- network_labeled %>%
     month_num = first(month_num),
     .groups = "drop"
   )
+
 kable(head(monthly_edges_df,3))
 ```
 
-#### 4 Create Month Reference Table
+#### 4. Reference Tables
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-# Create month reference table -----
+# Create month reference table
 months_table <- network_labeled %>%
   distinct(award_year, month_num, month_name, month_index, year_month) %>%
   arrange(month_index) %>%
@@ -302,18 +335,21 @@ months_table <- network_labeled %>%
     display_label = paste0(month_name, " ", award_year)
   )
 
-# Create agency types reference table -----
+# Create agency types reference table
 agency_types_df <- agency_nodes %>%
   select(agency = name, agency_type) %>%
   filter(!is.na(agency_type)) %>%
   distinct()
+```
 
-# Package everything -----
+#### 5. Save Network Dataset
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+# Package everything
 network_data <- list(
-  # Main network components
   nodes = nodes_df,
   edges = edges_df,
-
   monthly_edges = monthly_edges_df,
   months = months_table,
   agency_types = agency_types_df,
@@ -324,13 +360,8 @@ network_data <- list(
     month_range = range(network_labeled$month_index, na.rm = TRUE)
   )
 )
-```
 
-#### 5 Save to RDS file for use
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
 # Save to RDS
-#saveRDS(network_data, "m3_processed_network_data.rds")
+saveRDS(network_data, "m3_processed_network_data.rds")
 ```
 

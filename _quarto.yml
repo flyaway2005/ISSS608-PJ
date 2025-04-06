@@ -13,8 +13,11 @@ website:
         menu:
         - text: "For LDA"
           href: Data_Preprocessing/Data_Preprocessing_LDA.qmd
-        - text: "Network Insights"
+        - text: "Network Insights Module"
           href: Data_Preprocessing/Data_Processing_Network.qmd
+        - text: "Procurement Trends Module"
+          href: Data_Preprocessing/Data_Processing_Temporal.qmd
+        
       - text: "Poster"
         href: Poster.qmd
       - text: "Meetings"
