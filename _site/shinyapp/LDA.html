@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-299fde5381b5a602aab895950093955a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-fb111ea82d72e5bd18f836ed95d90a79.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -101,15 +101,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <link href="../site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
-
 <script src="../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
-
 <script src="../site_libs/viz-1.8.2/viz.js"></script>
-
 <link href="../site_libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
-
 <script src="../site_libs/grViz-binding-1.0.11/grViz.js"></script>
-
 
 
 <link rel="stylesheet" href="../styles.css">
@@ -217,27 +212,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning: package 'tidyverse' was built under R version 4.4.3</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: package 'ggplot2' was built under R version 4.4.3</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.4     ✔ readr     2.1.5
 ✔ forcats   1.0.0     ✔ stringr   1.5.1
 ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
 ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-✔ purrr     1.0.2     
+✔ purrr     1.0.4     
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
 ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: package 'tm' was built under R version 4.4.3</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading required package: NLP
 
@@ -247,16 +233,11 @@ The following object is masked from 'package:ggplot2':
 
     annotate</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(topicmodels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: package 'topicmodels' was built under R version 4.4.3</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: package 'tidytext' was built under R version 4.4.3</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 讀取資料</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_LDA <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/Cleaned_GP_LDA.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(topicmodels)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 讀取資料</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_LDA <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/Cleaned_GP_LDA.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 11658 Columns: 7
 ── Column specification ────────────────────────────────────────────────────────
@@ -267,8 +248,8 @@ dbl (1): awarded_amt
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>Cleaned_GP <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/Cleaned_GP.csv"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tender_no, award_date, awarded_amt, tender_detail_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Cleaned_GP <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/Cleaned_GP.csv"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tender_no, award_date, awarded_amt, tender_detail_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 17855 Columns: 7
 ── Column specification ────────────────────────────────────────────────────────
@@ -279,77 +260,77 @@ dbl (1): awarded_amt
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 定義停用詞</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>default_stopwords <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">stopwords</span>(<span class="st">"en"</span>), <span class="st">"please"</span>, <span class="st">"refer"</span>, <span class="st">"another"</span>, <span class="st">"one"</span>, <span class="st">"two"</span>, <span class="st">"three"</span>, </span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"framework"</span>, <span class="st">"edition"</span>, <span class="st">"related"</span>, <span class="st">"whole"</span>, <span class="st">"period"</span>, <span class="st">"government"</span>, </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"entities"</span>, <span class="st">"various"</span>, <span class="st">"including"</span>, <span class="st">"requirement"</span>, <span class="st">"provide"</span>, <span class="st">"supply"</span>, </span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"service"</span>, <span class="st">"procurement"</span>, <span class="st">"year"</span>, <span class="st">"option"</span>, <span class="st">"extend"</span>, <span class="st">"agreement"</span>, </span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"singapore"</span>, <span class="st">"Singapore"</span>)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 清理文字</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_LDA <span class="ot">&lt;-</span> Cleaned_GP_LDA <span class="sc">%&gt;%</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">tender_clean =</span> tender_description <span class="sc">%&gt;%</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tolower</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">removePunctuation</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">removeNumbers</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">stripWhitespace</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">removeWords</span>(default_stopwords)</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 建立 DTM</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>dtm <span class="ot">&lt;-</span> Cleaned_GP_LDA <span class="sc">%&gt;%</span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, tender_clean) <span class="sc">%&gt;%</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(tender_no, word) <span class="sc">%&gt;%</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dtm</span>(<span class="at">document =</span> tender_no, <span class="at">term =</span> word, <span class="at">value =</span> n)</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 訓練 LDA 模型</span></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>lda_model <span class="ot">&lt;-</span> <span class="fu">LDA</span>(dtm, <span class="at">k =</span> <span class="dv">7</span>, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">seed =</span> <span class="dv">1234</span>))</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 取得分類</span></span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>lda_assignments <span class="ot">&lt;-</span> <span class="fu">tidy</span>(lda_model, <span class="at">matrix =</span> <span class="st">"gamma"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(document) <span class="sc">%&gt;%</span></span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">1</span>, gamma) <span class="sc">%&gt;%</span></span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 對應主題編號為分類名稱</span></span>
-<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>lda_category_map <span class="ot">&lt;-</span> <span class="cf">function</span>(topic) {</span>
-<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">case_when</span>(</span>
-<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"General Procurement - Goods"</span>,</span>
-<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"General Procurement - Services"</span>,</span>
-<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"Engineering Procurement - Goods"</span>,</span>
-<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"Engineering Procurement - Services"</span>,</span>
-<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">"Engineering Procurement - EPC"</span>,</span>
-<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">6</span> <span class="sc">~</span> <span class="st">"PPP Procurement - DBO"</span>,</span>
-<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">7</span> <span class="sc">~</span> <span class="st">"PPP Procurement - DBFO"</span>,</span>
-<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Unclassified"</span></span>
-<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a><span class="co"># 合併回原始 Cleaned_GP_LDA</span></span>
-<span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_LDA_LDA <span class="ot">&lt;-</span> Cleaned_GP_LDA <span class="sc">%&gt;%</span></span>
-<span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(lda_assignments, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"tender_no"</span> <span class="ot">=</span> <span class="st">"document"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-51"><a href="#cb16-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">LDA_Category =</span> <span class="fu">lda_category_map</span>(topic))</span>
-<span id="cb16-52"><a href="#cb16-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-53"><a href="#cb16-53" aria-hidden="true" tabindex="-1"></a><span class="co"># 合併 Cleaned_GP（含金額與日期）</span></span>
-<span id="cb16-54"><a href="#cb16-54" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_Final <span class="ot">&lt;-</span> Cleaned_GP <span class="sc">%&gt;%</span></span>
-<span id="cb16-55"><a href="#cb16-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb16-56"><a href="#cb16-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">tender_date =</span> <span class="fu">as.Date</span>(award_date, <span class="at">format =</span> <span class="st">"%d/%m/%Y"</span>),</span>
-<span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">tender_value =</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">"[^0-9.]"</span>, <span class="st">""</span>, awarded_amt))</span>
-<span id="cb16-58"><a href="#cb16-58" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb16-59"><a href="#cb16-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Cleaned_GP_LDA_LDA <span class="sc">%&gt;%</span> <span class="fu">select</span>(tender_no, LDA_Category), <span class="at">by =</span> <span class="st">"tender_no"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-60"><a href="#cb16-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(tender_date), <span class="sc">!</span><span class="fu">is.na</span>(tender_value), <span class="sc">!</span><span class="fu">is.na</span>(LDA_Category))</span>
-<span id="cb16-61"><a href="#cb16-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-62"><a href="#cb16-62" aria-hidden="true" tabindex="-1"></a><span class="co"># 儲存結果</span></span>
-<span id="cb16-63"><a href="#cb16-63" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(Cleaned_GP_Final, <span class="st">"data/default_dataset_tender_market_analysis.csv"</span>)</span>
-<span id="cb16-64"><a href="#cb16-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-65"><a href="#cb16-65" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"✅ default_dataset_tender_market_analysis.csv 已成功建立。</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 定義停用詞</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>default_stopwords <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">stopwords</span>(<span class="st">"en"</span>), <span class="st">"please"</span>, <span class="st">"refer"</span>, <span class="st">"another"</span>, <span class="st">"one"</span>, <span class="st">"two"</span>, <span class="st">"three"</span>, </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"framework"</span>, <span class="st">"edition"</span>, <span class="st">"related"</span>, <span class="st">"whole"</span>, <span class="st">"period"</span>, <span class="st">"government"</span>, </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"entities"</span>, <span class="st">"various"</span>, <span class="st">"including"</span>, <span class="st">"requirement"</span>, <span class="st">"provide"</span>, <span class="st">"supply"</span>, </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"service"</span>, <span class="st">"procurement"</span>, <span class="st">"year"</span>, <span class="st">"option"</span>, <span class="st">"extend"</span>, <span class="st">"agreement"</span>, </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"singapore"</span>, <span class="st">"Singapore"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 清理文字</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_LDA <span class="ot">&lt;-</span> Cleaned_GP_LDA <span class="sc">%&gt;%</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">tender_clean =</span> tender_description <span class="sc">%&gt;%</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tolower</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">removePunctuation</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">removeNumbers</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">stripWhitespace</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">removeWords</span>(default_stopwords)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 建立 DTM</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>dtm <span class="ot">&lt;-</span> Cleaned_GP_LDA <span class="sc">%&gt;%</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, tender_clean) <span class="sc">%&gt;%</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(tender_no, word) <span class="sc">%&gt;%</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dtm</span>(<span class="at">document =</span> tender_no, <span class="at">term =</span> word, <span class="at">value =</span> n)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 訓練 LDA 模型</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>lda_model <span class="ot">&lt;-</span> <span class="fu">LDA</span>(dtm, <span class="at">k =</span> <span class="dv">7</span>, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">seed =</span> <span class="dv">1234</span>))</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 取得分類</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>lda_assignments <span class="ot">&lt;-</span> <span class="fu">tidy</span>(lda_model, <span class="at">matrix =</span> <span class="st">"gamma"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(document) <span class="sc">%&gt;%</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">1</span>, gamma) <span class="sc">%&gt;%</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 對應主題編號為分類名稱</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>lda_category_map <span class="ot">&lt;-</span> <span class="cf">function</span>(topic) {</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">case_when</span>(</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"General Procurement - Goods"</span>,</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"General Procurement - Services"</span>,</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"Engineering Procurement - Goods"</span>,</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"Engineering Procurement - Services"</span>,</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">"Engineering Procurement - EPC"</span>,</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">6</span> <span class="sc">~</span> <span class="st">"PPP Procurement - DBO"</span>,</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    topic <span class="sc">==</span> <span class="dv">7</span> <span class="sc">~</span> <span class="st">"PPP Procurement - DBFO"</span>,</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Unclassified"</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a><span class="co"># 合併回原始 Cleaned_GP_LDA</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_LDA_LDA <span class="ot">&lt;-</span> Cleaned_GP_LDA <span class="sc">%&gt;%</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(lda_assignments, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"tender_no"</span> <span class="ot">=</span> <span class="st">"document"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">LDA_Category =</span> <span class="fu">lda_category_map</span>(topic))</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="co"># 合併 Cleaned_GP（含金額與日期）</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_Final <span class="ot">&lt;-</span> Cleaned_GP <span class="sc">%&gt;%</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">tender_date =</span> <span class="fu">as.Date</span>(award_date, <span class="at">format =</span> <span class="st">"%d/%m/%Y"</span>),</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">tender_value =</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">"[^0-9.]"</span>, <span class="st">""</span>, awarded_amt))</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(Cleaned_GP_LDA_LDA <span class="sc">%&gt;%</span> <span class="fu">select</span>(tender_no, LDA_Category), <span class="at">by =</span> <span class="st">"tender_no"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(tender_date), <span class="sc">!</span><span class="fu">is.na</span>(tender_value), <span class="sc">!</span><span class="fu">is.na</span>(LDA_Category))</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a><span class="co"># 儲存結果</span></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(Cleaned_GP_Final, <span class="st">"data/default_dataset_tender_market_analysis.csv"</span>)</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"✅ default_dataset_tender_market_analysis.csv 已成功建立。</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>✅ default_dataset_tender_market_analysis.csv 已成功建立。</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/default_dataset_tender_market_analysis.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/default_dataset_tender_market_analysis.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 17855 Columns: 7
 ── Column specification ────────────────────────────────────────────────────────
@@ -361,7 +342,7 @@ date (1): tender_date
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 17,855
 Columns: 7
@@ -375,7 +356,7 @@ $ LDA_Category         &lt;chr&gt; "PPP Procurement - DBO", "Engineering Procure
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_LDA <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/Cleaned_GP_LDA.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_LDA <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/Cleaned_GP_LDA.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 11658 Columns: 7
 ── Column specification ────────────────────────────────────────────────────────
@@ -386,7 +367,7 @@ dbl (1): awarded_amt
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_LDA</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>Cleaned_GP_LDA</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 11,658 × 7
    tender_no         tender_description   agency award_date tender_detail_status
@@ -406,46 +387,44 @@ dbl (1): awarded_amt
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DiagrammeR)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: package 'DiagrammeR' was built under R version 4.4.3</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grViz</span>(<span class="st">"</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="st">digraph LDA_Preparation {</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="st">  graph [layout = dot, rankdir = TB]</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="st">  node [shape = rect, style = filled, color = gray90, fontname = Helvetica]</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="st">  Start [shape = circle, label = '', width = 0.3, color = black, fillcolor = black]</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="st">  End [shape = circle, label = '', width = 0.3, color = black, fillcolor = black]</span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="st">  Start -&gt; A1</span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="st">  A1 [label = 'Load raw data (CSV)']</span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="st">  A1 -&gt; A2</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="st">  A2 [label = 'Inspect structure using glimpse()']</span></span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="st">  A2 -&gt; A3</span></span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="st">  A3 [label = 'Filter for awarded tenders only']</span></span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="st">  A3 -&gt; A4</span></span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="st">  A4 [label = 'Lowercase tender_description']</span></span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="st">  A4 -&gt; A5</span></span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="st">  A5 [label = 'Group by tender_no and check distinct descriptions']</span></span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="st">  A5 -&gt; A6</span></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="st">  A6 [label = 'Filter for distinct tender no. and tender description']</span></span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="st">  A6 -&gt; A7</span></span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="st">  A7 [label = 'Clean special characters, symbols, punctuation']</span></span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="st">  A7 -&gt; A8</span></span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a><span class="st">  A8 [label = 'Remove stop words and unnecessary text']</span></span>
-<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a><span class="st">  A8 -&gt; A9</span></span>
-<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a><span class="st">  A9 [label = 'Tokenize and lemmatize description']</span></span>
-<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a><span class="st">  A9 -&gt; A10</span></span>
-<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a><span class="st">  A10 [label = 'Recombine cleaned words into final string']</span></span>
-<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a><span class="st">  A10 -&gt; A11</span></span>
-<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a><span class="st">  A11 [label = 'Write cleaned data to Cleaned_GP_LDA.csv']</span></span>
-<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a><span class="st">  A11 -&gt; End</span></span>
-<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
-<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DiagrammeR)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">grViz</span>(<span class="st">"</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="st">digraph LDA_Preparation {</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="st">  graph [layout = dot, rankdir = TB]</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="st">  node [shape = rect, style = filled, color = gray90, fontname = Helvetica]</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="st">  Start [shape = circle, label = '', width = 0.3, color = black, fillcolor = black]</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="st">  End [shape = circle, label = '', width = 0.3, color = black, fillcolor = black]</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="st">  Start -&gt; A1</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="st">  A1 [label = 'Load raw data (CSV)']</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="st">  A1 -&gt; A2</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="st">  A2 [label = 'Inspect structure using glimpse()']</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="st">  A2 -&gt; A3</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="st">  A3 [label = 'Filter for awarded tenders only']</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="st">  A3 -&gt; A4</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="st">  A4 [label = 'Lowercase tender_description']</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="st">  A4 -&gt; A5</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="st">  A5 [label = 'Group by tender_no and check distinct descriptions']</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="st">  A5 -&gt; A6</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="st">  A6 [label = 'Filter for distinct tender no. and tender description']</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a><span class="st">  A6 -&gt; A7</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a><span class="st">  A7 [label = 'Clean special characters, symbols, punctuation']</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="st">  A7 -&gt; A8</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a><span class="st">  A8 [label = 'Remove stop words and unnecessary text']</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a><span class="st">  A8 -&gt; A9</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a><span class="st">  A9 [label = 'Tokenize and lemmatize description']</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a><span class="st">  A9 -&gt; A10</span></span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a><span class="st">  A10 [label = 'Recombine cleaned words into final string']</span></span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a><span class="st">  A10 -&gt; A11</span></span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a><span class="st">  A11 [label = 'Write cleaned data to Cleaned_GP_LDA.csv']</span></span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a><span class="st">  A11 -&gt; End</span></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="grViz html-widget html-fill-item" id="htmlwidget-c68f45d524b2dcc0933c" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-c68f45d524b2dcc0933c">{"x":{"diagram":"\ndigraph LDA_Preparation {\n  graph [layout = dot, rankdir = TB]\n  node [shape = rect, style = filled, color = gray90, fontname = Helvetica]\n\n  Start [shape = circle, label = \"\", width = 0.3, color = black, fillcolor = black]\n  End [shape = circle, label = \"\", width = 0.3, color = black, fillcolor = black]\n\n  Start -> A1\n  A1 [label = \"Load raw data (CSV)\"]\n  A1 -> A2\n  A2 [label = \"Inspect structure using glimpse()\"]\n  A2 -> A3\n  A3 [label = \"Filter for awarded tenders only\"]\n  A3 -> A4\n  A4 [label = \"Lowercase tender_description\"]\n  A4 -> A5\n  A5 [label = \"Group by tender_no and check distinct descriptions\"]\n  A5 -> A6\n  A6 [label = \"Filter for distinct tender no. and tender description\"]\n  A6 -> A7\n  A7 [label = \"Clean special characters, symbols, punctuation\"]\n  A7 -> A8\n  A8 [label = \"Remove stop words and unnecessary text\"]\n  A8 -> A9\n  A9 [label = \"Tokenize and lemmatize description\"]\n  A9 -> A10\n  A10 [label = \"Recombine cleaned words into final string\"]\n  A10 -> A11\n  A11 [label = \"Write cleaned data to Cleaned_GP_LDA.csv\"]\n  A11 -> End\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-a835d6d2eeec7581dba5" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-a835d6d2eeec7581dba5">{"x":{"diagram":"\ndigraph LDA_Preparation {\n  graph [layout = dot, rankdir = TB]\n  node [shape = rect, style = filled, color = gray90, fontname = Helvetica]\n\n  Start [shape = circle, label = \"\", width = 0.3, color = black, fillcolor = black]\n  End [shape = circle, label = \"\", width = 0.3, color = black, fillcolor = black]\n\n  Start -> A1\n  A1 [label = \"Load raw data (CSV)\"]\n  A1 -> A2\n  A2 [label = \"Inspect structure using glimpse()\"]\n  A2 -> A3\n  A3 [label = \"Filter for awarded tenders only\"]\n  A3 -> A4\n  A4 [label = \"Lowercase tender_description\"]\n  A4 -> A5\n  A5 [label = \"Group by tender_no and check distinct descriptions\"]\n  A5 -> A6\n  A6 [label = \"Filter for distinct tender no. and tender description\"]\n  A6 -> A7\n  A7 [label = \"Clean special characters, symbols, punctuation\"]\n  A7 -> A8\n  A8 [label = \"Remove stop words and unnecessary text\"]\n  A8 -> A9\n  A9 [label = \"Tokenize and lemmatize description\"]\n  A9 -> A10\n  A10 [label = \"Recombine cleaned words into final string\"]\n  A10 -> A11\n  A11 [label = \"Write cleaned data to Cleaned_GP_LDA.csv\"]\n  A11 -> End\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 
