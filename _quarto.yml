@@ -4,6 +4,7 @@ project:
 website:
   title: "Lets’ Track Public Dollars!"
   navbar:
+
     right:
       - href: index.qmd
         text: "Home"
@@ -30,6 +31,15 @@ website:
           href: meetings/meeting_notes_3.qmd
         - text: "Meeting 4"
           href: meetings/meeting_notes_4.qmd
+
+    left:
+      - text: "Shiny App"
+        menu:
+        - text: "Shiny App"
+        
+        - text: "User Guide"
+       
+        
 
 
 format:
