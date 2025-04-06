@@ -62,7 +62,8 @@ ui <- dashboardPage(
                menuSubItem("Data Sampling", tabName = "data_sampling"),
                menuSubItem("LDA Supervised ML", tabName = "lda_supervised"),
                menuSubItem("LDA Clustering", tabName = "lda_clustering"),
-               menuSubItem("Market Insights", tabName = "market_analysis")
+               menuSubItem("Market Insights", tabName = "market_analysis")#,
+               #menuSubItem("Stopwords Management", tabName = "stopwords_management")
                ),
       menuItem("Procurement Trends", tabName = "temo_analysis", icon = icon("dashboard"),
                menuSubItem("Time Series", tabName = "time_series")),
@@ -290,6 +291,9 @@ tabItem(tabName = "time_series",
             network_community_ui("community_module")
     ),
 
+    tabItem(tabName = "stopwords_management",
+            mod_stopwords_ui("stopwords_module")
+    ),
 
 #-------------------
 # Introduction tab
@@ -395,6 +399,15 @@ server <- function(input, output, session) {
   # Initialise network module server
   network_analysis_server("network_module", network_data)
   network_community_server("community_module", community_data_global)
+  
+  # Initialize stopwords management server
+  mod_stopwords_server(
+    id = "stopwords_module",
+    selected_data = selected_data,
+    lda_results = lda_results,
+    current_stopwords = current_stopwords,
+    default_stopwords = default_stopwords
+  )
   
   # Statistics for valueBoxes
   output$mean_value <- renderText({

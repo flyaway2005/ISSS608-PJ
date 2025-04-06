@@ -2,7 +2,6 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    # Reactive value to store market_data for downstream plots
     market_data <- reactiveVal(NULL)
     
     update_market_visualizations <- function(data) {
@@ -20,18 +19,36 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
     }
     
     output$date_slider <- renderUI({
-      min_date <- lubridate::floor_date(min(Cleaned_GP$tender_date, na.rm = TRUE), "month")
-      max_date <- lubridate::ceiling_date(max(Cleaned_GP$tender_date, na.rm = TRUE), "month")
-      dateRangeInput(ns("date_range"), "Select Date Range:",
-                     start = min_date, end = max_date, min = min_date, max = max_date)
+      data <- if (input$market_data_source == "default") {
+        readr::read_csv("data/default_dataset_tender_market_analysis.csv") %>%
+          filter(!is.na(tender_date))
+      } else {
+        Cleaned_GP %>%
+          left_join(lda_results(), by = "tender_no") %>%
+          filter(!is.na(tender_date))
+      }
+      
+      if (nrow(data) > 0) {
+        min_date <- lubridate::floor_date(min(data$tender_date, na.rm = TRUE), "month")
+        max_date <- lubridate::ceiling_date(max(data$tender_date, na.rm = TRUE), "month")
+        dateRangeInput(ns("date_range"), "Select Date Range:",
+                       start = min_date, end = max_date, min = min_date, max = max_date)
+      }
     })
     
     observeEvent(input$run_market_analysis, {
-      req(lda_results())
-      data <- Cleaned_GP %>%
-        left_join(lda_results(), by = "tender_no") %>%
-        filter(!is.na(tender_date), !is.na(tender_value), !is.na(LDA_Category))
+      # 🧾 讀入資料
+      data <- if (input$market_data_source == "default") {
+        readr::read_csv("data/default_dataset_tender_market_analysis.csv") %>%
+          filter(!is.na(tender_date), !is.na(tender_value), !is.na(LDA_Category))
+      } else {
+        req(lda_results())
+        Cleaned_GP %>%
+          left_join(lda_results(), by = "tender_no") %>%
+          filter(!is.na(tender_date), !is.na(tender_value), !is.na(LDA_Category))
+      }
       
+      # 🧹 Remove outliers
       if (input$remove_outliers) {
         data <- data %>%
           group_by(LDA_Category) %>%
@@ -45,24 +62,29 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
           filter(tender_value >= lower, tender_value <= upper)
       }
       
+      # 📆 篩選日期區間
       if (!is.null(input$date_range)) {
         data <- data %>%
-          filter(tender_date >= input$date_range[1], tender_date <= input$date_range[2])
+          filter(tender_date >= input$date_range[1],
+                 tender_date <= input$date_range[2])
       }
       
+      # 🏷️ 篩選 LDA 類別
       if (input$market_category != "All") {
         data <- data %>% filter(grepl(input$market_category, LDA_Category))
       }
       
+      # 🧾 篩選投標狀態
       if (input$tender_status != "All") {
         data <- data %>% filter(tender_detail_status == input$tender_status)
       }
       
-      market_data(data)  # Store for plots
+      # ✅ 儲存並更新視覺化
+      market_data(data)
       update_market_visualizations(data)
     })
     
-    # Plot: Market Trend
+    # 📊 市場趨勢圖
     output$market_trend_plot <- renderPlotly({
       req(market_data())
       df <- market_data()
@@ -101,7 +123,7 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
       )
     })
     
-    # Plot: Monthly/Quarterly/Yearly Trend
+    # 📊 月／季／年 分析圖
     output$monthly_analysis_plot <- renderPlotly({
       req(market_data())
       df <- market_data()
@@ -116,11 +138,9 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
         group_by(time_point) %>%
         summarise(count = n(), total_value = sum(tender_value, na.rm = TRUE), .groups = "drop")
       
-      # Calculate Y-axis range
       y_max <- max(df$count)
       y_breaks <- pretty(c(0, y_max), n = 5)
       
-      # Set date format based on time unit
       date_format <- case_when(
         time_unit == "month" ~ "%Y-%m",
         time_unit == "quarter" ~ "%Y-Q%q",
@@ -142,11 +162,8 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
                               labels = scales::label_number(scale_cut = cut_short_scale()))
         ) +
         labs(title = paste(tools::toTitleCase(time_unit), "Analysis"),
-             x = case_when(
-               time_unit == "month" ~ "Month",
-               time_unit == "quarter" ~ "Quarter",
-               time_unit == "year" ~ "Year"
-             )) +
+             x = tools::toTitleCase(time_unit),
+             y = "Count / Value (K)") +
         theme_minimal() +
         theme(
           panel.grid.major = element_line(color = "gray90"),
@@ -161,13 +178,11 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
         layout(
           hoverlabel = list(bgcolor = "white"),
           margin = list(b = 50),
-          yaxis = list(
-            range = c(0, y_max * 1.1)
-          )
+          yaxis = list(range = c(0, y_max * 1.1))
         )
     })
     
-    # Plot: Dynamic Scatter
+    # 📊 動態氣泡圖
     output$dynamic_scatter_plot <- renderPlotly({
       req(market_data())
       df <- market_data()

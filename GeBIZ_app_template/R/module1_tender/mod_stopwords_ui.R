@@ -1,6 +1,6 @@
-
 mod_stopwords_ui <- function(id) {
   ns <- NS(id)
+  
   tagList(
     h4("Stopwords Management"),
     DTOutput(ns("stopwords_table")),

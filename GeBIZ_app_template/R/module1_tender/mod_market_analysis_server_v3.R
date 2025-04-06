@@ -1,4 +1,4 @@
-mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
+mod_market_analysis_server <- function(id, lda_results, Cleaned_GP, default_market_data) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -20,17 +20,36 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
     }
     
     output$date_slider <- renderUI({
-      min_date <- lubridate::floor_date(min(Cleaned_GP$tender_date, na.rm = TRUE), "month")
-      max_date <- lubridate::ceiling_date(max(Cleaned_GP$tender_date, na.rm = TRUE), "month")
+      # 根據選擇的數據來源決定使用哪個數據集
+      if (input$market_data_source == "default") {
+        data_source <- default_market_data
+      } else {
+        data_source <- Cleaned_GP
+      }
+      
+      min_date <- lubridate::floor_date(min(data_source$tender_date, na.rm = TRUE), "month")
+      max_date <- lubridate::ceiling_date(max(data_source$tender_date, na.rm = TRUE), "month")
       dateRangeInput(ns("date_range"), "Select Date Range:",
                      start = min_date, end = max_date, min = min_date, max = max_date)
     })
     
     observeEvent(input$run_market_analysis, {
-      req(lda_results())
-      data <- Cleaned_GP %>%
-        left_join(lda_results(), by = "tender_no") %>%
-        filter(!is.na(tender_date), !is.na(tender_value), !is.na(LDA_Category))
+      # 根據選擇的數據來源決定使用哪個數據集
+      if (input$market_data_source == "default") {
+        data <- default_market_data
+      } else {
+        req(lda_results())
+        data <- Cleaned_GP %>%
+          left_join(lda_results(), by = "tender_no")
+      }
+      
+      # 確保數據包含必要的欄位
+      data <- data %>%
+        filter(!is.na(tender_date), !is.na(tender_value))
+      
+      if (input$market_data_source != "default") {
+        data <- data %>% filter(!is.na(LDA_Category))
+      }
       
       if (input$remove_outliers) {
         data <- data %>%

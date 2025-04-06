@@ -27,22 +27,16 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
     })
     
     observeEvent(input$run_market_analysis, {
-      req(lda_results())
-      data <- Cleaned_GP %>%
-        left_join(lda_results(), by = "tender_no") %>%
-        filter(!is.na(tender_date), !is.na(tender_value), !is.na(LDA_Category))
-      
-      if (input$remove_outliers) {
-        data <- data %>%
-          group_by(LDA_Category) %>%
-          mutate(
-            Q1 = quantile(tender_value, 0.25),
-            Q3 = quantile(tender_value, 0.75),
-            IQR = Q3 - Q1,
-            lower = Q1 - 1.5 * IQR,
-            upper = Q3 + 1.5 * IQR
-          ) %>%
-          filter(tender_value >= lower, tender_value <= upper)
+      if (input$market_data_source == "default") {
+        # ✅ 使用 default dataset
+        data <- read_csv("data/default_dataset_tender_market_analysis.csv") %>%
+          filter(!is.na(tender_date))
+      } else {
+        # ✅ 使用 LDA 結果合併 Cleaned_GP
+        req(lda_results())
+        data <- Cleaned_GP %>%
+          left_join(lda_results(), by = "tender_no") %>%
+          filter(!is.na(tender_date), !is.na(tender_value), !is.na(LDA_Category))
       }
       
       if (!is.null(input$date_range)) {
