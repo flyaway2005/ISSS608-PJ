@@ -1,7 +1,0 @@
----
-title: "Project Poster"
-format:
-  html
----
-
-![](images/ISSS608_AY2024-25Jan_Group04.jpg)
