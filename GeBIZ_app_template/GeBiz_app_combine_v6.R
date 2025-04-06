@@ -28,12 +28,15 @@ source("global.R")
 # Source module file
 source("R/module1_tender/mod_text_data_ui.R")
 source("R/module1_tender/mod_text_data_server.R")
-source("R/module1_tender/mod_lda_supervised_ui.R")
-source("R/module1_tender/mod_lda_supervised_server.R")
+source("R/module1_tender/mod_lda_supervised_ui_v2.R")
+source("R/module1_tender/mod_lda_supervised_server_v3.R")
 source("R/module1_tender/mod_lda_clustering_ui.R")
 source("R/module1_tender/mod_lda_clustering_server.R")
 source("R/module1_tender/mod_market_analysis_ui.R")
 source("R/module1_tender/mod_market_analysis_server_v3.R")
+source("R/module1_tender/mod_stopwords_ui.R")
+source("R/module1_tender/mod_stopwords_server.R")
+
 
 source("R/module2_tempo/module2_overview_0404_1.R")
 #source("R/module2_tempo/module2_agency_git.R")
@@ -357,8 +360,10 @@ server <- function(input, output, session) {
     id = "lda_supervised_module",
     selected_data = selected_data,
     lda_results = lda_results,
-    current_stopwords = current_stopwords
+    current_stopwords = current_stopwords,
+    default_stopwords = default_stopwords   
   )
+  
   
   # Initiate LDA clustering
   mod_lda_clustering_server(
