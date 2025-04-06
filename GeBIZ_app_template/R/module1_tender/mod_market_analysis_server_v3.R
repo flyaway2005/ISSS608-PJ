@@ -63,114 +63,43 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
     })
     
     # Plot: Market Trend
-    # Market Trend Plot
     output$market_trend_plot <- renderPlotly({
-      # Calculate data for each half year
-      trend_data <- market_data %>%
-        mutate(
-          half_year = floor_date(tender_date, "6 months"),
-          category = case_when(
-            grepl("General Procurement", LDA_Category) ~ "General Procurement",
-            grepl("Engineering Procurement", LDA_Category) ~ "Engineering Procurement",
-            grepl("PPP Procurement", LDA_Category) ~ "PPP Procurement",
-            TRUE ~ "Other"
-          )
-        ) %>%
-        group_by(half_year, category) %>%
-        summarise(
-          count = n(),
-          total_value = sum(tender_value, na.rm = TRUE)
-        ) %>%
-        ungroup()
+      req(market_data())
+      df <- market_data()
       
-      # Calculate average amount for each half year
-      avg_data <- market_data %>%
-        mutate(half_year = floor_date(tender_date, "6 months")) %>%
+      trend_data <- df %>%
+        mutate(half_year = lubridate::floor_date(tender_date, "6 months")) %>%
+        group_by(half_year, LDA_Category) %>%
+        summarise(count = n(), total_value = sum(tender_value, na.rm = TRUE), .groups = "drop")
+      
+      avg_data <- df %>%
+        mutate(half_year = lubridate::floor_date(tender_date, "6 months")) %>%
         group_by(half_year) %>%
-        summarise(avg_value = mean(tender_value, na.rm = TRUE)) %>%
-        ungroup()
+        summarise(avg_value = mean(tender_value, na.rm = TRUE), .groups = "drop") %>%
+        arrange(half_year)
       
-      # Create stacked bar chart
-      p1 <- ggplot(trend_data, aes(x = half_year, y = count, fill = category,
-                                   text = paste("Date:", format(half_year, "%Y-%m"),
-                                                "<br>Category:", category,
-                                                "<br>Number of Tenders:", count))) +
-        geom_bar(stat = "identity", position = "stack", alpha = 0.8) +
-        scale_fill_manual(values = c(
-          "General Procurement" = "#FF6B6B",
-          "Engineering Procurement" = "#4ECDC4",
-          "PPP Procurement" = "#45B7D1",
-          "Other" = "#96CEB4"
-        )) +
-        scale_x_date(
-          date_breaks = "6 months",
-          date_labels = "%Y-%m",
-          expand = c(0.05, 0.05)
-        ) +
-        theme_minimal() +
-        theme(
-          panel.grid.major = element_line(color = "gray90"),
-          panel.grid.minor = element_line(color = "gray95"),
-          legend.position = "bottom",
-          legend.title = element_blank(),
-          legend.text = element_text(size = 10),
-          plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-          axis.title = element_text(size = 12, face = "bold"),
-          axis.text = element_text(size = 10),
-          axis.text.x = element_text(angle = 45, hjust = 1)
-        ) +
-        labs(title = "Number of Tenders by Category and Half-Year",
-             x = "Half Year",
-             y = "Number of Tenders",
-             fill = "Category")
       
-      # Create average amount line chart
-      p2 <- ggplot(avg_data, aes(x = half_year, y = avg_value/1000,
-                                 text = paste("Date:", format(half_year, "%Y-%m"),
-                                              "<br>Average Amount:", sprintf("$%.2fK", avg_value/1000)))) +
-        geom_line(color = "red", size = 1, alpha = 0.8) +
-        geom_point(color = "red", size = 3, alpha = 0.8) +
-        scale_x_date(
-          date_breaks = "6 months",
-          date_labels = "%Y-%m",
-          expand = c(0.05, 0.05)
-        ) +
-        scale_y_continuous(
-          labels = scales::label_number(scale_cut = cut_short_scale())
-        ) +
-        theme_minimal() +
-        theme(
-          panel.grid.major = element_line(color = "gray90"),
-          panel.grid.minor = element_line(color = "gray95"),
-          plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-          axis.title = element_text(size = 12, face = "bold"),
-          axis.text = element_text(size = 10),
-          axis.text.x = element_text(angle = 45, hjust = 1)
-        ) +
-        labs(title = "Average Tender Value / Tender Amount by Half Year",
-             x = "Half Year",
-             y = "Average Amount (K)")
       
-      # Combine two charts using subplot
+      p1 <- ggplot(trend_data, aes(x = half_year, y = count, fill = LDA_Category,
+                                   text = paste("Date:", half_year,
+                                                "<br>Category:", LDA_Category,
+                                                "<br>Tenders:", count))) +
+        geom_bar(stat = "identity") +
+        labs(title = "Number of Tenders by Category", x = "Half-Year", y = "Count") +
+        theme_minimal()
+      
+      p2 <- ggplot(avg_data, aes(x = as.Date(half_year), y = avg_value / 1000,
+                                 text = paste("Date:", half_year,
+                                              "<br>Avg Value:", round(avg_value / 1000)))) +
+        geom_line(color = "red") +
+        geom_point(color = "red") +
+        labs(title = "Average Tender Value (in $K)", x = "Half-Year", y = "Value ($K)") +
+        theme_minimal()
+      
+      
       subplot(
-        ggplotly(p1, tooltip = "text") %>%
-          layout(
-            hoverlabel = list(bgcolor = "white"),
-            showlegend = TRUE,
-            legend = list(
-              orientation = "h",
-              yanchor = "bottom",
-              y = -0.3,
-              xanchor = "center",
-              x = 0.5
-            ),
-            margin = list(b = 100)
-          ),
-        ggplotly(p2, tooltip = "text") %>%
-          layout(
-            hoverlabel = list(bgcolor = "white"),
-            margin = list(b = 50)
-          ),
+        ggplotly(p1, tooltip = "text"),
+        ggplotly(p2, tooltip = "text"),
         nrows = 2,
         heights = c(0.6, 0.4),
         shareX = TRUE
@@ -208,8 +137,7 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
                                        "<br>Number of Tenders:", count,
                                        "<br>Total Value:", sprintf("$%.2fK", total_value/1000)))) +
         geom_bar(aes(y = count), stat = "identity", fill = "steelblue", alpha = 0.7) +
-        geom_line(aes(y = total_value/1000), color = "red", size = 1, alpha = 0.8) +
-        geom_point(aes(y = total_value/1000), color = "red", size = 3, alpha = 0.8) +
+        geom_line(aes(y = total_value/1000), color = "red", size = 1, alpha = 0.8) +  # 折線圖表示 total_value
         scale_y_continuous(
           name = "Number of Tenders",
           breaks = y_breaks,
@@ -232,6 +160,7 @@ mod_market_analysis_server <- function(id, lda_results, Cleaned_GP) {
           axis.text = element_text(size = 10),
           axis.text.x = element_text(angle = 45, hjust = 1)
         )
+      
       
       ggplotly(p, tooltip = "text") %>%
         layout(
