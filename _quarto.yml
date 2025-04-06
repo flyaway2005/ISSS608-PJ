@@ -36,9 +36,9 @@ website:
       - text: "Shiny App"
         menu:
         - text: "Shiny App"
-          href: https://fangyuchang.shinyapps.io/GeBIZ/
+          href: https://cathyschu.shinyapps.io/SGPublicDollars/
         - text: "User Guide"
-          href: UserGuide.pdf
+          href: UserGuide_v2.pdf
        
         
 
