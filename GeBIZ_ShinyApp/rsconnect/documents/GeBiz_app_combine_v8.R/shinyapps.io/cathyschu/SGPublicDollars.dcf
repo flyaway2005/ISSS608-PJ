@@ -1,0 +1,13 @@
+name: SGPublicDollars
+title: SGPublicDollars
+username: cathyschu
+account: cathyschu
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14442758
+bundleId: 10065044
+url: https://cathyschu.shinyapps.io/SGPublicDollars/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: GeBiz_app_combine_v7.R|Archive
