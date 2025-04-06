@@ -36,8 +36,9 @@ website:
       - text: "Shiny App"
         menu:
         - text: "Shiny App"
-        
+          href: https://fangyuchang.shinyapps.io/GeBIZ/
         - text: "User Guide"
+          href: UserGuide.pdf
        
         
 
