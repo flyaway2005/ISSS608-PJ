@@ -1,0 +1,42 @@
+---
+title: "Meeting Minutes 2"
+date-modified: "last-modified"
+execute:
+  echo: False
+  eval: True
+  warning: false
+  freeze: true
+---
+
+The meeting notes below document the 2nd discussion among group members.
+
+#### **Date: 9pm, March 6, 2025**
+
+#### **Attendees:** Cathy, Fangyu
+
+#### **Discussion**
+
+***1 Nowcasting Data Requirements***
+
+-   Fangyu consulted on Piazza about nowcasting data frequency requirements, noting that most government datasets only update quarterly or annually, with approximately five datasets updating monthly. 
+-   *\[Prof. Kam clarified that best practices for nowcasting require monthly data updates.*
+-   Based on data availability constraints, Fangyu suggested Network analysis as a more feasible research direction. 
+
+***2 Procurement Data Analysis Opportunities***
+
+-   Cathy proposed that government procurement data could support multiple analysis approaches beyond Network analysis, including:  
+
+    -   Temporal analysis to identify trends and patterns over time 
+
+    -   Text analysis of tender descriptions for insights (including Word Cloud visualization) 
+
+***3 Text Analysis Approach***
+
+-   Fangyu proposed leveraging text analysis techniques specifically for Word Cloud visualisations of the procurement data. 
+
+**Team agreed with the proposals and will work on the following action items.** 
+
+***4 Action Items*** 
+
+-   Cathy will start developing a comprehensive storyboard for the Network analysis module. 
+-   Fangyu will begin text analysis implementation and create an initial prototype. 

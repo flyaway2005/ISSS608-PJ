@@ -1,0 +1,13 @@
+name: shinyapp
+title: shinyapp
+username: fangyuchang
+account: fangyuchang
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 14384173
+bundleId: 10041395
+url: https://fangyuchang.shinyapps.io/shinyapp/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: GeBIZPapp_template/GeBiz_app.R|GeBIZPapp_template/module2_tempo/market_analysis.R|LDA.qmd|output/tender_lda_labeled.csv|output/tender_lda_labeled_all.csv|TenderClassification_Combine1.R|TenderClassification_Combine10.R|TenderClassification_Combine12.R|TenderClassification_Combine13.R|TenderClassification_Combine2.R|TenderClassification_Combine3.R|TenderClassification_Combine4.R|TenderClassification_Combine9.R|TenderClassification_LDA_app.R|TenderClassification_LDA_app_2.R|TenderClassification_LDA_app_3.R|TenderClassification_LDAClustering_app_3.R|unsupervised.R

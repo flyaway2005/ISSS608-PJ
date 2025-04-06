@@ -1,0 +1,130 @@
+---
+title: "Data Preprocessing for Procurement Trends Module"
+author: "Cathy Chu"
+date-modified: "last-modified" 
+execute:
+  echo: true 
+  eval: true 
+  warning: false 
+  freeze: true  
+---
+
+## Overview
+
+This document outlines the data preprocessing steps for the Procurement Trends module. The process involves cleaning and transforming government procurement data from GeBIZ, with a focus on temporal patterns and trends in government spending and tender awards.
+
+## Data Dictionary
+
+### Temporal Variables
+- `award_date`: Date of tender award (format: YYYY-MM-DD)
+- `award_year`: Year of award (numeric)
+- `month`: Month of award (01-12)
+- `year_month`: Year and month in YYYY-MM format
+- `quarter`: Quarter of the year (Q1-Q4)
+
+### Key Metrics
+- `awarded_amt`: Amount awarded in the tender
+- `agency`: Government agency name
+- `supplier_name`: Supplier company name
+
+## Data Import and Exploration
+
+### Load packages
+```{r}
+pacman::p_load(dplyr, lubridate, readr, knitr)
+``` 
+
+### Import Data
+```{r}
+GeBiz_csv <- read_csv("../data/GovernmentProcurementviaGeBIZ.csv")
+```
+
+### Dataset Overview
+```{r}
+glimpse(GeBiz_csv)
+```
+
+### Temporal Coverage Analysis
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+# Check date range
+date_range <- GeBiz_csv %>%
+  mutate(award_date = as.Date(award_date, format = "%d/%m/%Y")) %>%
+  summarise(
+    min_date = min(award_date, na.rm = TRUE),
+    max_date = max(award_date, na.rm = TRUE),
+    total_days = as.numeric(max_date - min_date)
+  )
+kable(date_range)
+
+# Check monthly distribution
+monthly_counts <- GeBiz_csv %>%
+  mutate(
+    award_date = as.Date(award_date, format = "%d/%m/%Y"),
+    year_month = format(award_date, "%Y-%m")
+  ) %>%
+  count(year_month) %>%
+  arrange(year_month)
+kable(head(monthly_counts, 5))
+```
+
+## Data Processing
+
+### Data Cleaning
+
+Before analysis, we conducted exploratory data analysis to determine data quality and temporal coverage.
+
+Our analysis revealed that some entries have "unknown" listed as the supplier_name with zero values in awarded_amt. These represent tenders that failed to receive a successful bid. We will exclude these entries from our analysis.
+
+During data wrangling, we will:
+
+-   Convert dates to proper date type format
+-   Filter out entries with no awarded tenders
+-   Add columns for Year, Month, and Quarter to facilitate temporal analysis
+-   Handle any missing values in key fields
+
+### Data Wrangling
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+#filter out Unknown value (no tender awarded)
+GeBiz_full <- GeBiz_csv %>%
+  filter(supplier_name != "Unknown")
+
+# Convert dates
+GeBiz_full$award_date <- as.Date(GeBiz_full$award_date, , format = "%d/%m/%Y")
+
+# Remove white space if have.
+GeBiz_full$agency <- trimws(GeBiz_full$agency)
+GeBiz_full$supplier_name <- trimws(GeBiz_full$supplier_name)
+
+# Handle any missing values
+GeBiz_full <- GeBiz_full[!is.na(GeBiz_full$agency) & !is.na(GeBiz_full$supplier_name), ]
+
+# Add year and month columns for time-based filtering
+GeBiz_addtime <- GeBiz_full %>%
+  mutate(award_year = format(award_date, "%Y"),
+         month = format(award_date, "%m"),
+         year_month = format(award_date, "%Y-%m"),
+         quarter = quarters(award_date))
+```
+
+```{r}
+kable(head(GeBiz_addtime))
+```
+
+
+::::: goals
+::: goals-header
+Note
+:::
+
+::: goals-container
+-   The data now has 17,855 rows and 11 columns. Less rows from the original dataset because the unknown entries have been removed.
+-   Temporal variables have been added to facilitate trend analysis.
+-   The data is now ready for temporal analysis and visualization.
+:::
+:::::
+
+
